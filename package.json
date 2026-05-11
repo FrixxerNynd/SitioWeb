@@ -1,0 +1,11 @@
+{
+  "name": "back_sitioweb",
+  "version": "1.0.0",
+  "description": "Backend para sitio web del catalogo",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC"
+}
