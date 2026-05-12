@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "back_cabs", "back_cabs.csproj", "{616DFB75-C6F7-4B58-83A4-AEEDB31DA9CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{616DFB75-C6F7-4B58-83A4-AEEDB31DA9CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{616DFB75-C6F7-4B58-83A4-AEEDB31DA9CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{616DFB75-C6F7-4B58-83A4-AEEDB31DA9CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{616DFB75-C6F7-4B58-83A4-AEEDB31DA9CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {15AA4552-85D5-49C1-967D-91BD85A80620}
+	EndGlobalSection
+EndGlobal
