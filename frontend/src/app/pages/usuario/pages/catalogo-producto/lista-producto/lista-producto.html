@@ -1,0 +1,201 @@
+<ui-navbar-component></ui-navbar-component>
+
+<div class="mt-4">
+    <!-- Header-->
+    <div class="text-start ">
+        <h2 class="fw-bold text-dark mb-2">Catálogo de productos</h2>
+    </div>
+
+    <!-- Opciones de filtros-->
+    <div class="container-fluid mt-3">
+        <div class="row g-3 align-items-end">
+            <!-- Filtro por categoría -->
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Categoría</label>
+                <select class="form-select">
+                    <option selected>Todas las categorías</option>
+                    <option>Computadoras</option>
+                    <option>Laptops</option>
+                    <option>Monitores</option>
+                    <option>Teclados</option>
+                    <option>Mouses</option>
+                    <option>Componentes</option>
+                </select>
+            </div>
+
+            <!-- Filtro por precio -->
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Precio</label>
+                <select class="form-select">
+                    <option selected>Cualquier precio</option>
+                    <option>Menor a $500</option>
+                    <option>$500 - $1000</option>
+                    <option>$1000 - $2000</option>
+                    <option>Mayor a $2000</option>
+                </select>
+            </div>
+
+            <!-- Filtro por marca -->
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Marca</label>
+                <select class="form-select">
+                    <option selected>Todas las marcas</option>
+                    <option>ASUS</option>
+                    <option>HP</option>
+                    <option>Lenovo</option>
+                    <option>Dell</option>
+                    <option>Logitech</option>
+                    <option>Samsung</option>
+                </select>
+            </div>
+
+            <!-- Botón de búsqueda -->
+            <div class="col-md-3">
+                <button class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtro de ordenamiento -->
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Ordenar por</label>
+                <select class="form-select">
+                    <option>Relevancia</option>
+                    <option>Precio: menor a mayor</option>
+                    <option>Precio: mayor a menor</option>
+                    <option>Nombre: A - Z</option>
+                    <option>Nombre: Z - A</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de productos -->
+    <div class="container-fluid mt-4">
+        <div class="row g-4">
+            <!-- Producto 1 -->
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Producto">
+                    <div class="card-body">
+                        <h5 class="card-title">Laptop Gaming ASUS</h5>
+                        <p class="card-text text-muted">Intel Core i7, 16GB RAM, 512GB SSD</p>
+                        <p class="card-text fw-bold text-primary fs-4">$1,299.99</p>
+                        <button class="btn btn-outline-primary w-100">Agregar al carrito</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Producto 2 -->
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Producto">
+                    <div class="card-body">
+                        <h5 class="card-title">Monitor 24" Samsung</h5>
+                        <p class="card-text text-muted">Full HD, 75Hz, Panel IPS</p>
+                        <p class="card-text fw-bold text-primary fs-4">$199.99</p>
+                        <button class="btn btn-outline-primary w-100">Agregar al carrito</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Producto 3 -->
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Producto">
+                    <div class="card-body">
+                        <h5 class="card-title">Teclado Mecánico Logitech</h5>
+                        <p class="card-text text-muted">Switch Blue, RGB, Aluminio</p>
+                        <p class="card-text fw-bold text-primary fs-4">$89.99</p>
+                        <button class="btn btn-outline-primary w-100">Agregar al carrito</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Producto 4 -->
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Producto">
+                    <div class="card-body">
+                        <h5 class="card-title">Mouse Gamer Razer</h5>
+                        <p class="card-text text-muted">Sensor óptico, 16000 DPI, RGB</p>
+                        <p class="card-text fw-bold text-primary fs-4">$49.99</p>
+                        <button class="btn btn-outline-primary w-100">Agregar al carrito</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Producto 5 -->
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Producto">
+                    <div class="card-body">
+                        <h5 class="card-title">PC Desktop HP</h5>
+                        <p class="card-text text-muted">Intel i5, 8GB RAM, 1TB HDD</p>
+                        <p class="card-text fw-bold text-primary fs-4">$699.99</p>
+                        <button class="btn btn-outline-primary w-100">Agregar al carrito</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Producto 6 -->
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Producto">
+                    <div class="card-body">
+                        <h5 class="card-title">Auriculares HyperX</h5>
+                        <p class="card-text text-muted">Sonido 7.1, Micrófono desmontable</p>
+                        <p class="card-text fw-bold text-primary fs-4">$79.99</p>
+                        <button class="btn btn-outline-primary w-100">Agregar al carrito</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Producto 7 -->
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Producto">
+                    <div class="card-body">
+                        <h5 class="card-title">SSD 1TB Kingston</h5>
+                        <p class="card-text text-muted">NVMe M.2, Lectura 3500MB/s</p>
+                        <p class="card-text fw-bold text-primary fs-4">$129.99</p>
+                        <button class="btn btn-outline-primary w-100">Agregar al carrito</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Producto 8 -->
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Producto">
+                    <div class="card-body">
+                        <h5 class="card-title">Webcam Logitech C920</h5>
+                        <p class="card-text text-muted">1080p, Enfoque automático, Micrófono estéreo</p>
+                        <p class="card-text fw-bold text-primary fs-4">$89.99</p>
+                        <button class="btn btn-outline-primary w-100">Agregar al carrito</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paginación -->
+        <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Navegación de páginas">
+                <ul class="pagination">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
