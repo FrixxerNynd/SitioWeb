@@ -45,13 +45,13 @@
                     <!-- Campo: Correo Electrónico (label afuera) -->
                     <div class="mb-4">
                         <label for="emailInput" class="form-label fw-semibold mb-2">
-                            Correo Electrónico
+                            Correo Electrónico o RFC
                         </label>
                         <input type="email" 
                                class="form-control form-control-lg" 
                                id="emailInput"
                                formControlName="email"
-                               placeholder="nombre@ejemplo.com">
+                               placeholder="nombre@ejemplo.com / XXXXXXXXXXX">
                         <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"
                             class="invalid-feedback d-block">
                             Correo requerido o formato inválido
@@ -84,6 +84,7 @@
 
                     <!-- Botón de envío -->
                     <button type="submit" 
+                            routerLink="/catalogo-producto"
                             class="btn btn-lg w-100 fw-semibold py-2 mb-4"
                             style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
                                 border: none;
