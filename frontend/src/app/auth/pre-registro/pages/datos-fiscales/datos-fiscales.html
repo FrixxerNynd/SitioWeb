@@ -56,7 +56,7 @@
                 <!-- Encabezado del formulario -->
                 <div class="text-start mb-4">
                     <h2 class="h1 fw-bold text-dark mb-2">Crear pre-registro</h2>
-                    <p class="fs-5 fw-semibold text-secondary">Ingresa tus datos fiscales.</p>
+                    <p class="fs-5 fw-semibold text-secondary">Ingresa tu RFC.</p>
                 </div>
                 
                 <!-- Formulario Reactivo de Angular -->
@@ -74,22 +74,6 @@
                         <div *ngIf="loginForm.get('rfc')?.touched && loginForm.get('rfc')?.invalid"
                             class="invalid-feedback d-block">
                             RFC requerido o formato inválido
-                        </div>
-                    </div>
-
-                    <!-- Campo: Subir constancia fiscal -->
-                    <div class="mb-4">
-                        <label for="constanciaInput" class="form-label fw-semibold mb-2">
-                            Subir tu constancia fiscal <span class="text-danger">*</span>
-                        </label>
-                        <input type="file" 
-                               class="form-control form-control-lg" 
-                               id="constanciaInput"
-                               formControlName="constancia"
-                               accept=".pdf,.jpg,.png">
-                        <div *ngIf="loginForm.get('constancia')?.touched && loginForm.get('constancia')?.invalid"
-                            class="invalid-feedback d-block">
-                            La constancia fiscal es requerida
                         </div>
                     </div>
 
