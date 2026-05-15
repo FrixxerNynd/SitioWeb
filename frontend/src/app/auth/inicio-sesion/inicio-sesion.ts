@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';  
 
 @Component({
-  imports: [],
+  imports: [ReactiveFormsModule, RouterModule],  
   templateUrl: './inicio-sesion.html',
 })
 export class PageInicioSesion {
