@@ -1,0 +1,30 @@
+<nav class="navbar bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand">
+            <img src="logo-completo.svg" alt="Logo CABS Computación" width="200" height="200"
+                class="d-inline-block align-text-top">
+        </a>
+        
+        <div class="d-flex justify-content-center align-items-center">
+            <a class="nav-link me-3" routerLink="/catalogo-producto/lista-producto">Catálogo de Productos</a>
+            <a class="nav-link" routerLink="/catalogo-producto/detalles-producto">Mis órdenes</a>
+        </div>
+        
+        <!-- Contenedor del avatar del usuario -->
+        <div class="d-flex align-items-center">
+            <div class="dropdown">
+                <button class="btn btn-link dropdown-toggle d-flex align-items-center" type="button" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    <div styles=" white: 40px; height: 40; background: #red;">
+                    </div>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#">Mi perfil</a></li>
+                    <li><a class="dropdown-item" href="#">Configuración</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#">Cerrar sesión</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
