@@ -40,19 +40,18 @@
                             }
                         </div>
                         @if(categoriaDesplegable()){
-                            <div class="filtro-card-body">
-                                @for (cat of categories(); track cat.id) {
-                                    <div class="filtro-item ">
-                                        <input class="form-check-input cursor-pointer" type="checkbox"
-                                            [id]="'categoria_' + cat.id" 
-                                            [checked]="selectedCategories()[cat.id]"
-                                            (change)="toggleCategory(cat.id, $event)">
-                                        <label class="form-check-label filtro-label" [for]="'categoria_' + cat.id">
-                                            {{ cat.nombre }}
-                                        </label>
-                                    </div>
-                                }
+                        <div class="filtro-card-body">
+                            @for (cat of categories(); track cat.id) {
+                            <div class="filtro-item ">
+                                <input class="form-check-input cursor-pointer" type="checkbox"
+                                    [id]="'categoria_' + cat.id" [checked]="selectedCategories()[cat.id]"
+                                    (change)="toggleCategory(cat.id, $event)">
+                                <label class="form-check-label filtro-label" [for]="'categoria_' + cat.id">
+                                    {{ cat.nombre }}
+                                </label>
                             </div>
+                            }
+                        </div>
                         }
                     </div>
                     <!-- Filtro por Marcas -->
@@ -80,14 +79,14 @@
                         @if(marcaDesplegable()){
                         <div class="filtro-card-body">
                             @for (brand of brands(); track brand.id) {
-                                <div class="filtro-item">
-                                    <input class="form-check-input cursor-pointer" type="checkbox"
-                                        [id]="'marca_' + brand.id" [checked]="selectedBrands()[brand.id]"
-                                        (change)="toggleBrand(brand.id, $event)">
-                                    <label class="form-check-label filtro-label" [for]="'marca_' + brand.id">
-                                        {{ brand.nombre }}
-                                    </label>
-                                </div>
+                            <div class="filtro-item">
+                                <input class="form-check-input cursor-pointer" type="checkbox"
+                                    [id]="'marca_' + brand.id" [checked]="selectedBrands()[brand.id]"
+                                    (change)="toggleBrand(brand.id, $event)">
+                                <label class="form-check-label filtro-label" [for]="'marca_' + brand.id">
+                                    {{ brand.nombre }}
+                                </label>
+                            </div>
                             }
                         </div>
                         }
@@ -114,60 +113,53 @@
                             </svg>
                             }
                         </div>
-@if (precioDesplegable()) {
-    <div class="filtro-card-body">
-        <!-- Inputs de valores -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-6">
-                <div class="input-group">
-                    <span class="input-group-text">$</span>
-                    <input type="number" 
-                        class="form-control" 
-                        placeholder="Mínimo"
-                        [(ngModel)]="precioMinimo"
-                        (input)="actualizarRangoMinimo()"
-                        min="0">
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="input-group">
-                    <span class="input-group-text">$</span>
-                    <input type="number" 
-                        class="form-control" 
-                        placeholder="Máximo"
-                        [(ngModel)]="precioMaximo"
-                        (input)="actualizarRangoMaximo()"
-                        min="0">
-                </div>
-            </div>
-        </div>
+                        @if (precioDesplegable()) {
+                        <div class="filtro-card-body">
+                            <!-- Inputs de valores -->
+                            <div class="row g-2 mb-4">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" placeholder="Mínimo"
+                                            [(ngModel)]="precioMinimo" (input)="actualizarRangoMinimo()" min="0">
+                                    </div>
+                                </div>
 
-        <!-- Double Range Slider con dos bolas -->
-        <div class="double-range-container">
-            <div class="slider-track"></div>
-            <input type="range" 
-                class="double-range-input min-range" 
-                [min]="rangoMinimoAbsoluto"
-                [max]="rangoMaximoAbsoluto"
-                [(ngModel)]="precioMinimo"
-                (input)="actualizarRangoMinimo()">
-            <input type="range" 
-                class="double-range-input max-range" 
-                [min]="rangoMinimoAbsoluto"
-                [max]="rangoMaximoAbsoluto"
-                [(ngModel)]="precioMaximo"
-                (input)="actualizarRangoMaximo()">
-        </div>
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" placeholder="Máximo"
+                                            [(ngModel)]="precioMaximo" (input)="actualizarRangoMaximo()" min="0">
+                                    </div>
+                                </div>
+                            </div>
 
-        <!-- Valores mostrados -->
-        <div class="d-flex justify-content-between mt-3">
-            <span class="small text-muted">${{ precioMinimo  }}</span>
-            <span class="small text-muted">${{ precioMaximo  }}</span>
-        </div>
-    </div>
-}
-                    </div>                    
+                            <!-- Double Range Slider con dos bolas -->
+                            <div class="double-range-container">
+                                <div class="slider-track"></div>
+                                <input type="range" class="double-range-input min-range" [min]="rangoMinimoAbsoluto"
+                                    [max]="rangoMaximoAbsoluto" [(ngModel)]="precioMinimo"
+                                    (input)="actualizarRangoMinimo()">
+                                <input type="range" class="double-range-input max-range" [min]="rangoMinimoAbsoluto"
+                                    [max]="rangoMaximoAbsoluto" [(ngModel)]="precioMaximo"
+                                    (input)="actualizarRangoMaximo()">
+                            </div>
 
+                            <!-- Valores mostrados -->
+                            <div class="d-flex justify-content-between mt-3">
+                                <span class="small text-muted">${{ precioMinimo }}</span>
+                                <span class="small text-muted">${{ precioMaximo }}</span>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    <!--Filtro para ver stock vacios -->
+                    <div class="filtro-card-body">
+                        <div class="filtro-item">
+                            <input class="form-check-input cursor-pointer" type="checkbox" id="sinStock">
+                            <label class="form-check-label filtro-label" for="sinStock">
+                                Mostrar productos sin stock
+                            </label>
+                        </div>
+                    </div>
                     <!-- Botones de acción -->
                     <div class="d-flex gap-3 mt-4">
                         <button class="btn btn-primary btn-lg flex-grow-1 transition-hover" onclick="aplicarFiltros()">
