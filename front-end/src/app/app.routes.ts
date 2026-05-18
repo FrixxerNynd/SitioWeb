@@ -7,6 +7,8 @@ import { PageCuenta } from './auth/pre-registro/pages/cuenta/cuenta';
 import { PageSolicitarCorreo } from './auth/recuperar-contraseña/pages/solicitar-correo/solicitar-correo';
 import { PageVerificarCodigo } from './auth/recuperar-contraseña/pages/verificar-codigo/verificar-codigo';
 import { PageNuevaContrasena } from './auth/recuperar-contraseña/pages/nueva-contrasena/nueva-contrasena';
+import { PageListaProducto } from './pages/usuario/pages/catalogo-producto/lista-producto/lista-producto';
+import { PageDetalleProducto } from './pages/usuario/pages/catalogo-producto/detalle-producto/detalle-producto';
 
 export const routes: Routes = [
     {
@@ -32,4 +34,12 @@ export const routes: Routes = [
             { path: '', redirectTo: 'solicitar-correo', pathMatch: 'full' }
         ]
     },
+    {
+        path: 'catalogo-producto',
+        children: [
+            { path: 'lista-producto', component: PageListaProducto },
+            { path: 'detalles-producto', component: PageDetalleProducto },
+            { path: '', redirectTo: 'lista-producto', pathMatch: 'full' }
+        ]
+    } 
 ];
