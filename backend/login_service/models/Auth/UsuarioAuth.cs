@@ -100,7 +100,7 @@ namespace back_cabs.CRM.models.Auth
         [Required]
         [StringLength(30)]
         [Column("rol")]
-        public string Rol { get; set; } = string.Empty;
+        public string Rol { get; set; } = "SUBADMIN"; // Valor por defecto
 
         /// <summary>
         /// Indica si el usuario está activo en el sistema

@@ -1,4 +1,7 @@
 using back_cabs.CRM.DTOs.Legacy;
+using back_cabs.CRM.DTOs.ServiceResponse;
+using back_cabs.CRM.models.legacy;
+using CRM.DTOs.Request;
 
 namespace back_cabs.CRM.Interfaces.Legacy
 {
@@ -16,5 +19,15 @@ namespace back_cabs.CRM.Interfaces.Legacy
         /// Obtener cliente por ID con domicilio
         /// </summary>
         Task<AdmClienteConDomicilioResponseDto?> GetByIdAsync(int idCliente, bool incluirDetalleUbicacion = true);
+
+        ///<summary>
+        /// Registrar un cliente nuevo
+        /// </summary>
+        Task<ServiceResult<AdmClienteConDomicilioResponseDto>> RegistrarAsync(UserClientRequestDto clientData);
+
+        /// <summary>
+        /// Validar correo y contraseñas de un cliente para login (soporte legacy)
+        /// </summary>
+        Task<AdmCliente?> ValidateCredentialsAsync(string email, string contrasena);
     }
 }

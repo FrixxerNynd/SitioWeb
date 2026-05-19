@@ -30,6 +30,7 @@ using back_cabs.services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using back_cabs.CRM.DTOs.ServiceResponse;
+using back_cabs.CRM.Interfaces.Legacy;
 
 namespace back_cabs.CRM.services.Auth
 {
@@ -39,6 +40,7 @@ namespace back_cabs.CRM.services.Auth
     public class UsuarioAuthService
     {
         private readonly IUsuarioAuthRepository _usuarioRepository;
+        private readonly IAdmClienteService _admClienteService;
         private readonly WriteContext? _writeContext;
         private readonly ReadOnlyContext? _readContext;
         private readonly IServicioJwt _servicioJwt;
@@ -47,6 +49,7 @@ namespace back_cabs.CRM.services.Auth
 
         public UsuarioAuthService(
             IUsuarioAuthRepository usuarioRepository,
+            IAdmClienteService admClienteService,
             WriteContext? writeContext,
             ReadOnlyContext? readContext,
             IServicioJwt servicioJwt,
@@ -54,6 +57,7 @@ namespace back_cabs.CRM.services.Auth
             UsuarioRegistroValidator? validator)
         {
             _usuarioRepository = usuarioRepository ?? throw new ArgumentNullException(nameof(usuarioRepository));
+            _admClienteService = admClienteService ?? throw new ArgumentNullException(nameof(admClienteService));
             _writeContext = writeContext; // Nullable for unit testing
             _readContext = readContext;   // Nullable for unit testing
             _servicioJwt = servicioJwt ?? throw new ArgumentNullException(nameof(servicioJwt));
@@ -102,6 +106,16 @@ namespace back_cabs.CRM.services.Auth
                 _logger.LogDebug("Hash de contraseña generado para usuario: {Email}", request.Email);
 
                 // PASO 4: CREAR ENTIDAD DE USUARIO
+
+                //Paso 4.1: Obtener el cliente asociado para el usuario
+                var cliente = await _admClienteService.GetByIdAsync(request.IdCliente);
+                if (cliente == null)
+                {
+                    _logger.LogWarning("No se encontró el cliente con ID: {IdCliente} para el registro de usuario: {Email}",
+                        request.IdCliente, request.Email);
+                    throw new InvalidOperationException($"No se encontró el cliente con ID: {request.IdCliente}");
+                }
+                
                 var nuevoUsuario = new UsuarioAuth
                 {
                     // Id se genera automáticamente por IDENTITY en la base de datos
@@ -112,7 +126,9 @@ namespace back_cabs.CRM.services.Auth
                     Password = contrasenaHash, // Guardar el hash en password_hash
                     Activo = request.Activo ?? false, // Si no se envía, por defecto false
                     CreadoEn = DateTime.UtcNow,
-                    ActualizadoEn = DateTime.UtcNow
+                    ActualizadoEn = DateTime.UtcNow,
+                    IdAgenteLegacy = cliente.Id, // Asociar con el cliente registrado
+                    CodigoAgenteLegacy = cliente.CodigoCliente
                 };
 
                 // PASO 5: GUARDAR EN BASE DE DATOS
@@ -242,8 +258,25 @@ namespace back_cabs.CRM.services.Auth
                 // If repository returned a user, credentials were validated
                 if (usuario == null)
                 {
-                    _logger.LogWarning($"Credenciales inválidas o usuario no encontrado: {email}");
-                    return null;
+                    _logger.LogInformation("Usuario no encontrado en sistema interno, verificando acceso como cliente legacy.");
+                    // Intentar validar como cliente legacy
+                    var clienteLegacy = await _admClienteService.ValidateCredentialsAsync(email, contrasena);
+                    if (clienteLegacy == null)
+                    {
+                        _logger.LogWarning("Credenciales inválidas para usuario: {Email}", email);
+                        return null;
+                    }
+                    usuario = new UsuarioAuth
+                    {
+                        Id = clienteLegacy.CIdClienteProveedor,
+                        Nombre = clienteLegacy.CRazonSocial,
+                        Apellido = "", // No hay campo de apellido en cliente legacy, se puede ajustar según necesidad
+                        Email = clienteLegacy.CEmail1,
+                        Rol = "CLIENTE_LEGACY",
+                        IdAgenteLegacy = clienteLegacy.CIdClienteProveedor,
+                    };
+                    _logger.LogInformation($"Credenciales válidas para cliente legacy: {email}");
+                    return usuario;
                 }
                 _logger.LogInformation($"Credenciales válidas para usuario: {email}");
                 return usuario;

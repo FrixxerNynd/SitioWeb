@@ -2,7 +2,10 @@ using back_cabs.CRM.contexts;
 using back_cabs.CRM.DTOs.Legacy;
 using back_cabs.CRM.Interfaces.Legacy;
 using back_cabs.CRM.models.legacy;
+using CRM.DTOs.Request;
 using Microsoft.EntityFrameworkCore;
+using back_cabs.CRM.DTOs.ServiceResponse;
+using Microsoft.OpenApi.Any;
 
 namespace back_cabs.CRM.services.Legacy
 {
@@ -30,6 +33,84 @@ namespace back_cabs.CRM.services.Legacy
             _context = context;
             _logger = logger;
             _cacheService = cacheService;
+        }
+
+        /// <summary>
+        /// Registro de clientes nuevos con domicilio
+        /// </summary>
+        public async Task<ServiceResult<AdmClienteConDomicilioResponseDto>> RegistrarAsync(UserClientRequestDto clientData)
+        {
+            //Validar existencia de RFC o email para evitar duplicados
+            var existeRfc = await _context.AdmClientes
+                .AsNoTracking()
+                .AnyAsync(c => c.CRfc == clientData.RFC);
+            if (existeRfc)
+            {
+                
+                _logger.LogWarning("Intento de registro con RFC duplicado: {RFC}", clientData.RFC);
+            }
+            
+
+            var nuevoCliente = new AdmCliente
+            {
+                CCodigoCliente = clientData.RFC, // Usamos RFC como código cliente para garantizar unicidad
+                CRazonSocial = $"{clientData.Nombre} {clientData.ApellidoPaterno} {clientData.ApellidoMaterno}".Trim(),
+                CRfc = clientData.RFC,
+                CCurp = clientData.CURP,
+                CBanVentaCredito = 1, // Asumimos que el nuevo cliente puede tener crédito
+                CEmail1 = clientData.Email,
+                CEmail2 = clientData.Email2,
+                CEmail3 = clientData.Email3,
+                CTipoCliente = 1, // Asumimos tipo cliente
+                CEstatus = 0, // Inactivo hasta que se apruebe
+                CTextoExtra1 = clientData.Contraseña,
+                CTextoExtra2 = "Cliente registrado desde sitio web",
+                CWhatsapp = clientData.Telefono,
+
+                //Fechas
+                CFechaAlta = DateTime.Now,
+                CFechaBaja = new DateTime(1899, 12, 30),
+                CFechaExtra = DateTime.Now,
+                CFechaUltimaRevision = DateTime.Now,
+            };
+            var clienteInsertado = await _repository.InsertAsync(nuevoCliente);
+
+            _logger.LogInformation("Nuevo cliente registrado con ID {IdCliente} y RFC {RFC}", clienteInsertado.CIdClienteProveedor, nuevoCliente.CRfc);
+
+            // Crear domicilio predeterminado para el cliente
+            var nuevoDomicilio = new AdmDomicilio
+            {
+                CIdCatalogo = clienteInsertado.CIdClienteProveedor,
+                CTipoCatalogo = 1, // Cliente
+                CTipoDireccion = 1,
+                CNombreCalle = clientData.UbicacionDetalle.Calle,
+                CNumeroExterior = clientData.UbicacionDetalle.NumeroExterior,
+                CNumeroInterior = clientData.UbicacionDetalle.NumeroInterior,
+                CColonia = clientData.UbicacionDetalle.Colonia,
+                CCodigoPostal = clientData.UbicacionDetalle.CodigoPostal,
+                CCiudad = clientData.UbicacionDetalle.Ciudad,
+                CMunicipio = clientData.UbicacionDetalle.Municipio,
+                CEstado = clientData.UbicacionDetalle.Estado,
+                CPais = clientData.UbicacionDetalle.Pais,
+
+                //Datos de contacto del domicilio
+                CTelefono1 = clientData.UbicacionDetalle.Telefono1,
+                CTelefono2 = clientData.UbicacionDetalle.Telefono2,
+                CTelefono3 = clientData.UbicacionDetalle.TelefonoCompleto,
+                CTelefono4 = clientData.Telefono, // También guardamos el teléfono principal del cliente
+
+                
+            };
+            var domicilioInsertado = await _repository.InsertDomicilioAsync(nuevoDomicilio);
+
+            _logger.LogInformation("Nuevo domicilio registrado con ID {IdDomicilio}", domicilioInsertado.CIdDireccion);
+
+            return new ServiceResult<AdmClienteConDomicilioResponseDto> 
+            {
+                Success = true,
+                Message = "Cliente registrado exitosamente",
+                Data = MapToDto(clienteInsertado, domicilioInsertado, true)
+            };
         }
 
         /// <summary>
@@ -109,6 +190,19 @@ namespace back_cabs.CRM.services.Legacy
             }
         }
 
+        public async Task<AdmCliente?> ValidateCredentialsAsync(string email, string contrasena)
+        {
+            // Validar en el repositorio de clientes para soporte legacy
+            var cliente = await _repository.ValidateCredentialsAsync(email, contrasena);
+            if (cliente == null)
+            {
+                _logger.LogWarning("⚠️ Credenciales inválidas para email: {Email}", email);
+                return null;
+            }
+
+            _logger.LogInformation("✅ Credenciales válidas para cliente ID: {IdCliente}, Email: {Email}", cliente.CIdClienteProveedor, email);
+            return cliente;
+        }
         /// <summary>
         /// Cargar domicilios para una lista de clientes (evitando OPENJSON con foreach)
         /// </summary>
@@ -227,6 +321,8 @@ namespace back_cabs.CRM.services.Legacy
 
             return dto;
         }
+
+
 
         /// <summary>
         /// Obtener primer teléfono disponible

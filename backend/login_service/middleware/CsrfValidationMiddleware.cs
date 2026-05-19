@@ -45,6 +45,7 @@ namespace back_cabs.CRM.middleware
         {
             "/api/auth/login",           // Login inicial no tiene token
             "/api/auth/registro",        // Registro no requiere token
+            "/api/auth/registro-cliente",
             "/api/auth/csrf-token",      // Endpoint para obtener token
             "/api/auth/refresh",         // Refresh token tampoco requiere validación
             "/api/GastoViaticos",        // Viáticos (temporal durante desarrollo)

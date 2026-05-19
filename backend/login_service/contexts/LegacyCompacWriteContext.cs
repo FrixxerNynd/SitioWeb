@@ -46,6 +46,18 @@ namespace back_cabs.CRM.contexts
         public DbSet<AdmAgente> AdmAgentes { get; set; }
 
         /// <summary>
+        /// Tabla admClientes del sistema legacy
+        /// Contiene el catálogo completo de clientes y proveedores
+        /// </summary>
+        public DbSet<AdmCliente> AdmClientes { get; set; }
+
+        /// <summary>
+        /// Tabla admDomicilios del sistema legacy
+        /// Contiene domicilios asociados a clientes/proveedores (relacionados por CIdCatalogo)
+        /// </summary>
+        public DbSet<AdmDomicilio> AdmDomicilios { get; set; }
+
+        /// <summary>
         /// Tabla admMonedas del sistema legacy
         /// Catálogo de monedas (MXN, USD, EUR, etc.)
         /// </summary>
@@ -281,6 +293,28 @@ namespace back_cabs.CRM.contexts
                     .HasColumnName("CSCAGENTE3")
                     .HasColumnType("varchar(50)")
                     .IsRequired();
+            });
+
+            modelBuilder.Entity<AdmCliente>(entity =>
+            {
+                entity.ToTable("admClientes", "dbo");
+                entity.HasKey(e => e.CIdClienteProveedor);
+
+                entity.Property(e => e.CFechaAlta)
+                    .HasColumnName("CFECHAALTA")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.CFechaBaja)
+                    .HasColumnName("CFECHABAJA")
+                    .HasColumnType("datetime"); 
+
+                entity.Property(e => e.CFechaUltimaRevision)
+                    .HasColumnName("CFECHAULTIMAREVISION")
+                    .HasColumnType("datetime");
+                
+                entity.Property(e => e.CFechaExtra)
+                    .HasColumnName("CFECHAEXTRA")
+                    .HasColumnType("datetime");
             });
 
             // ═══════════════════════════════════════════════════════════════

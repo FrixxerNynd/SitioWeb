@@ -24,6 +24,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using back_cabs.CRM.DTOs.Legacy;
 using back_cabs.CRM.Core.Validation;
 
 namespace CRM.DTOs.Request
@@ -94,6 +95,13 @@ namespace CRM.DTOs.Request
         /// <example>true</example>
         [JsonPropertyName("activo")]
         public bool? Activo { get; set; } = true;
+
+        /// <summary>
+        /// ID Cliente (OBLIGATORIO para crear usuarios en el sitio web, se asignará al cliente registrado)
+        /// </summary>
+        [Required(ErrorMessage = "El ID del cliente es obligatorio para usuarios registrados desde el sitio web")]
+        [JsonPropertyName("idCliente")]
+        public int IdCliente { get; set; }
     }
     /// <summary>
     /// DTO para solicitud de registro de nuevo usuario
@@ -190,4 +198,22 @@ namespace CRM.DTOs.Request
         [JsonPropertyName("confirmarNuevaContrasena")]
         public string ConfirmarNuevaContrasena { get; set; } = string.Empty;
     }
+
+    public class UserClientRequestDto
+    {
+        public string Contraseña { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
+        public string ApellidoPaterno { get; set; } = string.Empty;
+        public string ApellidoMaterno { get; set; } = string.Empty;
+        public string RFC { get; set; } = string.Empty;
+        public string CURP { get; set; } = string.Empty;
+        public string Telefono { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Email2 { get; set; } = string.Empty;
+        public string Email3 { get; set; } = string.Empty;
+        public string Ubicacion { get; set; } = string.Empty;
+        public string Estado { get; set; } = string.Empty;
+        public UbicacionDetalleDto? UbicacionDetalle { get; set; }
+    }
+
 }

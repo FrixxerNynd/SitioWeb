@@ -23,6 +23,7 @@
 using CRM.DTOs.Request;
 using CRM.DTOs.Response;
 using back_cabs.CRM.services.Auth;
+using back_cabs.CRM.Interfaces.Legacy;
 using back_cabs.CRM.models.Auth;
 using back_cabs.CRM.models;
 using back_cabs.CRM.Middleware;
@@ -49,6 +50,7 @@ namespace back_cabs.CRM.controllers.Auth
     public class AuthController : ControllerBase
     {
         private readonly UsuarioAuthService _usuarioAuthService;
+        private readonly IAdmClienteService _admClienteService;
         private readonly ILogger<AuthController> _logger;
         private readonly IConfiguration _configuration;
         private readonly IAntiforgery _antiforgery;
@@ -60,15 +62,79 @@ namespace back_cabs.CRM.controllers.Auth
             ILogger<AuthController> logger,
             IConfiguration configuration,
             IAntiforgery antiforgery,
-            EmailService emailService)
+            EmailService emailService,
+            IAdmClienteService admClienteService)
         {
             _usuarioAuthService = usuarioAuthService ?? throw new ArgumentNullException(nameof(usuarioAuthService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _antiforgery = antiforgery ?? throw new ArgumentNullException(nameof(antiforgery));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService)); // <-- Y aquí
+            _admClienteService = admClienteService ?? throw new ArgumentNullException(nameof(admClienteService));
 
         }
+        ///<summary>
+        /// Registrar un nuevo cliente en el sistema
+        /// </summary>
+        /// <param name="request"> Datos del cliente</param>
+        /// <returns> Mensaje con solicitud enviada</returns>
+        [HttpPost("registro-cliente")]
+        [ProducesResponseType(typeof(IActionResult), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> RegistrarCliente([FromBody] UserClientRequestDto request)
+        {
+            try
+            {
+                _logger.LogInformation("Iniciando registro de cliente para email: {Email}", request?.Email);
+                // Validación básica del request
+                if (request == null)
+                {
+                    _logger.LogWarning("Request de registro recibido como null");
+                    return BadRequest(UtilidadesManejoErrores.CreateErrorResponse(
+                        TipoError.ErrorValidacion,
+                        "Los datos del cliente son requeridos",
+                        "Request body cannot be null"));
+                }
+
+                //Procesar el registro
+                var resultado = await _admClienteService.RegistrarAsync(request);
+                if (!resultado.Success)
+                {
+                    _logger.LogWarning("Error al registrar cliente: {Mensaje}", resultado.Message);
+                    return BadRequest(UtilidadesManejoErrores.CreateErrorResponse(
+                        TipoError.ErrorValidacion,
+                        "Error al registrar cliente",
+                        resultado.Message));
+                }
+                _logger.LogInformation("Cliente registrado exitosamente: {Nombre} - {Email}",
+                    request.Nombre, request.Email);
+                // Enviar email de confirmación (opcional)
+                // await _emailService.EnviarEmailAsync(request.Email, "Registro exitoso", $"Hola {request.Nombre}, tu registro como cliente ha sido exitoso.");
+
+                // Retornar respuesta exitosa con código 201 Created
+                return StatusCode(201, new
+                {
+                    success = true,
+                    message = "Cliente registrado exitosamente, en espera de aceptacion"
+                });
+            }
+            catch (FluentValidation.ValidationException ex)
+            {
+                _logger.LogWarning("Errores de validación en registro de cliente: {Errores}",
+                    string.Join(", ", ex.Errors.Select(e => e.ErrorMessage)));
+                // Crear respuesta estructurada con errores de validación
+                var erroresValidacion = ex.Errors
+                    .GroupBy(e => e.PropertyName)
+                    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+
+                return BadRequest(UtilidadesManejoErrores.CreateErrorResponse(
+                    TipoError.ErrorValidacion,
+                    "Errores de validación en los datos proporcionados",
+                    System.Text.Json.JsonSerializer.Serialize(erroresValidacion)));
+            }
+        }
+
 
         /// <summary>
         /// Registra un nuevo usuario en el sistema
@@ -246,6 +312,7 @@ namespace back_cabs.CRM.controllers.Auth
                     Id = usuario.Id.ToString(),
                     Email = usuario.Email,
                     Name = usuario.NombreCompleto,
+                    Role = usuario.Rol,
                     IdAgenteLegacy = usuario.IdAgenteLegacy
                 };
                 var tokens = GenerateTokens(user);

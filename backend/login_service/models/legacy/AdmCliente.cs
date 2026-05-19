@@ -429,6 +429,9 @@ namespace back_cabs.CRM.models.legacy
         [StringLength(15)]
         public string CWhatsapp { get; set; } = string.Empty;
 
+        [Column("CCODIGOALTERNO")]
+        [StringLength(60)]
+        public string CCodigoAlterno { get; set; } = string.Empty;
         // Relación con domicilios
         public virtual ICollection<AdmDomicilio> Domicilios { get; set; } = new List<AdmDomicilio>();
     }
