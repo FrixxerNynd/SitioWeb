@@ -1,6 +1,6 @@
-// front-end/src/app/services/excel-norte-catalogo.service.ts
+// front-end/src/app/services/exel-api-base.service.ts
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -25,7 +25,7 @@ export interface IProduct {
     subcategoria_nombre: string;
     categoria_id: string;
     categoria_nombre: string;
-    imagen_url?: string;  // 👈 Campo para la imagen
+    imagen_url?: string;
 }
 
 export interface IImagenProducto {
@@ -180,7 +180,7 @@ export class Subcategory {
 }
 
 // ============================================
-// SERVICIO UNIFICADO CON IMÁGENES
+// SERVICIO CON AUTENTICACIÓN
 // ============================================
 
 @Injectable({
@@ -189,20 +189,31 @@ export class Subcategory {
 export class ExcelNorteCatalogoService {
     private http = inject(HttpClient);
     private baseUrl = environment.apiExcelUrl;
+    private apiKey = environment.Authorization;
 
-    // Cache de imágenes para evitar múltiples llamadas
     private imagenesCache = new Map<string, string>();
 
-    // ============================================
-    // MÉTODOS PRIVADOS - HTTP
-    // ============================================
-
+    // Método con headers de autenticación
     private async get<T>(endpoint: string): Promise<T> {
         const url = `${this.baseUrl}/${endpoint}`;
         console.log(`🌐 GET: ${url}`);
-
+        
+        const token = localStorage.getItem('token');
+        
+        let headers = new HttpHeaders({
+            'Content-Type': 'application/json'
+        });
+        
+        if (token) {
+            headers = headers.set('Authorization', `Bearer ${token}`);
+            console.log('🔑 Usando token de autenticación');
+        } else if (this.apiKey) {
+            headers = headers.set('Authorization', this.apiKey);
+            console.log('🔑 Usando API key del environment');
+        }
+        
         try {
-            const response = await firstValueFrom(this.http.get<T>(url));
+            const response = await firstValueFrom(this.http.get<T>(url, { headers }));
             return response;
         } catch (error) {
             console.error(`❌ Error en ${url}:`, error);
@@ -210,15 +221,8 @@ export class ExcelNorteCatalogoService {
         }
     }
 
-    // ============================================
-    // IMÁGENES DE PRODUCTOS
-    // ============================================
-
-    /**
-     * Obtiene las imágenes de un producto específico
-     * @param productId ID del producto
-     * @returns Array de URLs de imágenes
-     */
+    // ========== MÉTODOS DE IMÁGENES ==========
+    
     async getImagenesProducto(productId: string): Promise<IImagenProducto[]> {
         try {
             const data = await this.get<IApiResponse<IImagenProducto[]>>(`imagenes/${productId}`);
@@ -233,13 +237,7 @@ export class ExcelNorteCatalogoService {
         }
     }
 
-    /**
-     * Obtiene la URL de la imagen principal de un producto
-     * @param productId ID del producto
-     * @returns URL de la imagen principal o null
-     */
     async getImagenPrincipal(productId: string): Promise<string | null> {
-        // Verificar caché primero
         if (this.imagenesCache.has(productId)) {
             return this.imagenesCache.get(productId) || null;
         }
@@ -247,7 +245,7 @@ export class ExcelNorteCatalogoService {
         try {
             const imagenes = await this.getImagenesProducto(productId);
             const imagenPrincipal = imagenes.find(img => img.principal === true) || imagenes[0];
-
+            
             if (imagenPrincipal) {
                 this.imagenesCache.set(productId, imagenPrincipal.url);
                 return imagenPrincipal.url;
@@ -259,65 +257,35 @@ export class ExcelNorteCatalogoService {
         }
     }
 
-    /**
-     * Enriquece una lista de productos con sus imágenes principales
-     * @param products Lista de productos
-     * @returns Lista de productos con imagen_url
-     */
-    async enrichProductsWithImages(products: IProduct[]): Promise<IProduct[]> {
-        const productsWithImages = await Promise.all(
-            products.map(async (product) => {
-                const imagenUrl = await this.getImagenPrincipal(product.id);
-                return {
-                    ...product,
-                    imagen_url: imagenUrl || undefined
-                };
-            })
-        );
-        return productsWithImages;
-    }
-
-    // ============================================
-    // PRODUCTOS (con imágenes)
-    // ============================================
-
-    // front-end/src/app/services/exel-api-base.service.ts
-    // Reemplaza el método getProducts con este:
-
-    // front-end/src/app/services/exel-api-base.service.ts
-
-    async getProducts(filters?: {
-        categoria?: string;
-        subcategoria?: string;
-        marca?: string;
-        sin_stock?: boolean;
-    }): Promise<IProduct[]> {
+    // ========== PRODUCTOS ==========
+    
+    async getProducts(): Promise<IProduct[]> {
         try {
-            // Obtener las imágenes directamente (este endpoint sí funciona)
             const imagenesData = await this.get<any>('imagenes');
-
+            
             if (!imagenesData?.DATA || imagenesData.DATA.length === 0) {
                 console.warn('⚠️ No se encontraron imágenes');
                 return [];
             }
-
+            
             console.log(`✅ ${imagenesData.DATA.length} productos obtenidos desde 'imagenes'`);
-
-            // Transformar los datos de imágenes en productos
+            
             const products: IProduct[] = imagenesData.DATA.map((item: any) => {
-                // Extraer marca del SKU o referencia
                 const marcaInfo = this.extraerMarcaInfo(item.referencia, item.sku);
-
+                const precioAleatorio = Math.floor(Math.random() * 4900) + 100;
+                const stockAleatorio = Math.floor(Math.random() * 50);
+                const tieneOferta = Math.random() > 0.7;
+                
                 return {
                     id: item.referencia,
                     referencia: item.referencia,
                     sku: item.sku,
                     nombre: this.generarNombreProducto(item.sku, item.referencia),
-                    stock: Math.floor(Math.random() * 50).toString(), // Temporal: generar stock aleatorio
-                    precio: this.generarPrecioAleatorio(), // Temporal: precio aleatorio
-                    precio_oferta: null,
+                    stock: stockAleatorio.toString(),
+                    precio: precioAleatorio.toString(),
+                    precio_oferta: tieneOferta ? (precioAleatorio * 0.8).toString() : null,
                     precio_sin_oferta: "0",
-                    oferta: false,
+                    oferta: tieneOferta,
                     moneda: "MXN",
                     marca_id: marcaInfo.id,
                     marca_nombre: marcaInfo.nombre,
@@ -329,21 +297,40 @@ export class ExcelNorteCatalogoService {
                     imagen_url: item.imagenes && item.imagenes.length > 0 ? item.imagenes[0] : undefined
                 };
             });
-
+            
             return products;
-
+            
         } catch (error) {
             console.error('Error fetching products:', error);
             return [];
         }
     }
 
-    // Métodos auxiliares
+    async getProductById(id: string): Promise<IProduct | null> {
+        try {
+            const allProducts = await this.getProducts();
+            const product = allProducts.find(p => p.id === id || p.referencia === id);
+            
+            if (product) {
+                console.log(`✅ Producto encontrado: ${product.referencia}`);
+                return product;
+            }
+            
+            console.warn(`⚠️ Producto no encontrado: ${id}`);
+            return null;
+            
+        } catch (error) {
+            console.error(`Error fetching product ${id}:`, error);
+            return null;
+        }
+    }
+
+    // ========== MÉTODOS AUXILIARES ==========
+    
     private extraerMarcaInfo(referencia: string, sku: string): { id: string; nombre: string } {
-        // Intentar extraer del SKU o referencia
         const match = (referencia || sku).match(/^([A-Za-z0-9]+)/);
         const codigo = match ? match[1] : 'GEN';
-
+        
         const marcas: Record<string, { id: string; nombre: string }> = {
             '3M': { id: '3M', nombre: '3M' },
             '3MP': { id: '3MP', nombre: '3M' },
@@ -379,56 +366,37 @@ export class ExcelNorteCatalogoService {
             'XEC': { id: 'XEC', nombre: 'Xerox' },
             'ZEP': { id: 'ZEP', nombre: 'Zebra' }
         };
-
+        
         return marcas[codigo] || { id: 'GEN', nombre: 'General' };
     }
 
     private generarNombreProducto(sku: string, referencia: string): string {
-        // Si el SKU es legible, usarlo como nombre
         if (sku && sku.length > 0 && sku !== referencia) {
             return `Producto ${sku}`;
         }
         return `Producto ${referencia}`;
     }
 
-    private generarPrecioAleatorio(): string {
-        // Generar precio entre 100 y 5000 pesos
-        const precio = Math.floor(Math.random() * 4900) + 100;
-        return precio.toString();
-    }
-
-    async getProductById(id: string): Promise<IProduct | null> {
-        try {
-            // Obtener todos los productos y buscar por ID
-            const allProducts = await this.getProducts();
-            const product = allProducts.find(p => p.id === id || p.referencia === id);
-
-            if (product) {
-                console.log(`✅ Producto encontrado: ${product.referencia}`);
-                return product;
-            }
-
-            console.warn(`⚠️ Producto no encontrado: ${id}`);
-            return null;
-
-        } catch (error) {
-            console.error(`Error fetching product ${id}:`, error);
-            return null;
-        }
-    }
-
-
-    // ============================================
-    // MARCAS
-    // ============================================
-
+    // ========== MARCAS ==========
+    
     async getAllBrands(): Promise<Brand[]> {
         try {
-            const data = await this.get<IApiResponse<IBrand[]>>('marcas');
-            if (data?.resultado && data.datos) {
-                console.log(`✅ ${data.datos.length} marcas obtenidas`);
-                return data.datos.map(brand => new Brand(brand));
+            const response = await this.get<any>('marcas');
+            
+            console.log('📦 Respuesta de marcas:', response);
+            
+            if (response && response.resultado === true && response.datos && Array.isArray(response.datos)) {
+                console.log(`✅ ${response.datos.length} marcas obtenidas`);
+                
+                return response.datos.map((brand: any) => new Brand({
+                    id: brand.id,
+                    nombre: brand.nombre,
+                    logo_url: brand.logo_url,
+                    descripcion: brand.descripcion
+                }));
             }
+            
+            console.warn('⚠️ No se encontraron marcas en la respuesta');
             return [];
         } catch (error) {
             console.error('Error fetching brands:', error);
@@ -441,39 +409,56 @@ export class ExcelNorteCatalogoService {
         return brands.find(b => b.id === id) || null;
     }
 
-    // ============================================
-    // CATEGORÍAS
-    // ============================================
+    // ========== CATEGORÍAS ==========
+    
+// front-end/src/app/services/exel-api-base.service.ts
 
-    async getAllCategories(): Promise<Category[]> {
-        try {
-            const data = await this.get<IApiResponse<ICategory[]>>('categorias');
-            if (data?.resultado && data.datos) {
-                console.log(`✅ ${data.datos.length} categorías obtenidas`);
-                return data.datos.map(cat => new Category(cat));
-            }
-            return [];
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-            return [];
+async getAllCategories(): Promise<Category[]> {
+    try {
+        const response = await this.get<any>('categorias');
+        
+        console.log('📦 Respuesta de categorías:', response);
+        
+        // Verificar la estructura de la respuesta
+        if (response && response.resultado === true && response.datos && Array.isArray(response.datos)) {
+            console.log(`✅ ${response.datos.length} categorías obtenidas`);
+            
+            // Mostrar primeras 5 categorías para debug
+            console.log('📋 Ejemplo de categorías:', response.datos.slice(0, 5));
+            
+            return response.datos.map((cat: any) => new Category({
+                id_categoria: cat.id,
+                nombre_categoria: cat.nombre
+            }));
         }
+        
+        console.warn('⚠️ No se encontraron categorías en la respuesta');
+        return [];
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        return [];
     }
+}
 
     async getCategoryById(id: string): Promise<Category | null> {
         const categories = await this.getAllCategories();
         return categories.find(c => c.id === id) || null;
     }
 
-    // ============================================
-    // SUBCATEGORÍAS
-    // ============================================
-
+    // ========== SUBCATEGORÍAS ==========
+    
     async getAllSubcategories(): Promise<Subcategory[]> {
         try {
-            const data = await this.get<IApiResponse<ISubcategory[]>>('subcategorias');
-            if (data?.resultado && data.datos) {
-                console.log(`✅ ${data.datos.length} subcategorías obtenidas`);
-                return data.datos.map(sub => new Subcategory(sub));
+            const response = await this.get<any>('subcategorias');
+            
+            if (response && response.resultado === true && response.datos && Array.isArray(response.datos)) {
+                console.log(`✅ ${response.datos.length} subcategorías obtenidas`);
+                return response.datos.map((sub: any) => new Subcategory({
+                    id_subcategoria: sub.id,
+                    nombre_subcategoria: sub.nombre,
+                    id_categoria: sub.id_categoria,
+                    nombre_categoria: sub.nombre_categoria
+                }));
             }
             return [];
         } catch (error) {
@@ -492,34 +477,38 @@ export class ExcelNorteCatalogoService {
         return subcategories.find(sub => sub.id === id) || null;
     }
 
-    // ============================================
-    // MÉTODOS UTILITARIOS
-    // ============================================
-
+    // ========== MÉTODOS UTILITARIOS ==========
+    
     async loadAllCatalogs(): Promise<{
         brands: Brand[];
         categories: Category[];
         subcategories: Subcategory[];
     }> {
-        const [brands, categories, subcategories] = await Promise.all([
-            this.getAllBrands(),
-            this.getAllCategories(),
-            this.getAllSubcategories()
-        ]);
-
-        console.log('✅ Catálogos cargados:', {
-            marcas: brands.length,
-            categorias: categories.length,
-            subcategorias: subcategories.length
-        });
-
-        return { brands, categories, subcategories };
+        try {
+            const [brands, categories, subcategories] = await Promise.all([
+                this.getAllBrands(),
+                this.getAllCategories(),
+                this.getAllSubcategories()
+            ]);
+            
+            console.log('✅ Catálogos cargados:', {
+                marcas: brands.length,
+                categorias: categories.length,
+                subcategorias: subcategories.length
+            });
+            
+            return { brands, categories, subcategories };
+            
+        } catch (error) {
+            console.error('Error loading catalogs:', error);
+            return { brands: [], categories: [], subcategories: [] };
+        }
     }
 
     async getPriceRange(): Promise<{ min: number; max: number }> {
         const products = await this.getProducts();
         if (products.length === 0) return { min: 0, max: 100000 };
-
+        
         const prices = products.map(p => parseFloat(p.precio)).filter(p => !isNaN(p));
         return {
             min: Math.min(...prices),
@@ -529,15 +518,15 @@ export class ExcelNorteCatalogoService {
 
     formatPrice(price: number | string): string {
         const num = typeof price === 'string' ? parseFloat(price) : price;
+        if (isNaN(num)) return '$0.00';
+        
         return new Intl.NumberFormat('es-MX', {
             style: 'currency',
-            currency: 'MXN'
+            currency: 'MXN',
+            minimumFractionDigits: 2
         }).format(num);
     }
 
-    /**
-     * Limpia la caché de imágenes
-     */
     clearImageCache(): void {
         this.imagenesCache.clear();
         console.log('🗑️ Caché de imágenes limpiada');

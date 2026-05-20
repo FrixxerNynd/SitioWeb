@@ -73,7 +73,7 @@
                 </div>
 
                 <!-- Filtro por rango de precios -->
-                <div class="filtro-card">
+                <div class="filtro-card mb-3">
                     <div class="filtro-card-header" (click)="togglePrecio()">
                         Rango de precios
                         <svg class="cursor-pointer" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -116,15 +116,22 @@
                     </div>
                     }
                 </div>
+                <!-- Mostrar productos sin stock -->
+                <div class="filtro-item">
+                    <input class="form-check-input cursor-pointer" type="checkbox">
+                    <label class="form-check-label filtro-label text-wrap">
+                        Mostrar productos sin stock
+                    </label>
+                </div>
 
                 <!-- Botones de acción -->
                 <div class="d-flex gap-2 mt-4">
-                    <button class="btn btn-primary flex-grow-1" (click)="aplicarFiltros()">
-                        Aplicar ({{ totalResultados() }})
+                    <button class="btn btn-gradient flex-grow-1" (click)="aplicarFiltros()">
+                        Aplicar filtro
                     </button>
-                    <button class="btn btn-outline-secondary flex-grow-1" (click)="limpiarFiltros()"
+                    <button class="btn bt-secundarioñ flex-grow-1" (click)="limpiarFiltros()"
                         [disabled]="!hasTempFilters()">
-                        Limpiar
+                        Limpiar filtro 
                     </button>
                 </div>
             </div>
@@ -132,7 +139,7 @@
             <!-- Contenedor derecho (75%) - PRODUCTOS -->
             <div class="col-12 col-md-9 col-lg-9 p-3" style="background: #f8f9fa;">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <span class="fw-bold mb-0">
+                    <span class="fw-bold mb-0" style="color: oklch(44.2% 0.017 285.786)">
                         Mostrando {{ getRangoInicio() }}-{{ getRangoFin() }} de {{totalResultados()}} resultados
                     </span>
                     <span class="badge bg-primary fs-6 px-3 py-2">
