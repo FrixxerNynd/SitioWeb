@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    apiKey: '', 
-    apiUrl: '/api/exel'  
+    apiExcelUrl: '/api-exel',  // Proxy en producción
+    apiCabsUrl: '/api'          // Proxy en producción
 };
