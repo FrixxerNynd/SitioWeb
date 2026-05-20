@@ -1,312 +1,278 @@
-<body class="bg-light">
-    <div class="container-fluid">
-        <div class="container">
-            <!-- Título principal arriba a la izquierda -->
+<!-- front-end/src/app/pages/usuario/pages/catalogo-producto/lista-producto/lista-producto.html -->
+<div class="container-fluid bg-lith">
+    <div class="container">
+        <!-- Título principal -->
+        <div class="d-flex align-items-center mb-3 mt-3">
             <h2 class="titulo-catalogo">Catálogo de productos</h2>
+        </div>
 
-            <!-- Layout padre con dos columnas usando grid de Bootstrap -->
-            <div class="row g-0 bg-white shadow-lg overflow-hidden">
+        <!-- Layout padre con dos columnas -->
+        <div class="row g-0 bg-white overflow-hidden rounded-4">
 
-                <!-- Contenedor izquierdo (25%) -->
-                <div class="col-12 col-md-3 col-lg-3 bg-light">
-                    <!-- Header de filtros -->
-                    <div class="d-flex justify-content-between align-items-center px-3 py-3">
-                        <h5 class="fw-bold mb-0">
-                            Opciones de filtros
-                        </h5>
-                    </div>
-                    <hr class="mt-0 mb-0">
-
-                    <!-- Filtro por categorias -->
-                    <div class="filtro-card">
-                        <div class="filtro-card-header">
-                            Por Categorías
+            <!-- Contenedor izquierdo (25%) - FILTROS -->
+            <div class="col-12 col-md-3 col-lg-3 bg-light p-3 ">
+                <h5 class="fw-bold mb-3">Opciones de filtros</h5>
+                <hr>
+                <!-- Filtro por categorías -->
+                <div class="filtro-card">
+                    <div class="filtro-card-header" (click)="toggleCategoria()">
+                        Categorías
+                        <svg class="cursor-pointer" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                             @if (categoriaDesplegable()) {
-                            <!-- Chevron UP (flechita arriba) - cuando está expandido -->
-                            <svg (click)="toggleCategoria()" class="cursor-pointer" xmlns="http://www.w3.org/2000/svg"
-                                width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z"
-                                    clip-rule="evenodd" />
-                            </svg>
+                            <path fill-rule="evenodd"
+                                d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z" />
                             } @else {
-                            <!-- Chevron DOWN (flechita abajo) - cuando está colapsado -->
-                            <svg (click)="toggleCategoria()" class="cursor-pointer" xmlns="http://www.w3.org/2000/svg"
-                                width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-                                    clip-rule="evenodd" />
-                            </svg>
+                            <path fill-rule="evenodd"
+                                d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" />
                             }
-                        </div>
-                        @if(categoriaDesplegable()){
-                        <div class="filtro-card-body">
-                            @for (cat of categories(); track cat.id) {
-                            <div class="filtro-item ">
-                                <input class="form-check-input cursor-pointer" type="checkbox"
-                                    [id]="'categoria_' + cat.id" [checked]="selectedCategories()[cat.id]"
-                                    (change)="toggleCategory(cat.id, $event)">
-                                <label class="form-check-label filtro-label" [for]="'categoria_' + cat.id">
-                                    {{ cat.nombre }}
-                                </label>
-                            </div>
-                            }
-                        </div>
-                        }
+                        </svg>
                     </div>
-                    <!-- Filtro por Marcas -->
-                    <div class="filtro-card">
-                        <div class="filtro-card-header">
-                            Por Marcas
-                            @if (marcaDesplegable()) {
-                            <!-- Chevron UP (flechita arriba) - cuando está expandido -->
-                            <svg (click)="toggleMarca()" class="cursor-pointer" xmlns="http://www.w3.org/2000/svg"
-                                width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            } @else {
-                            <!-- Chevron DOWN (flechita abajo) - cuando está colapsado -->
-                            <svg (click)="toggleMarca()" class="cursor-pointer" xmlns="http://www.w3.org/2000/svg"
-                                width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            }
-                        </div>
-                        @if(marcaDesplegable()){
-                        <div class="filtro-card-body">
-                            @for (brand of brands(); track brand.id) {
-                            <div class="filtro-item">
-                                <input class="form-check-input cursor-pointer" type="checkbox"
-                                    [id]="'marca_' + brand.id" [checked]="selectedBrands()[brand.id]"
-                                    (change)="toggleBrand(brand.id, $event)">
-                                <label class="form-check-label filtro-label" [for]="'marca_' + brand.id">
-                                    {{ brand.nombre }}
-                                </label>
-                            </div>
-                            }
-                        </div>
-                        }
-                    </div>
-                    <!-- Filtro por rango de precios -->
-                    <div class="filtro-card">
-                        <div class="filtro-card-header">
-                            Rango de precios
-                            @if (precioDesplegable()) {
-                            <!-- Chevron UP (flechita arriba) - cuando está expandido -->
-                            <svg (click)="togglePrecio()" class="cursor-pointer" xmlns="http://www.w3.org/2000/svg"
-                                width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            } @else {
-                            <!-- Chevron DOWN (flechita abajo) - cuando está colapsado -->
-                            <svg (click)="togglePrecio()" class="cursor-pointer" xmlns="http://www.w3.org/2000/svg"
-                                width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            }
-                        </div>
-                        @if (precioDesplegable()) {
-                        <div class="filtro-card-body">
-                            <!-- Inputs de valores -->
-                            <div class="row g-2 mb-4">
-                                <div class="col-md-6">
-                                    <div class="input-group">
-                                        <input type="number" class="form-control" placeholder="Mínimo"
-                                            [(ngModel)]="precioMinimo" (input)="actualizarRangoMinimo()" min="0">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="input-group">
-                                        <input type="number" class="form-control" placeholder="Máximo"
-                                            [(ngModel)]="precioMaximo" (input)="actualizarRangoMaximo()" min="0">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Double Range Slider con dos bolas -->
-                            <div class="double-range-container">
-                                <div class="slider-track"></div>
-                                <input type="range" class="double-range-input min-range" [min]="rangoMinimoAbsoluto"
-                                    [max]="rangoMaximoAbsoluto" [(ngModel)]="precioMinimo"
-                                    (input)="actualizarRangoMinimo()">
-                                <input type="range" class="double-range-input max-range" [min]="rangoMinimoAbsoluto"
-                                    [max]="rangoMaximoAbsoluto" [(ngModel)]="precioMaximo"
-                                    (input)="actualizarRangoMaximo()">
-                            </div>
-
-                            <!-- Valores mostrados -->
-                            <div class="d-flex justify-content-between mt-3">
-                                <span class="small text-muted">${{ precioMinimo }}</span>
-                                <span class="small text-muted">${{ precioMaximo }}</span>
-                            </div>
-                        </div>
-                        }
-                    </div>
-                    <!--Filtro para ver stock vacios -->
+                    @if (categoriaDesplegable()) {
                     <div class="filtro-card-body">
+                        @for (cat of categories(); track cat.id) {
                         <div class="filtro-item">
-                            <input class="form-check-input cursor-pointer" type="checkbox" id="sinStock">
-                            <label class="form-check-label filtro-label" for="sinStock">
-                                Mostrar productos sin stock
+                            <input class="form-check-input cursor-pointer" type="checkbox" [id]="'categoria_' + cat.id"
+                                [checked]="isCategorySelected(cat.id)" (change)="toggleCategory(cat.id)">
+                            <label class="form-check-label filtro-label" [for]="'categoria_' + cat.id"
+                                title="{{ cat.nombre }}">
+                                {{ cat.nombre }}
                             </label>
                         </div>
+                        }
                     </div>
-                    <!-- Botones de acción -->
-                    <div class="d-flex gap-3 mt-4">
-                        <button class="btn btn-primary btn-lg flex-grow-1 transition-hover" onclick="aplicarFiltros()">
-                            <i class="bi bi-search"></i> Aplicar Filtro
-                        </button>
-                        <button class="btn btn-outline-secondary btn-lg flex-grow-1 transition-hover"
-                            onclick="limpiarCheckboxes()">
-                            <i class="bi bi-eraser"></i> Limpiar
-                        </button>
-                    </div>
-
-                    <!-- Filtros seleccionados -->
-                    <div class="alert alert-info mt-4" id="alertFiltros" style="display: none;">
-                        <h6 class="alert-heading">
-                            <i class="bi bi-check-circle-fill"></i> Filtros seleccionados:
-                        </h6>
-                        <hr>
-                        <div id="filtrosSeleccionadosTexto"></div>
-                    </div>
+                    }
                 </div>
 
-                <!-- Contenedor derecho (75%) con fondo rojo -->
-                <div class="col-12 col-md-9 col-lg-9 bg-red-custom p-4">
-                    <div class="d-flex justify-content-between align-items-center text-white mb-4">
-                        <h3 class="fw-bold mb-0">
-                            <i class="bi bi-grid-3x3-gap-fill"></i> Productos destacados
-                        </h3>
-                        <span class="badge bg-light text-dark fs-6 px-3 py-2">12 resultados</span>
+                <!-- Filtro por marcas -->
+                <div class="filtro-card">
+                    <div class="filtro-card-header" (click)="toggleMarca()">
+                        Marcas
+                        <svg class="cursor-pointer" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            @if (marcaDesplegable()) {
+                            <path fill-rule="evenodd"
+                                d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z" />
+                            } @else {
+                            <path fill-rule="evenodd"
+                                d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" />
+                            }
+                        </svg>
                     </div>
-
-                    <!-- Grid de productos -->
-                    <div class="row g-3">
-                        <div class="col-sm-6 col-lg-4">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-body">
-                                    <div class="bg-secondary bg-opacity-10 rounded-3 mb-3" style="height: 120px;"></div>
-                                    <h6 class="fw-bold mb-1">Producto 1</h6>
-                                    <p class="text-muted small mb-0">$49.990</p>
-                                </div>
-                            </div>
+                    @if (marcaDesplegable()) {
+                    <div class="filtro-card-body">
+                        @for (brand of brands(); track brand.id) {
+                        <div class="filtro-item">
+                            <input class="form-check-input cursor-pointer" type="checkbox" [id]="'marca_' + brand.id"
+                                [checked]="isBrandSelected(brand.id)" (change)="toggleBrand(brand.id)">
+                            <label class="form-check-label filtro-label text-wrap" [for]="'marca_' + brand.id">
+                                {{ brand.nombre }}
+                            </label>
                         </div>
-                        <div class="col-sm-6 col-lg-4">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-body">
-                                    <div class="bg-secondary bg-opacity-10 rounded-3 mb-3" style="height: 120px;"></div>
-                                    <h6 class="fw-bold mb-1">Producto 2</h6>
-                                    <p class="text-muted small mb-0">$79.990</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-lg-4">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-body">
-                                    <div class="bg-secondary bg-opacity-10 rounded-3 mb-3" style="height: 120px;"></div>
-                                    <h6 class="fw-bold mb-1">Producto 3</h6>
-                                    <p class="text-muted small mb-0">$39.990</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-lg-4">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-body">
-                                    <div class="bg-secondary bg-opacity-10 rounded-3 mb-3" style="height: 120px;"></div>
-                                    <h6 class="fw-bold mb-1">Producto 4</h6>
-                                    <p class="text-muted small mb-0">$59.990</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-lg-4">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-body">
-                                    <div class="bg-secondary bg-opacity-10 rounded-3 mb-3" style="height: 120px;"></div>
-                                    <h6 class="fw-bold mb-1">Producto 5</h6>
-                                    <p class="text-muted small mb-0">$89.990</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-lg-4">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-body">
-                                    <div class="bg-secondary bg-opacity-10 rounded-3 mb-3" style="height: 120px;"></div>
-                                    <h6 class="fw-bold mb-1">Producto 6</h6>
-                                    <p class="text-muted small mb-0">$29.990</p>
-                                </div>
-                            </div>
-                        </div>
+                        }
                     </div>
-
-                    <div class="text-center mt-5 text-white">
-                        <i class="bi bi-box-seam fs-1 opacity-50"></i>
-                        <p class="mt-3 mb-0 opacity-75">Contenedor con fondo rojo · Área de productos</p>
-                    </div>
+                    }
                 </div>
+
+                <!-- Filtro por rango de precios -->
+                <div class="filtro-card mb-3">
+                    <div class="filtro-card-header" (click)="togglePrecio()">
+                        Rango de precios
+                        <svg class="cursor-pointer" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            @if (precioDesplegable()) {
+                            <path fill-rule="evenodd"
+                                d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z" />
+                            } @else {
+                            <path fill-rule="evenodd"
+                                d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" />
+                            }
+                        </svg>
+                    </div>
+                    @if (precioDesplegable()) {
+                    <div class="filtro-card-body">
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <input type="number" class="form-control form-control-sm" placeholder="Mínimo"
+                                    [(ngModel)]="tempPrecioMinimo" (input)="actualizarRangoMinimo()">
+                            </div>
+                            <div class="col-6">
+                                <input type="number" class="form-control form-control-sm" placeholder="Máximo"
+                                    [(ngModel)]="tempPrecioMaximo" (input)="actualizarRangoMaximo()">
+                            </div>
+                        </div>
+
+                        <div class="double-range-container">
+                            <div class="slider-track"></div>
+                            <input type="range" class="double-range-input min-range" [min]="rangoMinimoAbsoluto"
+                                [max]="rangoMaximoAbsoluto" [(ngModel)]="tempPrecioMinimo"
+                                (input)="actualizarRangoMinimo()">
+                            <input type="range" class="double-range-input max-range" [min]="rangoMinimoAbsoluto"
+                                [max]="rangoMaximoAbsoluto" [(ngModel)]="tempPrecioMaximo"
+                                (input)="actualizarRangoMaximo()">
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-2">
+                            <small class="text-muted">{{ formatPrice(tempPrecioMinimo().toString()) }}</small>
+                            <small class="text-muted">{{ formatPrice(tempPrecioMaximo().toString()) }}</small>
+                        </div>
+                    </div>
+                    }
+                </div>
+                <!-- Mostrar productos sin stock -->
+                <div class="filtro-item">
+                    <input class="form-check-input cursor-pointer" type="checkbox">
+                    <label class="form-check-label filtro-label text-wrap">
+                        Mostrar productos sin stock
+                    </label>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="d-flex gap-2 mt-4">
+                    <button class="btn btn-gradient flex-grow-1" (click)="aplicarFiltros()">
+                        Aplicar filtro
+                    </button>
+                    <button class="btn bt-secundarioñ flex-grow-1" (click)="limpiarFiltros()"
+                        [disabled]="!hasTempFilters()">
+                        Limpiar filtro 
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenedor derecho (75%) - PRODUCTOS -->
+            <div class="col-12 col-md-9 col-lg-9 p-3" style="background: #f8f9fa;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="fw-bold mb-0" style="color: oklch(44.2% 0.017 285.786)">
+                        Mostrando {{ getRangoInicio() }}-{{ getRangoFin() }} de {{totalResultados()}} resultados
+                    </span>
+                    <span class="badge bg-primary fs-6 px-3 py-2">
+                    </span>
+                </div>
+
+                <!-- Loading State -->
+                @if (isLoading()) {
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Cargando productos...</p>
+                </div>
+                }
+
+                <!-- Grid de productos -->
+                @if (!isLoading()) {
+                <div class="row g-3 productos-grid">
+                    @for (product of paginatedProducts(); track product.id) {
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card border rounded-4 h-100 hover-card" style="overflow: hidden;">
+                            <!-- Imagen del producto -->
+                            <div class="bg-white d-flex align-items-center justify-content-center position-relative"
+                                style="height: 180px; overflow: hidden;">
+                                @if (product.imagen_url) {
+                                <img [src]="product.imagen_url" [alt]="product.nombre" class="img-fluid p-3"
+                                    style="max-height: 160px; object-fit: contain;">
+                                } @else {
+                                <i class="bi bi-image fs-1 text-secondary"></i>
+                                }
+                                @if (product.oferta) {
+                                <span class="badge bg-danger position-absolute top-0 end-0 m-2">Oferta</span>
+                                }
+                            </div>
+
+                            <div class="card-body">
+                                <!--Stock -->
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge" [class]="getStockClass(product.stock)">
+                                        Stock: {{ product.stock }}
+                                    </span>
+                                </div>
+
+                                <!-- Nombre del producto -->
+                                <h6 class="fw-bold mb-2" title="{{ product.nombre }}">
+                                    {{ product.nombre.length > 50 ? (product.nombre | slice:0:50) + '...' :
+                                    product.nombre }}
+                                </h6>
+
+                                <!-- Marca y categoría -->
+                                <p class="text-muted small mb-2">
+                                    {{ product.marca_nombre }} • {{ product.categoria_nombre }}
+                                </p>
+
+                                <!-- Precios: Precio original y precio con descuento -->
+                                <div class="mt-2">
+                                    @if (tieneOferta(product)) {
+                                    <!-- Precio tachado (original) -->
+                                    <span class="text-muted text-decoration-line-through small">
+                                        {{ formatPrice(product.precio) }}
+                                    </span>
+                                    <!-- Precio con descuento (destacado) -->
+                                    <h5 class="text-danger fw-bold d-inline-block ms-2">
+                                        {{ formatPrecioOferta(product) }}
+                                    </h5>
+                                    <span class="badge bg-success ms-2">
+                                        -{{ getPorcentajeDescuento(product) }}%
+                                    </span>
+                                    } @else {
+                                    <!-- Precio normal sin descuento -->
+                                    <h5 class="text-primary fw-bold">
+                                        {{ formatPrice(product.precio) }}
+                                    </h5>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="card-footer bg-transparent border-0 pb-3">
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-primary flex-grow-1 rounded-pill"
+                                        (click)="agregarAlCarrito(product)">
+                                        Agregar
+                                    </button>
+                                    <button class="btn btn-outline-secondary rounded-pill px-3"
+                                        [routerLink]="['/catalogo-producto/detalles-producto', product.id]">
+                                        Ver
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+
+                <!-- Paginación -->
+                @if (totalPagesCalculated() > 1) {
+                <nav class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" [class.disabled]="currentPage() === 1">
+                            <button class="page-link" (click)="prevPage()">Anterior</button>
+                        </li>
+
+                        @for (page of getPageNumbers(); track $index) {
+                        @if (page === -1) {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        } @else {
+                        <li class="page-item" [class.active]="currentPage() === page">
+                            <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                        </li>
+                        }
+                        }
+
+                        <li class="page-item" [class.disabled]="currentPage() === totalPagesCalculated()">
+                            <button class="page-link" (click)="nextPage()">Siguiente</button>
+                        </li>
+                    </ul>
+                </nav>
+                }
+
+                <!-- No results -->
+                @if (filteredProducts().length === 0 && !isLoading()) {
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                    <p class="mt-3 text-muted">No se encontraron productos con los filtros seleccionados</p>
+                    <button class="btn btn-primary" (click)="limpiarFiltros()">Limpiar filtros</button>
+                </div>
+                }
+                }
             </div>
         </div>
     </div>
-
-    <script>
-        function aplicarFiltros() {
-            actualizarResumenFiltros();
-            alert('✅ Filtros aplicados correctamente');
-        }
-
-        function limpiarCheckboxes() {
-            const checkboxes = document.querySelectorAll('.form-check-input');
-            checkboxes.forEach(cb => cb.checked = false);
-            const alertBox = document.getElementById('alertFiltros');
-            alertBox.style.display = 'none';
-        }
-
-        function actualizarResumenFiltros() {
-            const marcasSeleccionadas = [];
-            const catsSeleccionadas = [];
-
-            if (document.getElementById('marcaNike')?.checked) marcasSeleccionadas.push('Nike');
-            if (document.getElementById('marcaAdidas')?.checked) marcasSeleccionadas.push('Adidas');
-            if (document.getElementById('marcaPuma')?.checked) marcasSeleccionadas.push('Puma');
-            if (document.getElementById('catZapatillas')?.checked) catsSeleccionadas.push('Zapatillas');
-            if (document.getElementById('catRopa')?.checked) catsSeleccionadas.push('Ropa deportiva');
-            if (document.getElementById('catAccesorios')?.checked) catsSeleccionadas.push('Accesorios');
-
-            const alertDiv = document.getElementById('alertFiltros');
-            const textoDiv = document.getElementById('filtrosSeleccionadosTexto');
-
-            if (marcasSeleccionadas.length === 0 && catsSeleccionadas.length === 0) {
-                alertDiv.style.display = 'none';
-                return;
-            }
-
-            let html = '';
-            if (marcasSeleccionadas.length) {
-                html += `<div><strong>Marcas:</strong> ${marcasSeleccionadas.map(m => `<span class="badge bg-primary me-1">${m}</span>`).join('')}</div>`;
-            }
-            if (catsSeleccionadas.length) {
-                html += `<div class="mt-2"><strong>Categorías:</strong> ${catsSeleccionadas.map(c => `<span class="badge bg-success me-1">${c}</span>`).join('')}</div>`;
-            }
-            textoDiv.innerHTML = html;
-            alertDiv.style.display = 'block';
-        }
-
-        // Escuchar cambios en checkboxes
-        document.querySelectorAll('.form-check-input').forEach(cb => {
-            cb.addEventListener('change', actualizarResumenFiltros);
-        });
-
-        window.addEventListener('DOMContentLoaded', () => {
-            actualizarResumenFiltros();
-        });
-    </script>
-</body>
+</div>

@@ -1,14 +1,14 @@
 {
   "/api-exel": {
     "target": "https://api01.exeldelnorte.com.mx",
-    "secure": true,
+    "secure": false,
     "changeOrigin": true,
     "logLevel": "debug",
     "pathRewrite": {
       "^/api-exel": ""
     },
     "headers": {
-      "X-API-Ke": ""
+      "Authorization": "LLave_de_api"
     }
   }
 }
