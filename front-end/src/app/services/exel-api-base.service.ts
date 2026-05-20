@@ -1,13 +1,15 @@
-// frontend/src/app/services/exel-api-base.service.ts
+// front-end/src/app/services/exel-api-base.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ExelApiBaseService {
-    protected baseUrl = '/api-exel';
+    // Usar la URL de Excel Norte, no la de CABS
+    protected baseUrl = environment.apiExcelUrl;
 
     constructor(protected http: HttpClient) {}
 
@@ -17,7 +19,7 @@ export class ExelApiBaseService {
         
         try {
             const response = await firstValueFrom(this.http.get<T>(url));
-            console.log(`✅ Response received:`, response);
+            console.log(`✅ Response received`);
             return response;
         } catch (error) {
             console.error(`❌ Error fetching ${url}:`, error);

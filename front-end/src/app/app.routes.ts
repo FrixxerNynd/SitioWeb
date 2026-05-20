@@ -9,6 +9,7 @@ import { PageVerificarCodigo } from './auth/recuperar-contraseña/pages/verifica
 import { PageNuevaContrasena } from './auth/recuperar-contraseña/pages/nueva-contrasena/nueva-contrasena';
 import { PageListaProducto } from './pages/usuario/pages/catalogo-producto/lista-producto/lista-producto';
 import { PageDetalleProducto } from './pages/usuario/pages/catalogo-producto/detalle-producto/detalle-producto';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
     {
@@ -36,10 +37,14 @@ export const routes: Routes = [
     },
     {
         path: 'catalogo-producto',
+        canActivate: [AuthGuard], 
         children: [
             { path: 'lista-producto', component: PageListaProducto },
             { path: 'detalles-producto', component: PageDetalleProducto },
             { path: '', redirectTo: 'lista-producto', pathMatch: 'full' }
         ]
-    } 
+    },
+    // Redirección por defecto
+    { path: '', redirectTo: '/inicio-sesion', pathMatch: 'full' },
+    { path: '**', redirectTo: '/inicio-sesion' }
 ];

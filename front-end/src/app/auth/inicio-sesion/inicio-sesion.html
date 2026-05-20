@@ -4,24 +4,36 @@
     }
     .cursor-pointer {
         cursor: pointer;
-    }    
+    }
+    .btn-gradient {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
+        border: none;
+        color: white;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    .btn-gradient:disabled {
+        opacity: 0.7;
+        transform: none;
+        cursor: not-allowed;
+    }
 </style>
 
 <div class="container-fluid vh-100 bg-light p-2">
     <div class="row g-0 h-100">
         <!-- CONTENEDOR IZQUIERDO -->
-        <div
-            class="d-none d-lg-flex col-lg-6 rounded-4 gradient-bg align-items-between justify-content-between p-4 ">
+        <div class="d-none d-lg-flex col-lg-6 rounded-4 gradient-bg align-items-between justify-content-between p-4">
             <div class="w-100 d-flex flex-column justify-content-between">
-                <!-- Logo en la esquina superior izquierda -->
                 <div class="mb-4">
                     <div style="width: 80px; height: 80px;">
-                        <!-- Logo de empresa -->
-                         <img src="logo-cabs.svg" alt="Logo CABS Computación">
+                        <img src="logo-cabs.svg" alt="Logo CABS Computación">
                     </div>
                 </div>
-
-                <!-- Encabezado principal -->
                 <div class="w-100">
                     <h2 class="text-white fw-semibold">Accede de forma sencilla</h2>
                     <h2 class="text-white fw-semibold">al catálogo de productos de CABS Computación</h2>
@@ -29,36 +41,54 @@
             </div>
         </div>
 
-        <!-- CONTENEDOR DERECHO - FORMULARIO DE INICIO DE SESIÓN -->
+        <!-- CONTENEDOR DERECHO -->
         <div class="col-12 col-lg-6 d-flex align-items-center justify-content-center p-4 p-sm-5">
             <div class="w-100" style="max-width: 40.625rem;">
-                <!-- Encabezado del formulario -->
-                <div class="text-start mb-4">
+                <div class="text-start mb-3">
                     <h2 class="display-5 fw-bold text-dark mb-2">Iniciar Sesión</h2>
                     <p class="fs-5 fw-semibold text-secondary">
                         Ingresa tu correo y contraseña para poder <br> acceder al catálogo de productos.
                     </p>
                 </div>
-                
-                <!-- Formulario Reactivo de Angular -->
-                <form>
-                    <!-- Campo: Correo Electrónico (label afuera) -->
-                    <div class="mb-4">
+
+                <!-- Mensaje de error -->
+                @if(errorMessage()){
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        {{ errorMessage() }}
+                        <button type="button" class="btn-close" (click)="errorMessage.set(null)" aria-label="Close"></button>
+                    </div>
+                }
+
+                <!-- Formulario -->
+                <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                    <!-- Campo: Correo Electrónico o RFC -->
+                    <div class="mb-3">
                         <label for="emailInput" class="form-label fw-semibold mb-2">
                             Correo Electrónico o RFC
                         </label>
-                        <input type="email" 
+                        <input type="text" 
                                class="form-control form-control-lg" 
                                id="emailInput"
                                formControlName="email"
-                               placeholder="nombre@ejemplo.com / XXXXXXXXXXX">
-                        <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"
-                            class="invalid-feedback d-block">
-                            Correo requerido o formato inválido
-                        </div>
+                               [class.is-invalid]="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"
+                               placeholder="ejemplo@correo.com o XAXX010101XXX"
+                               autocomplete="email">
+                        
+                        <!-- Mensajes de error específicos -->
+                        @if(loginForm.get('email')?.touched && loginForm.get('email')?.invalid){
+                            <div class="invalid-feedback d-block">
+                                @if(loginForm.get('email')?.errors?.['required']) {
+                                    El correo o RFC es requerido
+                                }
+                                @if(loginForm.get('email')?.errors?.['invalidEmailOrRfc']) {
+                                    Ingresa un correo electrónico válido (ejemplo@correo.com) 
+                                    o un RFC (XAXX010101XXX)
+                                }
+                            </div>
+                        }
                     </div>
 
-                    <!-- Campo: Contraseña (label afuera) -->
+                    <!-- Campo: Contraseña -->
                     <div class="mb-1">
                         <label for="passwordInput" class="form-label fw-semibold mb-2">
                             Contraseña
@@ -67,39 +97,52 @@
                                class="form-control form-control-lg" 
                                id="passwordInput"
                                formControlName="password"
-                               placeholder="Tu contraseña">
-                        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
-                            class="invalid-feedback d-block">
-                            Mínimo 6 caracteres
-                        </div>
+                               [class.is-invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+                               placeholder="Tu contraseña (mínimo 6 caracteres)"
+                               autocomplete="current-password">
+                        
+                        <!-- Mensajes de error específicos -->
+                        @if(loginForm.get('password')?.touched && loginForm.get('password')?.invalid){
+                            <div class="invalid-feedback d-block">
+                                @if(loginForm.get('password')?.errors?.['required']) {
+                                    La contraseña es requerida
+                                }
+                                @if(loginForm.get('password')?.errors?.['minlength']) {
+                                    La contraseña debe tener al menos 6 caracteres
+                                }
+                            </div>
+                        }
                     </div>
 
                     <!-- Enlace para recuperar contraseña -->
-                    <div class="text-end mb-4">
+                    <div class="text-end mb-3 mt-3">
                         <a routerLink="/recuperar-contrasena/solicitar-correo"
-                            class="text-decoration text-primary small fw-semibold cursor-pointer">
+                           class="text-decoration text-primary small fw-semibold cursor-pointer">
                             ¿Olvidaste tu contraseña?
                         </a>
                     </div>
 
                     <!-- Botón de envío -->
                     <button type="submit" 
-                            routerLink="/catalogo-producto"
-                            class="btn btn-lg w-100 fw-semibold py-2 mb-4"
-                            style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
-                                border: none;
-                                color: white;
-                                border-radius: 8px;
-                                transition: all 0.3s ease;
-                                box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                        Iniciar sesión
+                            class="btn btn-lg w-100 fw-semibold py-2 mb-3 btn-gradient"
+                            [disabled]="loginForm.invalid || isLoading()">
+                        @if(!isLoading()){
+                            <span>Iniciar sesión</span>
+                        }
+                        @if(isLoading()){
+                            <span>
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Iniciando sesión...
+                            </span>
+                        }
                     </button>
+
                     <!-- Enlace para registro -->
                     <div class="text-center fw-semibold">
                         <span>
                             ¿Sin cuenta?
                             <a routerLink="/pre-registro/datos-fiscales"
-                                class="text-decoration text-primary small fw-semibold cursor-pointer">
+                               class="text-decoration text-primary small fw-semibold cursor-pointer">
                                 Haz tu prerregistro aquí.
                             </a>
                         </span>
