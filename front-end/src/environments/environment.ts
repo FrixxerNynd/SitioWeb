@@ -2,7 +2,8 @@
 export const environment = {
     production: false,
     // API de Excel Norte (catálogo de productos)
-    apiExcelUrl: 'https://api01.exeldelnorte.com.mx',
+    apiExcelUrl: '/api-exel',
+    Authorization: 'LLave_de_api',    
     // API de CABS  
     apiCabsUrl: 'http://localhost:5176'  
 };

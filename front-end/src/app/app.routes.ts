@@ -1,3 +1,4 @@
+// front-end/src/app/app.routes.ts
 import { Routes } from '@angular/router';
 import { PageInicioSesion } from './auth/inicio-sesion/inicio-sesion';
 import { PageDatosFiscales } from './auth/pre-registro/pages/datos-fiscales/datos-fiscales';
@@ -40,7 +41,8 @@ export const routes: Routes = [
         canActivate: [AuthGuard], 
         children: [
             { path: 'lista-producto', component: PageListaProducto },
-            { path: 'detalles-producto', component: PageDetalleProducto },
+            { path: 'detalles-producto/:id', component: PageDetalleProducto },
+            { path: 'detalles-producto', redirectTo: 'lista-producto', pathMatch: 'full' },
             { path: '', redirectTo: 'lista-producto', pathMatch: 'full' }
         ]
     },
