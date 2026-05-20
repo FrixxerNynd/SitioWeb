@@ -1,0 +1,474 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+}
+
+model User {
+  id                                                                        Int                           @id(map: "PK__auth_usu__3213E83F8B130EFE") @default(autoincrement())
+  creado_en                                                                 DateTime                      @default(now(), map: "DF__auth_usua__cread__5CD6CB2B")
+  actualizado_en                                                            DateTime?
+  correo                                                                    String                        @unique(map: "UQ__auth_usu__2A586E0B7E03FCB9") @db.VarChar(150)
+  password_hash                                                             String                        @db.VarChar(255)
+  nombre                                                                    String                        @db.VarChar(100)
+  apellido                                                                  String                        @db.VarChar(100)
+  telefono                                                                  BigInt
+  rol                                                                       String                        @db.VarChar(30)
+  activo                                                                    Boolean                       @default(true, map: "DF__auth_usua__activ__5DCAEF64")
+  transmision_habilitada                                                    String?                       @db.VarChar(50)
+  id_agente_legacy                                                          Int?
+  codigo_agente_legacy                                                      String?                       @db.NVarChar(30)
+  nombre_agente_legacy                                                      String?                       @db.NVarChar(60)
+  fecha_enlace_agente                                                       DateTime?
+  calendarios_evento_permisos                                               calendarios_evento_permisos[]
+  evaluaciones                                                              evaluaciones[]
+  files_documentos                                                          files_documentos[]
+  fleet_uso_vehiculos                                                       fleet_uso_vehiculos[]
+  notificaciones                                                            notificaciones[]
+  ops_ejecuciones_orden                                                     ops_ejecuciones_orden[]
+  ops_ordenes_trabajo_ops_ordenes_trabajo_asignada_a_user_idToauth_usuarios ops_ordenes_trabajo[]         @relation("ops_ordenes_trabajo_asignada_a_user_idToauth_usuarios")
+  ops_ordenes_trabajo_ops_ordenes_trabajo_creado_por_user_idToauth_usuarios ops_ordenes_trabajo[]         @relation("ops_ordenes_trabajo_creado_por_user_idToauth_usuarios")
+  reparaciones                                                              reparaciones[]
+  usuario_horarios                                                          usuario_horarios[]
+
+  @@index([codigo_agente_legacy], map: "IX_auth_usuarios_codigo_agente_legacy")
+  @@index([id_agente_legacy], map: "IX_auth_usuarios_id_agente_legacy")
+  @@map("auth_usuarios")
+}
+
+model Actividades {
+  Id                    Int       @id(map: "PK__Activida__3214EC072B088F3B") @default(autoincrement())
+  Participantes         Int?
+  DocumentoId           Int?
+  EsVirtual             Boolean
+  Horas                 Int?
+  InfDispositivo        String?   @db.NVarChar(Max)
+  Piezas                String?   @db.NVarChar(Max)
+  Ubicacion             String?   @db.VarChar(255)
+  Agentes               String?   @db.NVarChar(Max)
+  SoftwareControlRemoto Int?      @default(0, map: "DF__Actividad__Softw__5AEE82B9") @db.TinyInt
+  FechaCreacion         DateTime? @default(now(), map: "DF__Actividad__Fecha__5BE2A6F2") @db.DateTime
+  HoraInicio            DateTime? @db.DateTime
+  HoraFin               DateTime? @db.DateTime
+  vehiculoId            Int?
+  TipoOrden             Int?
+  AgentePrincipal       Int?
+  usaVehiculo           Boolean?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Actividades_Registro {
+  horas_impartidas   Int?
+  horas_restantes    Int?
+  comentarios_inicio String? @db.NVarChar(Max)
+  id_documento       String? @db.NChar(10)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Auth_usuarios_backup {
+  id                     Int       @default(autoincrement())
+  creado_en              DateTime
+  actualizado_en         DateTime?
+  correo                 String    @db.VarChar(150)
+  password_hash          String    @db.VarChar(255)
+  nombre                 String    @db.VarChar(100)
+  apellido               String    @db.VarChar(100)
+  telefono               BigInt
+  rol                    String    @db.VarChar(30)
+  activo                 Boolean
+  transmision_habilitada String?   @db.VarChar(50)
+  id_agente_legacy       Int?
+  codigo_agente_legacy   String?   @db.NVarChar(30)
+  nombre_agente_legacy   String?   @db.NVarChar(60)
+  fecha_enlace_agente    DateTime?
+
+  @@ignore
+}
+
+model calendario_eventos {
+  id                          Int                           @id(map: "PK__calendar__3213E83FA19C0051") @default(autoincrement())
+  creado_por_id               Int
+  titulo                      String?                       @db.NVarChar(255)
+  descripcion                 String?                       @db.NVarChar(Max)
+  fecha_inicio                DateTime                      @db.Date
+  fecha_fin                   DateTime                      @db.Date
+  hora_inicio                 DateTime                      @db.Time
+  hora_fin                    DateTime                      @db.Time
+  tipo_evento                 String?                       @db.NVarChar(50)
+  es_compartido               Boolean
+  color                       String?                       @db.NVarChar(50)
+  fecha_creacion              DateTime                      @default(now(), map: "DF__calendari__fecha__5EBF139D")
+  ultima_modificacion         DateTime                      @default(now(), map: "DF__calendari__ultim__5FB337D6")
+  calendarios_evento_permisos calendarios_evento_permisos[]
+}
+
+model calendarios_evento_permisos {
+  id                 Int                @id(map: "PK__calendar__3213E83F9D68F17C") @default(autoincrement())
+  evento_id          Int
+  usuario_id         Int
+  tipo_permiso       String?            @db.NVarChar(50)
+  fecha_asignacion   DateTime           @default(now(), map: "DF__calendari__fecha__60A75C0F") @db.DateTime
+  calendario_eventos calendario_eventos @relation(fields: [evento_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_EventoPermisos_Evento")
+  auth_usuarios      User               @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_EventoPermisos_Usuario")
+}
+
+model catalog_clientes {
+  id                  Int                   @id(map: "PK__catalog___3213E83FB0C71F7B") @default(autoincrement())
+  legacy_client_id    Int?                  @unique(map: "UQ__catalog___E91B6C841EECEB41")
+  nombre_comercial    String?               @db.VarChar(200)
+  nombre              String?               @db.VarChar(100)
+  apellido            String?               @db.VarChar(100)
+  rfc                 String?               @db.VarChar(13)
+  estado_fiscal       String?               @db.VarChar(50)
+  telefono            String?               @db.VarChar(20)
+  email               String?               @db.VarChar(150)
+  activo              Boolean               @default(true, map: "DF__catalog_c__activ__619B8048")
+  created_at          DateTime              @default(now(), map: "DF__catalog_c__creat__628FA481")
+  direccion_json      String?               @db.NVarChar(Max)
+  ops_ordenes_trabajo ops_ordenes_trabajo[]
+}
+
+model catalog_productos_servicio_ref {
+  id                Int     @id(map: "PK__catalog___3213E83F1865362C") @default(autoincrement())
+  nombre            String  @db.VarChar(200)
+  tipo              String  @db.VarChar(50)
+  unidad            String  @db.VarChar(20)
+  precio_lista      Decimal @db.Decimal(12, 2)
+  legacy_product_id Int?
+}
+
+model evaluacion_detalles {
+  id               Int                @id(map: "PK__evaluaci__3213E83F0EBB71F2") @default(autoincrement())
+  evaluacion_id    Int
+  fase             String             @db.VarChar(10)
+  descripcion      String?            @db.NVarChar(Max)
+  sugerencias      String?            @db.NVarChar(Max)
+  score_fase       Int?
+  evidencia_nota   String?            @db.NVarChar(Max)
+  creado_en        DateTime           @default(now(), map: "DF__evaluacio__cread__6383C8BA")
+  Lugar            String             @db.VarChar(100)
+  evaluacion_fotos evaluacion_fotos[]
+}
+
+model evaluacion_fotos {
+  id                  Int                 @id(map: "PK__evaluaci__3213E83FE7A09051") @default(autoincrement())
+  detalle_id          Int
+  documento_id        Int
+  tipo                String?             @db.VarChar(20)
+  descripcion         String?             @db.NVarChar(500)
+  creado_en           DateTime            @default(now(), map: "DF__evaluacio__cread__6477ECF3")
+  evaluacion_detalles evaluacion_detalles @relation(fields: [detalle_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_eval_fotos_detalle")
+}
+
+model evaluaciones {
+  id                    Int      @id(map: "PK__evaluaci__3213E83F61235287") @default(autoincrement())
+  orden_id              Int
+  ejecucion_id          Int?
+  cliente_id            Int?
+  evaluador_id          Int
+  objetivo              String?  @db.NVarChar(200)
+  comentarios_generales String?  @db.NVarChar(Max)
+  score_calidad_total   Int?
+  requiere_seguimiento  Boolean  @default(false, map: "DF__evaluacio__requi__656C112C")
+  seguimiento_notas     String?  @db.NVarChar(Max)
+  evaluacionActualizada String?  @db.NVarChar(255)
+  nuevaEvaluacion       String?  @db.NVarChar(255)
+  creado_en             DateTime @default(now(), map: "DF__evaluacio__cread__66603565")
+  auth_usuarios         User     @relation(fields: [evaluador_id], references: [id], onUpdate: NoAction, map: "FK_eval_usuario")
+}
+
+model files_documentos {
+  id                    Int                @id(map: "PK__files_do__3213E83FAA865FD7") @default(autoincrement())
+  creado_por_usuario_id Int
+  creado_en             DateTime           @default(now(), map: "DF__files_doc__cread__6754599E")
+  entidad_tipo          String             @db.VarChar(50)
+  entidad_id            Int
+  metadatos_json        String?            @db.NVarChar(Max)
+  tamano_bytes          BigInt?
+  mimetype              String?            @db.VarChar(100)
+  ruta_almacenamiento   String             @db.NVarChar(500)
+  nombre_archivo        String             @db.NVarChar(255)
+  checksum_sha256       String             @default("", map: "DF__files_doc__check__68487DD7") @db.VarChar(64)
+  nombre_original       String             @default("", map: "DF__files_doc__nombr__693CA210") @db.NVarChar(255)
+  activo                Boolean            @default(true, map: "DF__files_doc__activ__6A30C649")
+  actualizado_en        DateTime?
+  auth_usuarios         User               @relation(fields: [creado_por_usuario_id], references: [id], onUpdate: NoAction, map: "FK_documentos_usuario")
+  reparacion_fotos      reparacion_fotos[]
+
+  @@unique([entidad_tipo, entidad_id, nombre_archivo], map: "UQ_Documento_Entidad")
+}
+
+model finance_gastos_viaticos {
+  id               Int      @id(map: "PK__finance___3213E83F2D695E03") @default(autoincrement())
+  orden_id         Int?
+  tiene_factura    Boolean  @default(false, map: "DF__finance_g__tiene__6B24EA82")
+  descripcion      String?  @db.NVarChar(Max)
+  proveedor_nombre String?  @db.VarChar(200)
+  fecha            DateTime @db.Date
+  km_recorridos    Int?
+  gastos           String   @db.VarChar(200)
+  monto_total      Decimal  @db.Decimal(12, 2)
+  lugar_destino    String?  @db.VarChar(200)
+  vehiculo_id      Int?
+}
+
+model fleet_uso_vehiculos {
+  id                  Int       @id(map: "PK_fleet_uso_vehiculos") @default(autoincrement())
+  vehiculo_id         Int
+  usuario_id          Int
+  fecha               DateTime  @db.Date
+  hora_salida         DateTime  @db.Time
+  hora_regreso        DateTime? @db.Time
+  motivo_uso          String    @db.NVarChar(500)
+  kilometraje_inicial Int
+  kilometraje_final   Int?
+  observaciones       String?   @db.NVarChar(Max)
+  firma_base64        String?   @db.NVarChar(Max)
+  estado              String    @default("EN_USO", map: "DF__fleet_uso__estad__6C190EBB") @db.VarChar(20)
+  fecha_creacion      DateTime  @default(now(), map: "DF__fleet_uso__fecha__6D0D32F4")
+  fecha_actualizacion DateTime?
+  fecha_inicio        DateTime?
+  fecha_fin           DateTime?
+  auth_usuarios       User      @relation(fields: [usuario_id], references: [id], onUpdate: NoAction, map: "FK_fleet_uso_vehiculos_usuario")
+}
+
+model fleet_vehiculos {
+  id                         Int                     @id(map: "PK__fleet_ve__3213E83FD36CE62D") @default(autoincrement())
+  tipo_vehiculo              String?                 @db.VarChar(50)
+  transmision                String?                 @db.VarChar(20)
+  es_de_empresa              Boolean                 @default(true, map: "DF__fleet_veh__es_de__6E01572D")
+  placas                     String?                 @unique(map: "UQ__fleet_ve__A3547E39EE071D21") @db.VarChar(20)
+  activo                     Boolean                 @default(true, map: "DF__fleet_veh__activ__6EF57B66")
+  observaciones              String?                 @db.NVarChar(Max)
+  nombre_vehiculo            String                  @default("", map: "DF__fleet_veh__nombr__6FE99F9F") @db.VarChar(100)
+  kilometraje                Int?
+  creado_en                  DateTime                @default(now(), map: "DF__fleet_veh__cread__70DDC3D8")
+  creado_por_usuario_id      Int?
+  actualizado_en             DateTime?
+  actualizado_por_usuario_id Int?
+  historial_cambios          String?                 @db.NVarChar(Max)
+  disponible                 Boolean                 @default(true, map: "DF__fleet_veh__dispo__71D1E811")
+  fleet_vehiculos_uso        fleet_vehiculos_uso[]
+  ops_ejecuciones_orden      ops_ejecuciones_orden[]
+}
+
+model fleet_vehiculos_uso {
+  id                  Int             @id(map: "PK__fleet_ve__3213E83F7CAD8663") @default(autoincrement())
+  vehiculo_id         Int
+  usuario_id          Int
+  fecha_inicio        DateTime
+  fecha_fin           DateTime?
+  kilometraje_inicial Int
+  kilometraje_final   Int?
+  observaciones       String?         @db.NVarChar(Max)
+  creado_en           DateTime        @default(dbgenerated("getutcdate()"), map: "DF__fleet_veh__cread__72C60C4A")
+  fleet_vehiculos     fleet_vehiculos @relation(fields: [vehiculo_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_vehiculos_uso_vehiculo")
+
+  @@index([fecha_inicio], map: "IX_fleet_vehiculos_uso_fecha_inicio")
+  @@index([usuario_id], map: "IX_fleet_vehiculos_uso_usuario_id")
+  @@index([vehiculo_id], map: "IX_fleet_vehiculos_uso_vehiculo_id")
+}
+
+model legacy_clientes_ref {
+  legacy_client_id    Int       @id(map: "PK__legacy_c__E91B6C8511598D2E")
+  last_sync_timestamp DateTime?
+}
+
+model legacy_intakes_ref {
+  legacy_intake_id Int @id(map: "PK__legacy_i__BB75EA220B3983B8")
+}
+
+model legacy_productos_ref {
+  legacy_product_id Int @id(map: "PK__legacy_p__A21228DB140E0286")
+}
+
+model notificaciones {
+  id             Int       @id(map: "PK__notifica__3213E83FD6464B6C") @default(autoincrement())
+  usuario_id     Int
+  tipo           String    @db.VarChar(50)
+  titulo         String    @db.VarChar(200)
+  mensaje        String    @db.VarChar(1000)
+  datos          String?   @db.NVarChar(Max)
+  leida          Boolean   @default(false, map: "DF__notificac__leida__73BA3083")
+  fecha_creacion DateTime  @default(dbgenerated("sysutcdatetime()"), map: "DF__notificac__fecha__74AE54BC")
+  fecha_lectura  DateTime?
+  prioridad      String    @default("MEDIA", map: "DF__notificac__prior__75A278F5") @db.VarChar(20)
+  accion         String?   @db.VarChar(500)
+  auth_usuarios  User      @relation(fields: [usuario_id], references: [id], onUpdate: NoAction, map: "FK_notificaciones_usuario")
+}
+
+model ops_ejecuciones_orden {
+  id                Int              @id(map: "PK__ops_ejec__3213E83F7989A542") @default(autoincrement())
+  orden_id          Int
+  tipo_ejecucion    String           @db.VarChar(20)
+  tecnico_id        Int
+  hr_inicio         DateTime?
+  hr_fin            DateTime?
+  comentarios       String?          @db.NVarChar(Max)
+  vehiculo_id       Int?
+  km_inicial        Int?
+  km_final          Int?
+  herramientas      String?          @db.VarChar(100)
+  codigo_sesion     String?          @db.VarChar(100)
+  contrasena_sesion String?          @db.VarChar(100)
+  auth_usuarios     User             @relation(fields: [tecnico_id], references: [id], onUpdate: NoAction, map: "FK_ejecuciones_orden_tecnico")
+  fleet_vehiculos   fleet_vehiculos? @relation(fields: [vehiculo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ejecuciones_orden_vehiculo")
+}
+
+model ops_ordenes_trabajo {
+  id                                                                  Int               @id(map: "PK__ops_orde__3213E83FCF7D07AC") @default(autoincrement())
+  nuevo_cliente                                                       Boolean?
+  nombre_cliente                                                      String?           @db.VarChar(120)
+  cliente_id                                                          Int?
+  creado_por_user_id                                                  Int
+  asignada_a_user_id                                                  Int?
+  notas                                                               String?           @db.NVarChar(Max)
+  cita_programada_inicio                                              DateTime?
+  cita_programada_fin                                                 DateTime?
+  modalidad                                                           String?           @db.VarChar(50)
+  tipo_orden                                                          String?           @db.VarChar(50)
+  prioridad                                                           Int?
+  estado                                                              String            @db.VarChar(20)
+  ubicacion_text                                                      String?           @db.NVarChar(Max)
+  requiere_factura                                                    Boolean           @default(false, map: "DF__ops_orden__requi__76969D2E")
+  estado_facturado                                                    String?           @db.VarChar(50)
+  factura_folio                                                       String?           @db.VarChar(50)
+  creado_en                                                           DateTime          @default(now(), map: "DF__ops_orden__cread__778AC167")
+  actualizado_en                                                      DateTime?
+  costo_real                                                          Decimal?          @db.Decimal(12, 2)
+  costo_estimado                                                      Decimal?          @db.Decimal(12, 2)
+  cliente_telefono                                                    BigInt?
+  auth_usuarios_ops_ordenes_trabajo_asignada_a_user_idToauth_usuarios User?             @relation("ops_ordenes_trabajo_asignada_a_user_idToauth_usuarios", fields: [asignada_a_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ordenes_trabajo_asignada_a")
+  catalog_clientes                                                    catalog_clientes? @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ordenes_trabajo_cliente")
+  auth_usuarios_ops_ordenes_trabajo_creado_por_user_idToauth_usuarios User              @relation("ops_ordenes_trabajo_creado_por_user_idToauth_usuarios", fields: [creado_por_user_id], references: [id], onUpdate: NoAction, map: "FK_ordenes_trabajo_creado_por")
+  reparaciones                                                        reparaciones[]
+}
+
+model RecuperacionPasswordToken {
+  Id         Int       @id(map: "PK__Recupera__3214EC0749FE2FC5") @default(autoincrement())
+  Email      String?   @db.NVarChar(256)
+  Token      String?   @db.NVarChar(6)
+  Expiracion DateTime? @db.DateTime
+  Usado      Boolean?  @default(false, map: "DF__Recuperac__Usado__787EE5A0")
+}
+
+model RecuperacionPasswordTokens {
+  Id         Int      @id(map: "PK__Recupera__3214EC07015A87FA") @default(autoincrement())
+  Email      String   @db.NVarChar(255)
+  Token      String   @db.NVarChar(10)
+  Expiracion DateTime
+  Usado      Boolean  @default(false, map: "DF__Recuperac__Usado__797309D9")
+  CreatedAt  DateTime @default(dbgenerated("getutcdate()"), map: "DF__Recuperac__Creat__7A672E12")
+}
+
+model reparacion_componentes {
+  id                     Int      @id(map: "PK__reparaci__3213E83F61BA4210") @default(autoincrement())
+  reparacion_id          Int
+  componente             String   @db.VarChar(160)
+  cantidad               Int      @default(1, map: "DF__reparacio__canti__7B5B524B")
+  proveedor              String?  @db.VarChar(160)
+  garantia_meses         Int?
+  costo_unitario_compra  Decimal? @db.Decimal(12, 2)
+  costo_unitario_publico Decimal? @db.Decimal(12, 2)
+  subtotal_compra        Decimal? @db.Decimal(23, 2)
+  subtotal_publico       Decimal? @db.Decimal(23, 2)
+  notas                  String?  @db.NVarChar(500)
+}
+
+model reparacion_fotos {
+  id               Int              @id(map: "PK__reparaci__3213E83FBBC64585") @default(autoincrement())
+  reparacion_id    Int
+  documento_id     Int
+  etapa            String?          @db.VarChar(20)
+  descripcion      String?          @db.NVarChar(500)
+  creado_en        DateTime         @default(now(), map: "DF__reparacio__cread__7C4F7684")
+  files_documentos files_documentos @relation(fields: [documento_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_rep_fotos_documento")
+}
+
+model reparaciones {
+  id                        Int                 @id(map: "PK__reparaci__3213E83F7EAF944F") @default(autoincrement())
+  orden_id                  Int
+  tecnico_id                Int
+  dispositivo_tipo          String              @db.VarChar(80)
+  marca                     String?             @db.VarChar(80)
+  modelo                    String?             @db.VarChar(120)
+  accesorios_recibidos      String?             @db.NVarChar(500)
+  descripcion_falla         String              @db.NVarChar(Max)
+  diagnostico               String?             @db.NVarChar(Max)
+  solucion_aplicada         String?             @db.NVarChar(Max)
+  resultado                 String              @db.VarChar(20)
+  causa_irreparable         String?             @db.NVarChar(Max)
+  respaldo_datos_autorizado Boolean             @default(false, map: "DF__reparacio__respa__7D439ABD")
+  costo_mano_obra           Decimal?            @db.Decimal(12, 2)
+  costo_refacciones_compra  Decimal?            @db.Decimal(12, 2)
+  costo_refacciones_publico Decimal?            @db.Decimal(12, 2)
+  costo_total_compra        Decimal?            @db.Decimal(13, 2)
+  costo_total_publico       Decimal?            @db.Decimal(13, 2)
+  margen_estimado           Decimal?            @db.Decimal(13, 2)
+  garantia_dias             Int?
+  fecha_llegada             DateTime            @default(now(), map: "DF__reparacio__fecha__7E37BEF6")
+  empezado_en               DateTime?
+  entregado_en              DateTime?
+  tipo_entrega              String              @db.VarChar(20)
+  ubicacion_almacenamiento  String?             @db.NVarChar(200)
+  notas                     String?             @db.NVarChar(Max)
+  ops_ordenes_trabajo       ops_ordenes_trabajo @relation(fields: [orden_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_rep_orden")
+  auth_usuarios             User                @relation(fields: [tecnico_id], references: [id], onUpdate: NoAction, map: "FK_rep_tecnico")
+}
+
+model sales_cotizaciones {
+  CIDDOCUMENTO           Int       @id(map: "PK_sales_cotizaciones") @default(autoincrement())
+  CIDDOCUMENTODE         Int
+  CIDCONCEPTODOCUMENTO   Int
+  CIDCLIENTEPROVEEDOR    Int
+  CIDAGENTE              Int
+  CIDDOCUMENTOORIGEN     Int?
+  CSERIEDOCUMENTO        String?   @db.VarChar(11)
+  CFOLIO                 Float     @default(0, map: "DF__sales_cot__CFOLI__7F2BE32F")
+  CFECHA                 DateTime  @default(now(), map: "DF__sales_cot__CFECH__00200768") @db.DateTime
+  CFECHAVENCIMIENTO      DateTime? @db.DateTime
+  CFECHAENTREGARECEPCION DateTime? @db.DateTime
+  CRAZONSOCIAL           String?   @db.VarChar(60)
+  CRFC                   String?   @db.VarChar(20)
+  CREFERENCIA            String?   @db.VarChar(20)
+  COBSERVACIONES         String?   @db.VarChar(Max)
+  CNATURALEZA            Int       @default(0, map: "DF__sales_cot__CNATU__01142BA1")
+  CUSACLIENTE            Int       @default(1, map: "DF__sales_cot__CUSAC__02084FDA")
+  CAFECTADO              Int       @default(0, map: "DF__sales_cot__CAFEC__02FC7413")
+  CIMPRESO               Int       @default(0, map: "DF__sales_cot__CIMPR__03F0984C")
+  CCANCELADO             Int       @default(0, map: "DF__sales_cot__CCANC__04E4BC85")
+  CNETO                  Float     @default(0, map: "DF__sales_cot__CNETO__05D8E0BE")
+  CIMPUESTO1             Float     @default(0, map: "DF__sales_cot__CIMPU__06CD04F7")
+  CDESCUENTOMOV          Float     @default(0, map: "DF__sales_cot__CDESC__07C12930")
+  CTOTAL                 Float     @default(0, map: "DF__sales_cot__CTOTA__08B54D69")
+  CPENDIENTE             Float     @default(0, map: "DF__sales_cot__CPEND__09A971A2")
+  CTOTALUNIDADES         Float     @default(0, map: "DF__sales_cot__CTOTA__0A9D95DB")
+}
+
+model sysdiagrams {
+  name         String @db.NVarChar(128)
+  principal_id Int
+  diagram_id   Int    @id(map: "PK__sysdiagr__C2B05B617CD819D2") @default(autoincrement())
+  version      Int?
+  definition   Bytes?
+
+  @@unique([principal_id, name], map: "UK_principal_name")
+}
+
+model usuario_horarios {
+  Id            Int       @id(map: "PK__usuario___3214EC074B19A7AF") @default(autoincrement())
+  UsuarioId     Int
+  Nombre        String    @db.NVarChar(100)
+  DiaInicio     String    @db.NVarChar(20)
+  DiaFin        String    @db.NVarChar(20)
+  HoraInicio    DateTime  @db.Time
+  HoraFin       DateTime  @db.Time
+  IsCompartido  Boolean   @default(false, map: "DF__usuario_h__IsCom__0B91BA14")
+  CreadoEn      DateTime  @default(dbgenerated("getutcdate()"), map: "DF__usuario_h__Cread__0C85DE4D")
+  ActualizadoEn DateTime?
+  auth_usuarios User      @relation(fields: [UsuarioId], references: [id], onDelete: Cascade, map: "FK_usuario_horarios_auth_usuarios")
+}
