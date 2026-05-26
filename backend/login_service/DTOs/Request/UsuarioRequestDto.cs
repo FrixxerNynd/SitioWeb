@@ -210,9 +210,10 @@ namespace CRM.DTOs.Request
         public string Telefono { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Email2 { get; set; } = string.Empty;
-        public string Email3 { get; set; } = string.Empty;
+            public string Email3 { get; set; } = string.Empty;
         public string Ubicacion { get; set; } = string.Empty;
         public string Estado { get; set; } = string.Empty;
+        public string RecaptchaToken { get; set; } = string.Empty;
         public UbicacionDetalleDto? UbicacionDetalle { get; set; }
     }
 

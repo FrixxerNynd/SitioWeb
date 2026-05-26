@@ -38,6 +38,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Net;
+using login_service.services;
 
 namespace back_cabs.CRM.controllers.Auth
 {
@@ -48,6 +49,7 @@ namespace back_cabs.CRM.controllers.Auth
     [Route("api/[controller]")]
     [Produces("application/json")]
     public class AuthController : ControllerBase
+    
     {
         private readonly UsuarioAuthService _usuarioAuthService;
         private readonly IAdmClienteService _admClienteService;
@@ -55,6 +57,7 @@ namespace back_cabs.CRM.controllers.Auth
         private readonly IConfiguration _configuration;
         private readonly IAntiforgery _antiforgery;
         private readonly EmailService _emailService;
+        private readonly RecaptchaService _recaptchaService;
 
 
         public AuthController(
@@ -63,7 +66,8 @@ namespace back_cabs.CRM.controllers.Auth
             IConfiguration configuration,
             IAntiforgery antiforgery,
             EmailService emailService,
-            IAdmClienteService admClienteService)
+            IAdmClienteService admClienteService,
+            RecaptchaService recaptchaService)
         {
             _usuarioAuthService = usuarioAuthService ?? throw new ArgumentNullException(nameof(usuarioAuthService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -71,6 +75,7 @@ namespace back_cabs.CRM.controllers.Auth
             _antiforgery = antiforgery ?? throw new ArgumentNullException(nameof(antiforgery));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService)); // <-- Y aquí
             _admClienteService = admClienteService ?? throw new ArgumentNullException(nameof(admClienteService));
+            _recaptchaService = recaptchaService;
 
         }
         ///<summary>
@@ -86,6 +91,14 @@ namespace back_cabs.CRM.controllers.Auth
         {
             try
             {
+                //Validar reCAPTCHA v2
+                var recaptchaValido = await _recaptchaService.ValidarV2Async(request.RecaptchaToken);
+                if (!recaptchaValido)
+                {
+                    _logger.LogWarning("Registro bloqueado por reCAPTCHA v2 para email: {Email}", request.Email);
+                    return BadRequest(new { message = "Por favor completa el reCAPTCHA." });
+                }
+                
                 _logger.LogInformation("Iniciando registro de cliente para email: {Email}", request?.Email);
                 // Validación básica del request
                 if (request == null)
@@ -298,6 +311,14 @@ namespace back_cabs.CRM.controllers.Auth
         {
             try
             {
+                //Validar reCAPTCHA V3
+                 var recaptchaValido = await _recaptchaService.ValidarV3Async(request.RecaptchaToken);
+                if (!recaptchaValido)
+                {
+                     _logger.LogWarning("Login bloqueado por reCAPTCHA v3 para email: {Email}", request.Email);
+                    return BadRequest(new { message = "Validación de seguridad fallida. Intenta de nuevo." });
+                }
+
                 // Validar credenciales con base de datos
                 var usuario = await _usuarioAuthService.ValidarCredencialesAsync(request.Email, request.Password);
                 if (usuario == null)
@@ -1173,6 +1194,7 @@ public class LoginRequest
 {
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
+    public string RecaptchaToken { get; set; } = string.Empty;
 }
 
 public class ChangePasswordRequest

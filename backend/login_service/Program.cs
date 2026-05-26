@@ -20,6 +20,9 @@ using Microsoft.Data.SqlClient;
 
 using back_cabs.CRM.middleware;
 
+//RecaptchaService
+using login_service.services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Redis cache registration
@@ -55,6 +58,9 @@ builder.Services.AddOptions<Microsoft.Extensions.Caching.StackExchangeRedis.Redi
             return Task.FromResult(multiplexer);
         };
     });
+
+// Registrar el servicio de reCAPTCHA con HttpClient
+builder.Services.AddHttpClient<RecaptchaService>();
 
 // registrar CacheService
 builder.Services.AddScoped<ICacheService, CacheService>();

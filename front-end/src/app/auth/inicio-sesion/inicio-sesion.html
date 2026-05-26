@@ -36,7 +36,6 @@
         }
     }
 </style>
-
 <div class="container-fluid vh-100 bg-light p-2">
     <div class="row g-0 h-100">
         <!-- CONTENEDOR IZQUIERDO -->
@@ -55,9 +54,9 @@
         </div>
 
         <!-- CONTENEDOR DERECHO -->
-        <div class="col-12 col-lg-6 p-4 p-sm-5" 
+        <div class="col-12 col-lg-6 p-4 p-sm-5"
              style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
-            
+
             <!-- Título y subtítulo -->
             <div class="text-start">
                 <h2 class="display-5 fw-bold text-dark mb-2">Iniciar Sesión</h2>
@@ -65,11 +64,11 @@
                     Ingresa tu correo y contraseña para poder <br> acceder al catálogo de productos.
                 </p>
             </div>
-            
+
             <!-- Formulario centrado verticalmente-->
             <div class="d-flex align-items-center justify-content-center" style="flex: 1;">
                 <div class="w-100" style="max-width: 40.625rem;">
-                    
+
                     <!-- Mensaje de éxito -->
                     @if(successMessage()){
                         <div class="alert alert-success alert-dismissible fade show mb-4 success-message fw-semibold" role="alert">
@@ -80,12 +79,12 @@
                                 <!-- Mensaje -->
                                 <span>{{ successMessage() }}</span>
                             </div>
-                            
+
                             <!-- Botón de cerrar -->
                             <button type="button" class="btn-close" (click)="successMessage.set(null)" aria-label="Close"></button>
                         </div>
                     }
-                    
+
 
                     <!-- Mensaje de error -->
                     @if(errorMessage()){
@@ -103,14 +102,14 @@
                             <label for="emailInput" class="form-label fw-semibold mb-2">
                                 Correo Electrónico o RFC
                             </label>
-                            <input type="text" 
-                                   class="form-control form-control-lg" 
+                            <input type="text"
+                                   class="form-control form-control-lg"
                                    id="emailInput"
                                    formControlName="email"
                                    [class.is-invalid]="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"
                                    placeholder="ejemplo@correo.com o XAXX010101XXX"
                                    autocomplete="email">
-                            
+
                             <!-- Mensajes de error específicos -->
                             @if(loginForm.get('email')?.touched && loginForm.get('email')?.invalid){
                                 <div class="invalid-feedback d-block">
@@ -118,7 +117,7 @@
                                         El correo o RFC es requerido
                                     }
                                     @if(loginForm.get('email')?.errors?.['invalidEmailOrRfc']) {
-                                        Ingresa un correo electrónico válido (ejemplo@correo.com) 
+                                        Ingresa un correo electrónico válido (ejemplo@correo.com)
                                         o un RFC (XAXX010101XXX)
                                     }
                                 </div>
@@ -130,14 +129,14 @@
                             <label for="passwordInput" class="form-label fw-semibold mb-2">
                                 Contraseña
                             </label>
-                            <input type="password" 
-                                   class="form-control form-control-lg" 
+                            <input type="password"
+                                   class="form-control form-control-lg"
                                    id="passwordInput"
                                    formControlName="password"
                                    [class.is-invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
                                    placeholder="Tu contraseña"
                                    autocomplete="current-password">
-                            
+
                             <!-- Mensajes de error específicos -->
                             @if(loginForm.get('password')?.touched && loginForm.get('password')?.invalid){
                                 <div class="invalid-feedback d-block">
@@ -160,7 +159,7 @@
                         </div>
 
                         <!-- Botón de envío -->
-                        <button type="submit" 
+                        <button type="submit"
                                 class="btn btn-lg w-100 fw-semibold py-2 mb-3 btn-gradient"
                                 [disabled]="loginForm.invalid || isLoading()">
                             @if(!isLoading()){
@@ -187,7 +186,7 @@
                     </form>
                 </div>
             </div>
-            
+
             <!-- Espaciador inferior para balance -->
             <div style="height: 20px;"></div>
         </div>

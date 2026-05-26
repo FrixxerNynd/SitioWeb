@@ -25,20 +25,21 @@
 
     /* Efecto active (al hacer clic) */
     .btn-cerrar:active {
-        transform: translateY(0);          
+        transform: translateY(0);
     }
 </style>
+
 <!-- Modal Términos y Condiciones  -->
 @if(visualizarModal()){
     <!-- Overlay -->
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 z-40" 
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 z-40"
          (click)="cerrarModal()">
     </div>
-    
+
     <!-- Modal -->
-    <div class="modal show d-block" 
-         id="terminosModal" 
-         tabindex="-1" 
+    <div class="modal show d-block"
+         id="terminosModal"
+         tabindex="-1"
          role="dialog"
          style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
         <div class="modal-dialog modal-dialog-scrollable modal-lg">
@@ -47,8 +48,8 @@
                     <h5 class="modal-title fw-bold" id="terminosModalLabel">
                         Términos y Condiciones
                     </h5>
-                    <button type="button" 
-                            class="btn-close " 
+                    <button type="button"
+                            class="btn-close "
                             (click)="cerrarModal()"
                             aria-label="Close">
                     </button>
@@ -123,7 +124,7 @@
 <div class="container-fluid vh-100 bg-light p-2 overflow-hidden">
     <div class="row g-0 h-100 overflow-hidden">
         <!-- CONTENEDOR IZQUIERDO -->
-        <div class="d-none d-lg-flex col-lg-6 rounded-4 gradient-bg flex-column p-4" 
+        <div class="d-none d-lg-flex col-lg-6 rounded-4 gradient-bg flex-column p-4"
              style="overflow: hidden; height: 100%;">
             <!-- Logo -->
             <div class="mb-4">
@@ -140,25 +141,25 @@
         </div>
 
         <!-- CONTENEDOR DERECHO - FORMULARIO CUENTA -->
-        <div class="col-12 col-lg-6 d-flex align-items-start justify-content-center p-4 p-sm-5" 
+        <div class="col-12 col-lg-6 d-flex align-items-start justify-content-center p-4 p-sm-5"
              style="overflow-y: auto; height: 100%;">
             <div class="w-100" style="max-width: 40.625rem;">
                 <!-- Icono para retroceder -->
                 <div class="mb-3">
-                    <a routerLink="/pre-registro/domicilio" 
+                    <a routerLink="/pre-registro/domicilio"
                        class="text-decoration-none cursor-pointer d-inline-flex align-items-center gap-2"
                        style="color: #4a5568; transition: all 0.2s ease;"
                        onmouseover="this.style.color='#1e3a8a'; this.style.transform='translateX(-4px)';"
                        onmouseout="this.style.color='#4a5568'; this.style.transform='translateX(0)';">
-                        <svg xmlns="http://www.w3.org/2000/svg" 
-                             fill="none" 
-                             viewBox="0 0 24 24" 
-                             stroke-width="2" 
-                             stroke="currentColor" 
-                             width="24" 
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="2"
+                             stroke="currentColor"
+                             width="24"
                              height="24">
-                            <path stroke-linecap="round" 
-                                  stroke-linejoin="round" 
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
                                   d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
                         </svg>
                         <span class="fw-medium">Regresar</span>
@@ -170,7 +171,7 @@
                     <h2 class="h1 fw-bold text-dark mb-2">Cuenta</h2>
                     <p class="fs-5 fw-semibold text-secondary">Crea tu cuenta de acceso.</p>
                 </div>
-                
+
                 <!-- Formulario Reactivo de Angular -->
                 <form>
                     <!-- Campo: Correo Electrónico -->
@@ -178,8 +179,8 @@
                         <label for="emailInput" class="form-label fw-semibold mb-2">
                             Correo Electrónico <span class="text-danger">*</span>
                         </label>
-                        <input type="email" 
-                               class="form-control form-control-lg" 
+                        <input type="email"
+                               class="form-control form-control-lg"
                                id="emailInput"
                                formControlName="email"
                                placeholder="nombre@ejemplo.com">
@@ -190,8 +191,8 @@
                         <label for="passwordInput" class="form-label fw-semibold mb-2">
                             Contraseña <span class="text-danger">*</span>
                         </label>
-                        <input type="password" 
-                               class="form-control form-control-lg" 
+                        <input type="password"
+                               class="form-control form-control-lg"
                                id="passwordInput"
                                formControlName="password"
                                placeholder="Mínimo 6 caracteres">
@@ -201,34 +202,38 @@
                     <!-- Checkbox: Términos y Condiciones -->
                     <div class="mb-4">
                         <div class="form-check">
-                            <input class="form-check-input" 
-                                   type="checkbox" 
+                            <input class="form-check-input"
+                                   type="checkbox"
                                    id="terminosCheckbox"
                                    formControlName="terminos"
                                    style="cursor: pointer;">
-                            <label class="form-check-label fw-medium" 
+                            <label class="form-check-label fw-medium"
                                    for="terminosCheckbox"
                                    style="cursor: pointer;">
-                                Yo acepto los <span (click)="abrirModal()" 
+                                Yo acepto los <span (click)="abrirModal()"
                                                   target="_blank"
                                                   class="text-primary text-decoration-none fw-semibold">
                                     Términos y Condiciones
                         </span><span class="text-danger">*</span>
                             </label>
                         </div>
+                    <!-- Botón de Recaptcha -->
                     </div>
+                    <span class="msg-error error"></span>
+                    <div id="recaptcha-v2-container" class="mb-3"></div>
+                    @if(recaptchaError()){
+                      <div class="text-danger small mb-2">
+                         Por favor completa el reCAPTCHA
+                      </div>
+                    }
 
                     <!-- Botón de envío -->
-                    <button type="submit" 
-                            routerLink="/pre-registro/confirmacion"
+                    <button type="submit"
+                            (click)="onSubmit()"
                             class="btn btn-lg w-100 fw-semibold py-2 mb-4"
                             style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
-                                border: none;
-                                color: white;
-                                border-radius: 8px;
-                                transition: all 0.3s ease;
-                                box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                        Crear cuenta
+                                   border: none; color: white; border-radius: 8px;">
+                      Crear cuenta
                     </button>
                 </form>
             </div>

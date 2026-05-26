@@ -367,3 +367,6 @@ FodyWeavers.xsd
 #NODE CONFIG GITIGNORE
 node_modules/
 dist/
+
+appsetings.Development.json
+appsettings.json
