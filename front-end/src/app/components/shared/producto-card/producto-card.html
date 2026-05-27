@@ -1,0 +1,24 @@
+<div class="cards-grid">
+  <div class="producto-card">
+    <div class="imagen-container">
+      <img [src]="imagen" [alt]="nombre" class="producto-imagen" />
+      <span class="descuento-badge" *ngIf="descuento > 0"> {{ descuento }}% </span>
+    </div>
+
+    <div class="producto-info">
+      <h3 class="producto-nombre">{{ nombre }}</h3>
+
+      <div class="precios">
+        <span class="precio-actual">${{ precio }}</span>
+        <span class="precio-original" *ngIf="precioOriginal !== precio">
+          ${{ precioOriginal }}
+        </span>
+      </div>
+
+      <div class="acciones">
+        <button class="btn-agregar" (click)="onAgregar()">Agregar</button>
+        <a class="btn-detalles" href="url">Ver detalles</a>
+      </div>
+    </div>
+  </div>
+</div>

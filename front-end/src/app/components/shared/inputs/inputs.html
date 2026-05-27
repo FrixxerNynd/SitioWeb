@@ -1,0 +1,78 @@
+<div class="input-wrapper" [class.error]="hasError" [class.success]="touched && !hasError && value">
+  <!-- TEXT / EMAIL -->
+  <div class="field-container" *ngIf="type === 'text' || type === 'email'">
+    <input
+      [type]="type"
+      [value]="value"
+      placeholder=" "
+      (input)="onInput($event)"
+      (blur)="onTouched()"
+      [attr.required]="required"
+    />
+    <span class="field-placeholder">
+      {{ label || placeholder }}
+      <span class="required-star" *ngIf="required">*</span>
+    </span>
+  </div>
+
+  <!-- PASSWORD con toggle -->
+  <div class="field-container" *ngIf="type === 'password'">
+    <div class="password-wrapper">
+      <input
+        [type]="mostrarPassword ? 'text' : 'password'"
+        [value]="value"
+        placeholder=" "
+        (input)="onInput($event)"
+        (blur)="onTouched()"
+        [attr.required]="required"
+      />
+      <span class="icon" (click)="togglePassword()">{{ icono }}</span>
+    </div>
+    <span class="field-placeholder">
+      {{ label || placeholder }}
+      <span class="required-star" *ngIf="required">*</span>
+    </span>
+  </div>
+
+  <!-- SELECT -->
+  <div class="field-container" *ngIf="type === 'select'">
+    <select [value]="value" (change)="onInput($event)" (blur)="onTouched()">
+      <option value="" disabled></option>
+      <option *ngFor="let opt of options" [value]="opt.value">{{ opt.label }}</option>
+    </select>
+    <span class="field-placeholder">
+      {{ label || placeholder }}
+      <span class="required-star" *ngIf="required">*</span>
+    </span>
+  </div>
+
+  <!-- CHECKBOX -->
+  <label class="checkbox-label" *ngIf="type === 'checkbox'">
+    <input type="checkbox" [checked]="value" (change)="onInput($event)" (blur)="onTouched()" />
+    <span>
+      {{ placeholder }}
+      <span class="required-star" *ngIf="required">*</span>
+    </span>
+  </label>
+
+  <!-- RADIO GROUP -->
+  <div class="radio-group" *ngIf="type === 'radio'">
+    <label *ngFor="let opt of options" class="radio-label">
+      <input
+        type="radio"
+        [value]="opt.value"
+        [checked]="value === opt.value"
+        (change)="onInput($event)"
+        (blur)="onTouched()"
+        [name]="label"
+      />
+      {{ opt.label }}
+    </label>
+  </div>
+
+  <!-- Mensaje de error -->
+  <span class="error-msg" *ngIf="hasError && errorMessage">{{ errorMessage }}</span>
+
+  <!-- Icono de éxito -->
+  <span class="success-icon" *ngIf="touched && !hasError && value"></span>
+</div>
