@@ -2,7 +2,7 @@ import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { RecaptchaService } from 'C:/Desarrollo/Back_SitioWeb/front-end/src/app/services/RecaptchaService';
+import { RecaptchaService } from '../../../../services/RecaptchaService';
 
 
 @Component({
