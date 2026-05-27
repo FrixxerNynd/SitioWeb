@@ -1,0 +1,97 @@
+<style>
+    .gradient-bg {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
+
+<div class="container-fluid vh-100 bg-light p-2">
+    <div class="row g-0 h-100">
+        <!-- CONTENEDOR IZQUIERDO -->
+        <div class="d-none d-lg-flex col-lg-6 rounded-4 gradient-bg align-items-between justify-content-between p-4 ">
+            <div class="w-100 d-flex flex-column justify-content-between">
+                <!-- Logo en la esquina superior izquierda -->
+                <div class="mb-4">
+                    <div style="width: 80px; height: 80px;">
+                        <!-- Logo de empresa -->
+                        <img src="logo-cabs.svg" alt="Logo CABS Computación">
+                    </div>
+                </div>
+
+                <!-- Encabezado principal -->
+                <div class="w-100">
+                    <h2 class="text-white fw-semibold">Accede de forma sencilla</h2>
+                    <h2 class="text-white fw-semibold">al catálogo de productos de CABS Computación</h2>
+                </div>
+            </div>
+        </div>
+        <!-- CONTENEDOR DERECHO - FORMULARIO DE INICIO DE SESIÓN -->
+        <div class="col-12 col-lg-6 d-flex align-items-start justify-content-center p-4 p-sm-5">
+            <div class="w-100" style="max-width: 40.625rem;">
+                <!-- Icono para retroceder - CORREGIDO Y ESTILIZADO -->
+                <div class="mb-3">
+                    <a routerLink="/inicio-sesion"
+                        class="text-decoration-none cursor-pointer d-inline-flex align-items-center gap-2"
+                        style="color: #4a5568; transition: all 0.2s ease;"
+                        onmouseover="this.style.color='#1e3a8a'; this.style.transform='translateX(-4px)';"
+                        onmouseout="this.style.color='#4a5568'; this.style.transform='translateX(0)';">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" width="24" height="24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                        </svg>
+                        <span class="fw-medium">Regresar</span>
+                    </a>
+                </div>
+
+                <!-- Encabezado del formulario -->
+                <div class="text-start mb-4">
+                    <h2 class="h1 fw-bold text-dark mb-2">Crear pre-registro</h2>
+                    <p class="fs-5 fw-semibold text-secondary">Ingresa tu RFC.</p>
+                </div>
+
+                <!-- Formulario Reactivo de Angular -->
+                <form>
+                    <!-- Campo: RFC -->
+                    <div class="mb-4">
+                        <label for="rfcInput" class="form-label fw-semibold mb-2">
+                            RFC <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="rfcInput" formControlName="rfc"
+                            placeholder="XXXX000000XXX">
+                        <div *ngIf="loginForm.get('rfc')?.touched && loginForm.get('rfc')?.invalid"
+                            class="invalid-feedback d-block">
+                            RFC requerido o formato inválido
+                        </div>
+                    </div>
+                    <!-- Campo: Subir constancia fiscal -->
+                    <div class="mb-4">
+                        <label for="constanciaInput" class="form-label fw-semibold mb-2">
+                            Subir tu constancia fiscal <span class="text-danger">*</span>
+                        </label>
+                        <input type="file" class="form-control form-control-lg" id="constanciaInput"
+                            formControlName="constancia" accept=".pdf,.jpg,.png">
+                        <div *ngIf="loginForm.get('constancia')?.touched && loginForm.get('constancia')?.invalid"
+                            class="invalid-feedback d-block">
+                            La constancia fiscal es requerida
+                        </div>
+                    </div>
+
+                    <!-- Botón de envío -->
+                    <button type="submit" routerLink="/pre-registro/datos-personales"
+                        class="btn btn-lg w-100 fw-semibold py-2 mb-4" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
+                                border: none;
+                                color: white;
+                                border-radius: 8px;
+                                transition: all 0.3s ease;
+                                box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        Siguiente
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

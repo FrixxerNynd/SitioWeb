@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang='es'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>{titulo}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #ffffff;
+            padding: 30px;
+            text-align: center;
+            color: white;
+            border-bottom: 5px solid #1E90FF;
+        }
+
+        .logo {
+            width: 250px;
+            aspect-ratio: inherit;
+        }
+
+        .img-area {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .yosoybni {
+            background-color: red;
+        }
+
+        .yosoybni img {
+            width: 160px;
+            aspect-ratio: inherit;
+        }
+
+        .marcas {
+            background-color: red;
+            justify-content: center;
+            width: 600px;
+        }
+
+        .marcas img {
+            width: 600px;
+            aspect-ratio: inherit;
+        }
+
+        .content {
+            padding: 30px;
+            background-color: #ffffff;
+        }
+
+        .greeting {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .info-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #1E90FF;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .bank-details {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .bank-details td {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #555;
+            width: 120px;
+        }
+
+        .footer {
+            background-color: #f1f1f1;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .footer a {
+            color: #1E90FF;
+            text-decoration: none;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #1E90FF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class='container'>
+        <div class='header'>
+            <img class='logo' src='../../wwwroot/pdf-img/CABS-Logo.png' alt='Logo CABS' title="imagen">
+        </div>
+
+        <div class='content'>
+            <p class='greeting'>Estimado(a) {nombreCliente},</p>
+
+            <p>Es un gusto saludarte. En seguimiento a tu reciente solicitud, hacemos entrega de la documentación
+                correspondiente a tu cotización.</p>
+
+            <div class='info-box'>
+                <strong>Detalles del documento:</strong><br>
+                Tipo: {titulo}<br>
+                Folio: <span style='color: #1E90FF; font-weight: bold;'>{folio}</span>
+            </div>
+
+            {(!string.IsNullOrEmpty(mensajeAdicional) ? $'<p><em>{mensajeAdicional}</em></p>' : '')}
+
+            <p>Adjunto a este mensaje encontrará el archivo PDF con el desglose detallado de productos y servicios.</p>
+
+            <h3 style='border-bottom: 2px solid #1E90FF; padding-bottom: 5px; color: #333;'>Información para Pago</h3>
+            <p style='font-size: 13px;'>Para procesar su pedido, puede realizar su transferencia electrónica con los
+                siguientes datos:</p>
+
+            <table class='bank-details'>
+                <tr>
+                    <td class='label'>BENEFICIARIO:</td>
+                    <td>CABS COMPUTACION DGO SA DE CV</td>
+                </tr>
+                <tr>
+                    <td class='label'>BANCO:</td>
+                    <td>BANORTE</td>
+                </tr>
+                <tr>
+                    <td class='label'>CUENTA:</td>
+                    <td>08498985127</td>
+                </tr>
+                <tr>
+                    <td class='label'>RFC:</td>
+                    <td>CCD 120924 V1A</td>
+                </tr>
+                <tr>
+                    <td class='label'>TELÉFONO:</td>
+                    <td>618 811 1371</td>
+                </tr>
+            </table>
+
+            <p style='margin-top: 30px;'>Atentamente,<br>
+                <strong>Departamento de Ventas</strong><br>
+                CABS Computación
+            </p>
+        </div>
+
+        <div class='img-area'>
+            <div class='yosoybni'>
+                <img src='../../wwwroot/pdf-img/yosoybni.png' alt='Yo-soy-BNI'>
+            </div>
+            <div class='marcas'>
+                <img src='../../wwwroot/pdf-img/marcas.png' alt='Marcas'>
+            </div>
+        </div>
+
+        <div class='footer'>
+            <p>Este es un mensaje automático generado por el sistema CRM CABS.<br>
+                Por favor, no responda directamente a este correo.</p>
+            <p>© {DateTime.Now.Year} CABS Computación Durango. Todos los derechos reservados.</p>
+            <p><a href='https://cabsdgo.com'>Visitar nuestro sitio web</a> </p>
+        </div>
+    </div>
+</body>
+
+</html>

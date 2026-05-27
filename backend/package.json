@@ -1,0 +1,39 @@
+{
+  "name": "back_sitioweb",
+  "version": "1.0.0",
+  "description": "Backend para sitio web del catalogo",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node app.js",
+    "test": "test",
+    "db:generate": "prisma generate --schema=./src/models/schema.prisma",
+    "db:pull": "prisma db pull --schema=./src/models/schema.prisma",
+    "db:push": "prisma db push --schema=./src/models/schema.prisma",
+    "db:studio": "prisma studio --schema=./src/models/schema.prisma"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^7.8.0",
+    "express": "^5.2.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "typescript": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.0",
+    "axios": "^1.16.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "helmet": "^8.1.0",
+    "ioredis": "^5.10.1",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.1",
+    "prisma": "^7.8.0",
+    "winston": "^3.19.0"
+  },
+  "prisma": {
+    "schema": "src/models/schema.prisma"
+  }
+}

@@ -1,0 +1,33 @@
+using back_cabs.CRM.DTOs.Legacy;
+using back_cabs.CRM.DTOs.ServiceResponse;
+using back_cabs.CRM.models.legacy;
+using CRM.DTOs.Request;
+
+namespace back_cabs.CRM.Interfaces.Legacy
+{
+    /// <summary>
+    /// Interface para servicio de clientes con domicilio
+    /// </summary>
+    public interface IAdmClienteService
+    {
+        /// <summary>
+        /// Búsqueda paginada de clientes con domicilio
+        /// </summary>
+        Task<(List<AdmClienteConDomicilioResponseDto> Clientes, int TotalRegistros, int TotalPaginas)> SearchPaginatedAsync(AdmClienteFilterDto filter);
+
+        /// <summary>
+        /// Obtener cliente por ID con domicilio
+        /// </summary>
+        Task<AdmClienteConDomicilioResponseDto?> GetByIdAsync(int idCliente, bool incluirDetalleUbicacion = true);
+
+        ///<summary>
+        /// Registrar un cliente nuevo
+        /// </summary>
+        Task<ServiceResult<AdmClienteConDomicilioResponseDto>> RegistrarAsync(UserClientRequestDto clientData);
+
+        /// <summary>
+        /// Validar correo y contraseñas de un cliente para login (soporte legacy)
+        /// </summary>
+        Task<AdmCliente?> ValidateCredentialsAsync(string email, string contrasena);
+    }
+}

@@ -1,0 +1,223 @@
+/* Double Range Slider */
+.double-range-container {
+    position: relative;
+    width: 100%;
+    height: 30px;
+    margin: 10px 0;
+}
+
+.slider-track {
+    position: absolute;
+    top: 12px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+}
+
+.double-range-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: none;
+    pointer-events: none;
+    -webkit-appearance: none;
+}
+
+.double-range-input::-webkit-slider-thumb {
+    pointer-events: auto;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #0d6efd;
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.double-range-input::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    background-color: #0b5ed7;
+}
+
+.double-range-input::-webkit-slider-runnable-track {
+    height: 4px;
+    background: transparent;
+    border: none;
+}
+
+/* Firefox */
+.double-range-input::-moz-range-thumb {
+    pointer-events: auto;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #0d6efd;
+    border: 2px solid white;
+    cursor: pointer;
+}
+
+.double-range-input::-moz-range-track {
+    height: 4px;
+    background: transparent;
+}
+
+/* Relleno entre las bolas */
+.double-range-container::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right,
+            #e0e0e0 0%,
+            #e0e0e0 var(--min-pos, 0%),
+            #0d6efd var(--min-pos, 0%),
+            #0d6efd var(--max-pos, 100%),
+            #e0e0e0 var(--max-pos, 100%),
+            #e0e0e0 100%);
+    border-radius: 4px;
+    pointer-events: none;
+}
+
+.bg-contenedor-rojo {
+    background-color: red;
+}
+
+.bg-contenedor-azul {
+    background-color: #e3f2fd;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border-left: 4px solid #0d6efd;
+    width: 100%;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Solo estilos personalizados mínimos que Bootstrap no cubre */
+.bg-red-custom {
+    background-color: #dc3545;
+}
+
+.border-left-custom {
+    border-left: 1px solid #dee2e6;
+}
+
+/* Título principal */
+.titulo-catalogo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: #212529;
+    padding-left: 0;
+}
+
+@media (max-width: 768px) {
+    .border-left-custom {
+        border-left: none;
+        border-top: 1px solid #dee2e6;
+    }
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.transition-hover:hover {
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+}
+
+/* Estilos unificados para las tarjetas de filtros */
+.filtro-card {
+    border-bottom: 0.0938rem solid #e0e0e0;
+    overflow: hidden;
+}
+
+.filtro-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0px 8px 0px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #212529;
+}
+
+.filtro-card-body {
+    max-height: 12.5rem;
+    overflow-y: auto;
+}
+
+/* Estilos para los items de filtro */
+
+
+.filtro-label:hover {
+    color: #0d6efd;
+}
+
+.badge-count {
+    font-size: 0.7rem;
+    margin-left: 0.5rem;
+}
+
+/* Estilos del icono chevron */
+.icono-chevron-down {
+    width: 24px;
+    height: 24px;
+}
+
+
+/* En lista-producto.css */
+.filtro-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #495057;
+    margin-left: 0.5rem;
+    white-space: nowrap;      /* Evita salto de línea */
+    overflow: hidden;         /* Oculta el contenido que se desborda */
+    text-overflow: ellipsis;  /* Agrega "..." */
+    max-width: calc(100% - 30px); /* Ajusta el ancho máximo */
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.filtro-item {
+    margin-bottom: 0.5rem;
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+}
+
+.form-check-input {
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+}
+
+.btn-gradient {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
+    border: none;
+    color: white;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.bt-secundarioñ{
+    background: white;
+    border: 1px solid  oklch(27.4% 0.006 286.033);
+    color: oklch(27.4% 0.006 286.033);
+    border-radius: 8px;
+    cursor: pointer;
+}
+

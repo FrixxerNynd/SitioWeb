@@ -1,0 +1,242 @@
+<style>
+    .gradient-bg {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
+    }
+    .cursor-pointer {
+        cursor: pointer;
+    }
+    .btn-cerrar {
+        background: white;
+        border: 2px solid oklch(55.2% 0.016 285.938);
+        border-radius: 8px;
+        color: oklch(55.2% 0.016 285.938);
+        font-size: 1rem;
+        font-weight: 600;
+        text-align: center;
+        padding: 8px 24px;
+        cursor: pointer;
+    }
+
+    /* Efecto hover */
+    .btn-cerrar:hover {
+        background: oklch(55.2% 0.016 285.938);
+        color: white;
+    }
+
+    /* Efecto active (al hacer clic) */
+    .btn-cerrar:active {
+        transform: translateY(0);
+    }
+</style>
+
+<!-- Modal Términos y Condiciones  -->
+@if(visualizarModal()){
+    <!-- Overlay -->
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 z-40"
+         (click)="cerrarModal()">
+    </div>
+
+    <!-- Modal -->
+    <div class="modal show d-block"
+         id="terminosModal"
+         tabindex="-1"
+         role="dialog"
+         style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="terminosModalLabel">
+                        Términos y Condiciones
+                    </h5>
+                    <button type="button"
+                            class="btn-close "
+                            (click)="cerrarModal()"
+                            aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <!-- Sección 1 -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-primary">1. Aceptación de los Términos</h6>
+                            <p class="text-secondary small">Al acceder y utilizar los servicios de CABS Computación, usted acepta cumplir con estos términos y condiciones. Si no está de acuerdo con alguna parte de estos términos, no debe utilizar nuestros servicios.</p>
+                        </div>
+
+                        <!-- Sección 2 -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-primary">2. Descripción del Servicio</h6>
+                            <p class="text-secondary small">CABS Computación proporciona un catálogo de productos de cómputo y tecnología, permitiendo a los usuarios visualizar y solicitar información sobre productos disponibles.</p>
+                        </div>
+
+                        <!-- Sección 3 -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-primary">3. Registro de Cuenta</h6>
+                            <p class="text-secondary small">Para acceder a ciertas funcionalidades, deberá registrarse proporcionando información veraz y actualizada. Usted es responsable de mantener la confidencialidad de su contraseña y de todas las actividades que ocurran bajo su cuenta.</p>
+                        </div>
+
+                        <!-- Sección 4 -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-primary">4. Privacidad de Datos</h6>
+                            <p class="text-secondary small">Sus datos personales serán tratados conforme a nuestra Política de Privacidad. No compartiremos su información con terceros sin su consentimiento, excepto cuando sea requerido por ley.</p>
+                        </div>
+
+                        <!-- Sección 5 -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-primary">5. Propiedad Intelectual</h6>
+                            <p class="text-secondary small">Todo el contenido del catálogo, incluyendo imágenes, descripciones y logotipos, es propiedad de CABS Computación o de sus proveedores y está protegido por derechos de autor.</p>
+                        </div>
+
+                        <!-- Sección 6 -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-primary">6. Limitación de Responsabilidad</h6>
+                            <p class="text-secondary small">CABS Computación no será responsable por daños indirectos, pérdida de datos o lucro cesante derivado del uso de nuestros servicios.</p>
+                        </div>
+
+                        <!-- Sección 7 -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-primary">7. Modificaciones</h6>
+                            <p class="text-secondary small">Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios entrarán en vigor inmediatamente después de su publicación.</p>
+                        </div>
+
+                        <!-- Sección 8 -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-primary">8. Ley Aplicable</h6>
+                            <p class="text-secondary small">Estos términos se rigen por las leyes de México. Cualquier disputa será resuelta en los tribunales de la Ciudad de México.</p>
+                        </div>
+
+                        <!-- Fecha de actualización -->
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <small class="text-muted">Última actualización: 14 de mayo de 2026</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cerrar" (click)="cerrarModal()">Cerrar</button>
+                    <button type="button" class="btn btn-primary" (click)="cerrarModal()" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%); border: none;">
+                        Acepto los Términos
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="container-fluid vh-100 bg-light p-2 overflow-hidden">
+    <div class="row g-0 h-100 overflow-hidden">
+        <!-- CONTENEDOR IZQUIERDO -->
+        <div class="d-none d-lg-flex col-lg-6 rounded-4 gradient-bg flex-column p-4"
+             style="overflow: hidden; height: 100%;">
+            <!-- Logo -->
+            <div class="mb-4">
+                <div style="width: 80px; height: 80px;">
+                    <img src="logo-cabs.svg" alt="Logo CABS Computación">
+                </div>
+            </div>
+
+            <!-- Encabezado principal -->
+            <div class="mt-auto">
+                <h2 class="text-white fw-semibold">Accede de forma sencilla</h2>
+                <h2 class="text-white fw-semibold">al catálogo de productos de CABS Computación</h2>
+            </div>
+        </div>
+
+        <!-- CONTENEDOR DERECHO - FORMULARIO CUENTA -->
+        <div class="col-12 col-lg-6 d-flex align-items-start justify-content-center p-4 p-sm-5"
+             style="overflow-y: auto; height: 100%;">
+            <div class="w-100" style="max-width: 40.625rem;">
+                <!-- Icono para retroceder -->
+                <div class="mb-3">
+                    <a routerLink="/pre-registro/domicilio"
+                       class="text-decoration-none cursor-pointer d-inline-flex align-items-center gap-2"
+                       style="color: #4a5568; transition: all 0.2s ease;"
+                       onmouseover="this.style.color='#1e3a8a'; this.style.transform='translateX(-4px)';"
+                       onmouseout="this.style.color='#4a5568'; this.style.transform='translateX(0)';">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="2"
+                             stroke="currentColor"
+                             width="24"
+                             height="24">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                        </svg>
+                        <span class="fw-medium">Regresar</span>
+                    </a>
+                </div>
+
+                <!-- Encabezado del formulario -->
+                <div class="text-start mb-4">
+                    <h2 class="h1 fw-bold text-dark mb-2">Cuenta</h2>
+                    <p class="fs-5 fw-semibold text-secondary">Crea tu cuenta de acceso.</p>
+                </div>
+
+                <!-- Formulario Reactivo de Angular -->
+                <form>
+                    <!-- Campo: Correo Electrónico -->
+                    <div class="mb-4">
+                        <label for="emailInput" class="form-label fw-semibold mb-2">
+                            Correo Electrónico <span class="text-danger">*</span>
+                        </label>
+                        <input type="email"
+                               class="form-control form-control-lg"
+                               id="emailInput"
+                               formControlName="email"
+                               placeholder="nombre@ejemplo.com">
+                    </div>
+
+                    <!-- Campo: Contraseña -->
+                    <div class="mb-4">
+                        <label for="passwordInput" class="form-label fw-semibold mb-2">
+                            Contraseña <span class="text-danger">*</span>
+                        </label>
+                        <input type="password"
+                               class="form-control form-control-lg"
+                               id="passwordInput"
+                               formControlName="password"
+                               placeholder="Mínimo 6 caracteres">
+
+                    </div>
+
+                    <!-- Checkbox: Términos y Condiciones -->
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="terminosCheckbox"
+                                   formControlName="terminos"
+                                   style="cursor: pointer;">
+                            <label class="form-check-label fw-medium"
+                                   for="terminosCheckbox"
+                                   style="cursor: pointer;">
+                                Yo acepto los <span (click)="abrirModal()"
+                                                  target="_blank"
+                                                  class="text-primary text-decoration-none fw-semibold">
+                                    Términos y Condiciones
+                        </span><span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    <!-- Botón de Recaptcha -->
+                    </div>
+                    <span class="msg-error error"></span>
+                    <div id="recaptcha-v2-container" class="mb-3"></div>
+                    @if(recaptchaError()){
+                      <div class="text-danger small mb-2">
+                         Por favor completa el reCAPTCHA
+                      </div>
+                    }
+
+                    <!-- Botón de envío -->
+                    <button type="submit"
+                            (click)="onSubmit()"
+                            class="btn btn-lg w-100 fw-semibold py-2 mb-4"
+                            style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
+                                   border: none; color: white; border-radius: 8px;">
+                      Crear cuenta
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
