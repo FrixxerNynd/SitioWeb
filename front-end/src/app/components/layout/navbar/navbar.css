@@ -1,0 +1,240 @@
+.navbar {
+    background: white;
+    border-bottom: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    padding: 0.25rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.container-fluid {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.logo-imagen {
+    width: 120px;
+    height: 60px;
+    object-fit: contain;
+    transition: transform 0.2s ease;
+}
+
+.logo-imagen:hover {
+    transform: scale(1.02);
+}
+
+.d-flex {
+    flex: 1;
+    justify-content: center;
+    gap: 1.5rem !important;
+}
+
+.nav-link {
+    font-size: 14px;
+    font-weight: 500;
+    color: #4a5568;
+    text-decoration: none;
+    padding: 6px 12px;
+    position: relative;
+    transition: all 0.2s ease;
+    border-radius: 8px;
+}
+
+.nav-link:hover {
+    color: #373672;
+    background: #E3E6F6;
+    border-radius: 8px;    
+}
+
+.nav-link::after {
+    display: none;
+}
+
+.nav-link.active-link {
+    color: #373672;
+    font-weight: 600;
+    background: #E3E6F6;
+    border-radius: 8px;
+}
+
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.user-menu:hover {
+    background: #eef2ff;
+    transform: translateY(-1px);
+}
+
+.conteniner-avatar {
+    width: 32px;
+    height: 32px;
+    background: oklch(21% 0.006 285.885);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.text-avatar {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.nombre-rol {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.2;
+}
+
+.nombre-usuario {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.rol-usuario {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.icono-arrow {
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s ease;
+}
+
+.user-menu:hover .icono-arrow {
+    transform: translateY(2px);
+}
+
+.icono-arrow svg {
+    width: 16px;
+    height: 16px;
+    fill: #6b7280;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 1.5rem;
+    min-width: 200px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+    z-index: 1001;
+    overflow: hidden;
+    animation: dropdownFadeIn 0.2s ease;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-item {
+    display: block;
+    padding: 10px 16px;
+    color: #374151;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.dropdown-item:hover {
+    background: #f3f4f6;
+    color: #ef4444;
+}
+
+.dropdown-item:last-child {
+    color: #dc2626;
+    border-top: 1px solid #f0f0f0;
+}
+
+.dropdown-item:last-child:hover {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0 1rem;
+        gap: 1rem;
+    }
+    
+    .logo-imagen {
+        width: 100px;
+        height: 50px;
+    }
+    
+    .d-flex {
+        gap: 0.75rem !important;
+    }
+    
+    .nav-link {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+    
+    .conteniner-avatar {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .text-avatar {
+        font-size: 12px;
+    }
+    
+    .nombre-usuario {
+        font-size: 11px;
+    }
+    
+    .rol-usuario {
+        font-size: 9px;
+    }
+    
+    .user-menu {
+        padding: 4px 8px;
+        gap: 6px;
+    }
+    
+    .dropdown-menu {
+        right: 1rem;
+        min-width: 180px;
+    }
+    
+    .dropdown-item {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .d-flex {
+        display: none !important;
+    }
+}

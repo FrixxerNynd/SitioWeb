@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, forwardRef } from '@angular/core';
+import { Component, Input, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -34,15 +34,23 @@ export class Inputs implements ControlValueAccessor {
   writeValue(val: any) {
     this.value = val;
   }
+  
   registerOnChange(fn: any) {
     this.onChange = fn;
   }
+  
   registerOnTouched(fn: any) {
     this.onTouched = fn;
   }
 
   onInput(event: any) {
-    this.value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+    if (this.type === 'checkbox') {
+      this.value = event.target.checked;
+    } else if (this.type === 'radio') {
+      this.value = event.target.value;
+    } else {
+      this.value = event.target.value;
+    }
     this.onChange(this.value);
     this.onTouched();
   }

@@ -1,30 +1,50 @@
 <nav class="navbar bg-body-tertiary">
     <div class="container-fluid">
-        <a class="navbar-brand">
-            <img src="logo-completo.svg" alt="Logo CABS Computación" width="200" height="200"
-                class="d-inline-block align-text-top">
-        </a>
-        
-        <div class="d-flex justify-content-center align-items-center">
-            <a class="nav-link me-3" routerLink="/catalogo-producto/lista-producto">Catálogo de Productos</a>
-            <a class="nav-link" routerLink="/catalogo-producto/detalles-producto">Mis órdenes</a>
+        <div class="navbar-brand">
+            <img src="logo-completo.svg" alt="Logo CABS Computación" 
+                class="d-inline-block align-text-top logo-imagen">
         </div>
         
-        <!-- Contenedor del avatar del usuario -->
-        <div class="d-flex align-items-center">
-            <div class="dropdown">
-                <button class="btn btn-link dropdown-toggle d-flex align-items-center" type="button" 
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                    <div styles=" white: 40px; height: 40; background: #red;">
-                    </div>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#">Mi perfil</a></li>
-                    <li><a class="dropdown-item" href="#">Configuración</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#">Cerrar sesión</a></li>
-                </ul>
+        <div class="d-flex justify-content-center align-items-center gap-3">
+            <a class="nav-link" 
+               routerLink="catalogo-producto/lista-producto"
+               routerLinkActive="active-link">
+               Catálogo de Productos
+            </a>
+            <a class="nav-link" 
+               routerLink="ordenes/lista-ordenes"
+               routerLinkActive="active-link">
+               Mis órdenes
+            </a>
+        </div>
+        
+        <div class="user-menu" (click)="toggleDropdown()">
+            <div class="conteniner-avatar">
+                <span class="text-avatar">NU</span>
+            </div>
+            <div class="nombre-rol">
+                <span class="nombre-usuario">Nombre del usuario</span>
+                <span class="rol-usuario">Tipo de rol del usuario</span>
+            </div>
+            <div class="icono-arrow">
+                @if(dropOpciones){
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                        <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                    </svg>               
+                } @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                    </svg>
+                }
             </div>
         </div>
+
+        @if(dropOpciones){
+            <div class="dropdown-menu">
+                <div class="dropdown-item" (click)="cerrarSesion()">
+                    Cerrar Sesión
+                </div>
+            </div>
+        }
     </div>
 </nav>
