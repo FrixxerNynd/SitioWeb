@@ -368,5 +368,5 @@ FodyWeavers.xsd
 node_modules/
 dist/
 
-appsetings.Development.json
+appsettings.Development.json
 appsettings.json

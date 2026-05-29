@@ -19,6 +19,11 @@ namespace back_cabs.CRM.Interfaces.Legacy
         Task<AdmCliente> InsertAsync(AdmCliente cliente);
 
         /// <summary>
+        /// Actualiza un cliente en la base de datos
+        /// </summary>
+        Task<AdmCliente> UpdateAsync(AdmCliente cliente);
+
+        /// <summary>
         /// Búsqueda paginada de clientes con filtros
         /// </summary>
         Task<(List<models.legacy.AdmCliente> Clientes, int TotalRegistros)> SearchPaginatedAsync(AdmClienteFilterDto filter);
@@ -27,7 +32,7 @@ namespace back_cabs.CRM.Interfaces.Legacy
         /// Obtener cliente por ID con su domicilio
         /// </summary>
         Task<models.legacy.AdmCliente?> GetByIdWithDomicilioAsync(int idCliente, int? tipoDireccion = 1);
-    
+
         /// <summary>
         /// Validar credenciales (soporte legacy)
         /// </summary>

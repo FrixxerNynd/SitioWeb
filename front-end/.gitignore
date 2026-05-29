@@ -41,3 +41,6 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+pnpm-lock.yaml
+pnpm-workspace.yaml
