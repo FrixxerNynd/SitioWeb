@@ -5,11 +5,12 @@ import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SecureAuthService } from '../../../../../services/secure-auth.service';
 import { ExcelNorteCatalogoService, Brand, Category, IProduct } from '../../../../../services/exel-api-base.service';
+import { UIProductoCard } from '../../../../../components/shared/producto-card/producto-card';
 
 @Component({
     selector: 'app-lista-producto',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule],
+    imports: [CommonModule, RouterModule, FormsModule,UIProductoCard],
     templateUrl: './lista-producto.html',
     styleUrl: './lista-producto.css'
 })

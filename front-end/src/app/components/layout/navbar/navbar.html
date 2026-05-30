@@ -18,13 +18,12 @@
             </a>
         </div>
         
-        <div class="user-menu" (click)="toggleDropdown()">
+        <div class="user-menu" (click)="toggleDropdown($event)">
             <div class="conteniner-avatar">
-                <span class="text-avatar">NU</span>
+                <span class="text-avatar">{{ getInitials() }}</span>
             </div>
             <div class="nombre-rol">
-                <span class="nombre-usuario">Nombre del usuario</span>
-                <span class="rol-usuario">Tipo de rol del usuario</span>
+                <span class="nombre-usuario">{{ getNombreCompleto() }}</span>
             </div>
             <div class="icono-arrow">
                 @if(dropOpciones){
@@ -37,14 +36,14 @@
                     </svg>
                 }
             </div>
-        </div>
-
-        @if(dropOpciones){
-            <div class="dropdown-menu">
-                <div class="dropdown-item" (click)="cerrarSesion()">
-                    Cerrar Sesión
+            
+            @if(dropOpciones){
+                <div class="dropdown-menu">
+                    <div class="dropdown-item" (click)="cerrarSesion()">
+                        Cerrar Sesión
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
 </nav>

@@ -1,0 +1,59 @@
+@switch(tipo) {
+    @case('primario') {
+        <button class="btn btn-primario btn-{{size}} cursor-pointer"
+                [class.btn-full]="widthType === 'full'"
+                [style.width]="buttonWidth"
+                [type]="type"
+                [disabled]="disabled"
+                (click)="onClick($event)">
+            @if(viewIcon) {
+                <span class="btn-icon">
+                    <ng-content select="[icon]"></ng-content>
+                </span>
+            }
+            <span class="btn-text">{{ text }}</span>
+            <ng-content></ng-content>
+        </button>
+    }
+    
+    @case('secundario') {
+        <button class="btn btn-secundario btn-{{size}} cursor-pointer"
+                [class.btn-full]="widthType === 'full'"
+                [style.width]="buttonWidth"
+                [type]="type"
+                [disabled]="disabled"
+                (click)="onClick($event)">
+            @if(viewIcon) {
+                <span class="btn-icon">
+                    <ng-content select="[icon]"></ng-content>
+                </span>
+            }
+            <span class="btn-text">{{ text }}</span>
+            <ng-content></ng-content>
+        </button>
+    }
+    
+    @case('cerrar') {
+        <button class="btn btn-cerrar btn-{{size}} cursor-pointer"
+                [class.btn-full]="widthType === 'full'"
+                [style.width]="widthType === 'full' ? '100%' : 'auto'"
+                type="button"
+                [disabled]="disabled"
+                (click)="onClick($event)"
+                aria-label="Cerrar">
+            <span class="close-icon">✕</span>
+            <ng-content></ng-content>
+        </button>
+    }
+    
+    @case('icono') {
+        <button class="btn btn-icono btn-{{size}} cursor-pointer"
+                [style.width]="widthType === 'full' ? '100%' : 'auto'"
+                [type]="type"
+                [disabled]="disabled"
+                (click)="onClick($event)"
+                [attr.aria-label]="text">
+            <ng-content></ng-content>
+        </button>
+    }
+}

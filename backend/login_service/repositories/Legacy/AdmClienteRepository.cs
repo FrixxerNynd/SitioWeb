@@ -109,6 +109,31 @@ namespace back_cabs.CRM.repositories.Legacy
         }
 
         /// <summary>
+        /// Actualizar/Editar un cliente en la base de datos
+        /// </summary>
+        public async Task<AdmCliente> UpdateAsync(AdmCliente cliente)
+        {
+            try
+            {
+                _writeContext.AdmClientes.Update(cliente);
+                var succes = await _writeContext.SaveChangesAsync();
+                if (succes == 0)
+                {
+                    _logger.LogWarning("⚠️ No se actualizó ningún cliente");
+                    throw new Exception("No se pudo actualizar el cliente");
+                }
+
+                _logger.LogInformation("✅ Cliente actualizado con ID {IdCliente}", cliente.CIdClienteProveedor);
+                return cliente;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error al actualizar cliente");
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Búsqueda paginada con filtros múltiples
         /// </summary>
         public async Task<(List<AdmCliente> Clientes, int TotalRegistros)> SearchPaginatedAsync(AdmClienteFilterDto filter)
@@ -139,7 +164,7 @@ namespace back_cabs.CRM.repositories.Legacy
                 if (!string.IsNullOrWhiteSpace(filter.Email))
                 {
                     var email = filter.Email.Trim().ToLower();
-                    query = query.Where(c => 
+                    query = query.Where(c =>
                         c.CEmail1.ToLower().Contains(email) ||
                         c.CEmail2.ToLower().Contains(email) ||
                         c.CEmail3.ToLower().Contains(email)
@@ -225,7 +250,7 @@ namespace back_cabs.CRM.repositories.Legacy
 
                 if (cliente == null) return null;
 
-                _logger.LogInformation("✅ Cliente {IdCliente} encontrado: {RazonSocial}", 
+                _logger.LogInformation("✅ Cliente {IdCliente} encontrado: {RazonSocial}",
                     idCliente, cliente.CRazonSocial);
 
                 return cliente;

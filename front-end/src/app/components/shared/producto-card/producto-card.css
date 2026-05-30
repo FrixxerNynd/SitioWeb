@@ -17,12 +17,12 @@
   padding: 20px;
   margin-bottom: 12px;
 }
-.cards-grid {
+/* .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+  gap: 10px;
   padding: 20px;
-}
+} */
 
 .producto-card {
   background: white;
@@ -106,7 +106,7 @@
 .btn-agregar,
 .btn-detalles {
   flex: 1;
-  padding: 10px 16px;
+  padding: 10px 10px;
   border: none;
   border-radius: 6px;
   font-size: 16px;
@@ -127,4 +127,19 @@
 .btn-agregar:active,
 .btn-detalles:active {
   transform: scale(0.98);
+}
+
+.stock-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.producto-marca {
+  font-size: 13px;
+  color: #999;
+  margin: 0 0 8px 0;
 }

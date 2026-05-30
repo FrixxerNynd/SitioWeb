@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { CookieService } from './cookie.service';
 
 export interface User {
   id: number;
@@ -17,12 +18,13 @@ export interface AuthResponse {
   user: User;
   token: string;
   refreshToken?: string;
-  expiresIn: string; 
+  expiresIn: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class SecureAuthService {
   private http = inject(HttpClient);
+  private cookieService = inject(CookieService);
   private apiUrl = environment.apiCabsUrl;
 
   login(credentials: { email: string; password: string }): Observable<AuthResponse> {
@@ -32,10 +34,13 @@ export class SecureAuthService {
       .pipe(
         tap(response => {
           console.log('📡 Respuesta del backend:', response);
-            if (response && response.user) {
-              localStorage.setItem('user', JSON.stringify(response.user));
+          if (response && response.user) {
+            localStorage.setItem('user', JSON.stringify(response.user));
+            
             if (response.token) {
-              localStorage.setItem('token', response.token);
+              // Guardar token en cookie en lugar de localStorage
+              this.cookieService.setCookie('token', response.token, 7);
+              console.log('✅ Token guardado en cookie');
             }
             console.log('✅ Usuario guardado:', response.user);
           } else {
@@ -46,8 +51,13 @@ export class SecureAuthService {
   }
 
   logout(): void {
-    localStorage.clear();
-    console.log('👋 Sesión cerrada');
+      localStorage.removeItem('user');
+      this.cookieService.deleteCookie('token');
+      console.log('👋 Sesión cerrada correctamente');
+  }
+
+  getToken(): string | null {
+    return this.cookieService.getCookie('token');
   }
 
   getCurrentUser(): User | null {
@@ -56,6 +66,6 @@ export class SecureAuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.getCurrentUser();
+    return !!this.getCurrentUser() && this.cookieService.hasCookie('token');
   }
 }

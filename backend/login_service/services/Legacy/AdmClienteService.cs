@@ -46,31 +46,142 @@ namespace back_cabs.CRM.services.Legacy
                 .AnyAsync(c => c.CRfc == clientData.RFC);
             if (existeRfc)
             {
-                
+
                 _logger.LogWarning("Intento de registro con RFC duplicado: {RFC}", clientData.RFC);
             }
-            
+
 
             var nuevoCliente = new AdmCliente
             {
+                //Datos Personales
                 CCodigoCliente = clientData.RFC, // Usamos RFC como código cliente para garantizar unicidad
                 CRazonSocial = $"{clientData.Nombre} {clientData.ApellidoPaterno} {clientData.ApellidoMaterno}".Trim(),
                 CRfc = clientData.RFC,
                 CCurp = clientData.CURP,
+
+                //Datos Financieros y de contacto
+                CIdMoneda = 0,
+                CListaPrecioCliente = 0,
+                CDescuentoDocto = 0,
+                CDescuentoMovto = 0,
+                CIdValorClasifCliente1 = 0,
+                CIdValorClasifCliente2 = 0,
+                CIdValorClasifCliente3 = 0,
+                CIdValorClasifCliente4 = 0,
+                CIdValorClasifCliente5 = 0,
+                CIdValorClasifCliente6 = 0,
+                CTipoCliente = 1, // Asumimos tipo cliente
+                CEstatus = 0, // Inactivo hasta que se apruebe
+
+                // Datos iniciales de credito
                 CBanVentaCredito = 1, // Asumimos que el nuevo cliente puede tener crédito
+                CLimiteCreditoCliente = 0,
+                CDiasCreditoCliente = 0,
+                CBanExcederCredito = 0,
+                CDescuentoProntoPago = 0,
+                CDiasProntoPago = 0,
+                CInteresMoratorio = 0,
+                CDiaPago = 31,
+                CDiasRevision = 31,
+                CDiasEmbarqueCliente = 0,
+                CIdAlmacen = 0,
+                CIdAgenteVenta = 0,
+                CIdAgenteCobro = 0,
+                CRestriccionAgente = 0,
+                CImpuesto1 = 0,
+                CImpuesto2 = 0,
+                CImpuesto3 = 0,
+                CRetencionCliente1 = 0,
+                CRetencionCliente2 = 0,
+                CIdValorClasifProveedor1 = 0,
+                CIdValorClasifProveedor2 = 0,
+                CIdValorClasifProveedor3 = 0,
+                CIdValorClasifProveedor4 = 0,
+                CIdValorClasifProveedor5 = 0,
+                CLimiteCreditoProveedor = 0,
+                CDiasCreditoProveedor = 0,
+                CTiempoEntrega = 0,
+                CDiasEmbarqueProveedor = 0,
+                CImpuestoProveedor1 = 0,
+                CImpuestoProveedor2 = 0,
+                CImpuestoProveedor3 = 0,
+                CRetencionProveedor1 = 0,
+                CRetencionProveedor2 = 0,
+                CBanInteresMoratorio = 0,
+                CComVentaExcepCliente = 0,
+                CComCobroExcepCliente = 0,
+                CBanProductoConsignacion = 0,
+                CSegContCliente1 = "",
+                CSegContCliente2 = "",
+                CSegContCliente3 = "",
+                CSegContCliente4 = "",
+                CSegContCliente5 = "",
+                CSegContCliente6 = "",
+                CSegContCliente7 = "",
+                CSegContProveedor1 = "",
+                CSegContProveedor2 = "",
+                CSegContProveedor3 = "",
+                CSegContProveedor4 = "",
+                CSegContProveedor5 = "",
+                CSegContProveedor6 = "",
+                CSegContProveedor7 = "",
+                CBanDomicilio = 0,
+                CBanCreditoYCobranza = 0,
+                CBanEnvio = 0,
+                CBanAgente = 0,
+                CBanImpuesto = 0,
+                CBanPrecio = 0,
+                CFacTerc01 = 0,
+                CComVenta = 0,
+                CComCobro = 0,
+                CIdMoneda2 = 0,
+                CTipoEntre = 0,
+                CConcTeEma = 0,
+                CFtoAddend = 0,
+                CIdCertCte = 0,
+                CEncripEnt = 0,
+                CBanCfd = 0,
+                CIdAddenda = -1,
+                CCodProvCo = "",
+                CEnvAcUse = 0,
+                CCon1Nom = "",
+                CCon1Tel = "",
+                CQuitaBlan = 0,
+                CFmtoEntre = 0,
+                CIdComplem = -1,
+                CDesglosaI2 = 0,
+                CLimDoctos = 0,
+                CSitioFtp = "",
+                CUsrFtp = "",
+                CMetodoPag = "",
+                CNumCtaPag = "",
+                CIdCuenta = 0,
+                CUsoCfdi = "",
+                CRegimFisc = "",
+                CCodigoAlterno = "",
+
+                //Datos de Contacto
                 CEmail1 = clientData.Email,
                 CEmail2 = clientData.Email2,
                 CEmail3 = clientData.Email3,
-                CTipoCliente = 1, // Asumimos tipo cliente
-                CEstatus = 0, // Inactivo hasta que se apruebe
+                CWhatsapp = clientData.Telefono,
+
+                //Campos Extra
                 CTextoExtra1 = clientData.Contraseña,
                 CTextoExtra2 = "Cliente registrado desde sitio web",
-                CWhatsapp = clientData.Telefono,
+                CTextoExtra3 = "",
+                CTextoExtra4 = "",
+                CTextoExtra5 = "",
+                CImporteExtra1 = 0,
+                CImporteExtra2 = 0,
+                CImporteExtra3 = 0,
+                CImporteExtra4 = 0,
+                CImporteExtra5 = 0,
+                CFechaExtra = DateTime.Now,
 
                 //Fechas
                 CFechaAlta = DateTime.Now,
                 CFechaBaja = new DateTime(1899, 12, 30),
-                CFechaExtra = DateTime.Now,
                 CFechaUltimaRevision = DateTime.Now,
             };
             var clienteInsertado = await _repository.InsertAsync(nuevoCliente);
@@ -82,7 +193,7 @@ namespace back_cabs.CRM.services.Legacy
             {
                 CIdCatalogo = clienteInsertado.CIdClienteProveedor,
                 CTipoCatalogo = 1, // Cliente
-                CTipoDireccion = 1,
+                CTipoDireccion = 1, // 1 Fiscal / 0 Normal
                 CNombreCalle = clientData.UbicacionDetalle.Calle,
                 CNumeroExterior = clientData.UbicacionDetalle.NumeroExterior,
                 CNumeroInterior = clientData.UbicacionDetalle.NumeroInterior,
@@ -99,17 +210,80 @@ namespace back_cabs.CRM.services.Legacy
                 CTelefono3 = clientData.UbicacionDetalle.TelefonoCompleto,
                 CTelefono4 = clientData.Telefono, // También guardamos el teléfono principal del cliente
 
-                
+
             };
             var domicilioInsertado = await _repository.InsertDomicilioAsync(nuevoDomicilio);
 
             _logger.LogInformation("Nuevo domicilio registrado con ID {IdDomicilio}", domicilioInsertado.CIdDireccion);
 
-            return new ServiceResult<AdmClienteConDomicilioResponseDto> 
+            return new ServiceResult<AdmClienteConDomicilioResponseDto>
             {
                 Success = true,
                 Message = "Cliente registrado exitosamente",
                 Data = MapToDto(clienteInsertado, domicilioInsertado, true)
+            };
+        }
+
+        public async Task<ServiceResult<AdmClienteConDomicilioResponseDto>> AutorizarClienteAsync(int idCliente, AutorizarClienteRequestDto autorizacionData)
+        {
+            // Buscar el cliente por ID
+            var cliente = await _context.AdmClientes
+                .FirstOrDefaultAsync(c => c.CIdClienteProveedor == idCliente);
+
+            if (cliente == null)
+            {
+                _logger.LogWarning("Intento de autorización de cliente inexistente con ID: {IdCliente}", idCliente);
+                return new ServiceResult<AdmClienteConDomicilioResponseDto>
+                {
+                    Success = false,
+                    Message = $"No se encontró el cliente con ID {idCliente}"
+                };
+            }
+
+            if (cliente.CEstatus == 1)
+            {
+                _logger.LogWarning("Intento de autorización de cliente ya activo con ID: {IdCliente}", idCliente);
+                return new ServiceResult<AdmClienteConDomicilioResponseDto>
+                {
+                    Success = false,
+                    Message = "El cliente ya se encuentra autorizado/activo"
+                };
+            }
+
+            // ── Datos financieros ──────────────────────────────────────────
+            cliente.CListaPrecioCliente = autorizacionData.ListaPrecio ?? cliente.CListaPrecioCliente;
+            cliente.CLimiteCreditoCliente = autorizacionData.LimiteCredito ?? cliente.CLimiteCreditoCliente;
+            cliente.CDiasCreditoCliente = autorizacionData.DiasCredito ?? cliente.CDiasCreditoCliente;
+            cliente.CBanVentaCredito = autorizacionData.PermiteCredito ?? cliente.CBanVentaCredito;
+            cliente.CBanExcederCredito = autorizacionData.PuedeExcederCredito ?? cliente.CBanExcederCredito;
+            cliente.CDescuentoDocto = autorizacionData.DescuentoDocto ?? cliente.CDescuentoDocto;
+            cliente.CDescuentoMovto = autorizacionData.DescuentoMovto ?? cliente.CDescuentoMovto;
+
+            // ── Estatus y entrega ──────────────────────────────────────────
+            cliente.CEstatus = 1; // Activo — siempre se activa al autorizar
+            cliente.CTipoEntre = autorizacionData.TipoEntrega ?? cliente.CTipoEntre;
+
+            // ── Fecha de revisión ──────────────────────────────────────────
+            cliente.CFechaUltimaRevision = DateTime.Now;
+
+            await _repository.UpdateAsync(cliente);
+
+            _logger.LogInformation(
+                "Cliente con ID {IdCliente} autorizado exitosamente. Límite crédito: {Limite}, Días crédito: {Dias}",
+                idCliente,
+                cliente.CLimiteCreditoCliente,
+                cliente.CDiasCreditoCliente);
+
+            // Recuperar domicilio para armar el DTO de respuesta
+            var domicilio = await _context.AdmDomicilios
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.CIdCatalogo == idCliente && d.CTipoCatalogo == 1);
+
+            return new ServiceResult<AdmClienteConDomicilioResponseDto>
+            {
+                Success = true,
+                Message = "Cliente autorizado exitosamente",
+                Data = MapToDto(cliente, domicilio, true)
             };
         }
 

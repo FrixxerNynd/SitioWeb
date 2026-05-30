@@ -1,29 +1,37 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-producto-card',
-  imports: [CommonModule],
+  selector: 'ui-producto-card',
+  imports: [CommonModule, RouterLink],
   templateUrl: './producto-card.html',
   styleUrl: './producto-card.css',
 })
-
-//no se de donde obtiene la info btw
-export class ProductoCard {
+export class UIProductoCard {
   @Input() nombre: string = '';
   @Input() precio: number = 0;
   @Input() precioOriginal: number = 0;
   @Input() descuento: number = 0;
   @Input() imagen: string = '';
+  @Input() oferta: boolean = false;
+  @Input() stock: number = 0;
+  @Input() marca: string = '';
+  @Input() categoria: string = '';
+  @Input() productoId: number = 0;
 
   @Output() agregar = new EventEmitter<void>();
-  @Output() verDetalles = new EventEmitter<void>();
 
-  onAgregar() {
-    this.agregar.emit();
+  get tieneOferta(): boolean {
+    return this.oferta && this.descuento > 0;
   }
 
-  onVerDetalles() {
-    this.verDetalles.emit();
+  get stockClass(): string {
+    if (this.stock === 0) return 'stock-agotado';
+    if (this.stock <= 5) return 'stock-bajo';
+    return 'stock-disponible';
+  }
+  onAgregar() {
+    this.agregar.emit();
   }
 }

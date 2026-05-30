@@ -1,0 +1,130 @@
+/* Estilo base */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    font-family: inherit;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Estilos de los botones primarios */
+.btn-primario {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
+    color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn-primario:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.btn-primario:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* Estilos secundarios */
+.btn-secundario {
+    background-color: #6b7280;
+    color: white;
+}
+
+.btn-secundario:hover:not(:disabled) {
+    background-color: #4b5563;
+    transform: translateY(-1px);
+}
+
+.btn-secundario:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* Estilos cerrar */
+.btn-cerrar {
+    background-color: #ef4444;
+    color: white;
+    border-radius: 4px;
+}
+
+.btn-cerrar:hover:not(:disabled) {
+    background-color: #dc2626;
+    transform: scale(1.05);
+}
+
+/* Estilos icono */
+.btn-icono {
+    background-color: transparent;
+    color: #6b7280;
+    padding: 8px;
+    border-radius: 9999px;
+}
+
+.btn-icono:hover:not(:disabled) {
+    background-color: #f3f4f6;
+    color: #374151;
+    transform: scale(1.1);
+}
+
+/* Tamaños */
+.btn-xs {
+    padding: 4px 12px;
+    font-size: 12px;
+    gap: 4px;
+}
+
+.btn-md {
+    padding: 8px 16px;
+    font-size: 14px;
+    gap: 6px;
+}
+
+.btn-lg {
+    padding: 10px 20px;
+    font-size: 16px;
+    gap: 8px;
+}
+
+/* Ancho completo */
+.btn-full {
+    width: 100%;
+    display: flex;
+}
+
+/* Ancho fijo se aplica mediante style.width, no necesita clase específica */
+/* Para mantener consistencia, los botones con ancho fijo tendrán min-width para evitar que se encojan demasiado */
+.btn[style*="width"] {
+    min-width: fit-content;
+}
+
+/* Iconos */
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-text {
+    display: inline-block;
+}
+
+.close-icon {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* Estilo específico para botón icono sin texto */
+.btn-icono .btn-text {
+    display: none;
+}

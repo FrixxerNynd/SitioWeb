@@ -8,7 +8,16 @@
       "^/api-exel": ""
     },
     "headers": {
-      "Authorization": "LLave_de_api"
+      "Authorization": ""
+    }
+  },
+  "/api-mexico": {
+    "target": "https://mexico-api.devaleff.com",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api-mexico": "/api"
     }
   }
 }
