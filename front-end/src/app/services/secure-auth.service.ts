@@ -51,9 +51,9 @@ export class SecureAuthService {
   }
 
   logout(): void {
-    localStorage.clear();
-    this.cookieService.deleteCookie('token');
-    console.log('👋 Sesión cerrada');
+      localStorage.removeItem('user');
+      this.cookieService.deleteCookie('token');
+      console.log('👋 Sesión cerrada correctamente');
   }
 
   getToken(): string | null {

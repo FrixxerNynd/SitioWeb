@@ -2,7 +2,7 @@
 export const environment = {
     production: false,
     apiExcelUrl: '/api-exel',
-    Authorization: 'Clave_api',    
+    Authorization: '',    
     apiCabsUrl: 'http://localhost:5176',
     apiMexicoUrl: '/api-mexico' 
 };

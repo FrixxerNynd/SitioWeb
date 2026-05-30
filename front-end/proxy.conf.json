@@ -8,7 +8,7 @@
       "^/api-exel": ""
     },
     "headers": {
-      "Authorization": "LLave_de_api"
+      "Authorization": ""
     }
   },
   "/api-mexico": {
