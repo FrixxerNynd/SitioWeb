@@ -168,10 +168,10 @@ export class PageListaProducto implements OnInit {
     }
     
     ngOnInit() {
-        if (!this.authService.isAuthenticated()) {
-            this.router.navigate(['/inicio-sesion']);
-            return;
-        }
+//        if (!this.authService.isAuthenticated()) {
+  //          this.router.navigate(['/inicio-sesion']);
+    //        return;
+      //  }
         
         this.currentUser = this.authService.getCurrentUser();
         console.log('Usuario autenticado:', this.currentUser);

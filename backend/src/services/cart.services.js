@@ -44,8 +44,8 @@ class CartService {
                 where: { cartId: cart.id, productId }
             });
         } else {
-            // Regla de Negocio: Validar existencias reales en tiempo real con el catálogo externo
-            const externalData = await ExelService.fetchExternalProducts({ id: productId });
+            // 🔥 SOLO ESTA LÍNEA CAMBIA - usa el método con caché
+            const externalData = await ExelService.fetchExternalProductsWithCache({ id: productId });
             const externalProduct = externalData?.datos?.find(p => p.id === productId);
             
             if (!externalProduct) throw new Error("El producto seleccionado ya no existe en el catálogo.");
@@ -67,9 +67,9 @@ class CartService {
                     data: {
                         cartId: cart.id,
                         productId,
-                        sku: externalProduct.sku, //
-                        name: externalProduct.nombre, //
-                        price: parseFloat(externalProduct.precio), //
+                        sku: externalProduct.sku,
+                        name: externalProduct.nombre,
+                        price: parseFloat(externalProduct.precio),
                         quantity,
                         totalPrice: parseFloat(externalProduct.precio) * quantity
                     }
