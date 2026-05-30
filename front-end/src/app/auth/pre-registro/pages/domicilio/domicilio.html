@@ -1,232 +1,228 @@
+<!-- front-end/src/app/auth/pre-registro/pages/domicilio/domicilio.html -->
 <style>
     .gradient-bg {
         background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
     }
+
     .cursor-pointer {
         cursor: pointer;
+    }
+
+    .loading-spinner-sm {
+        width: 1rem;
+        height: 1rem;
+        margin-left: 0.5rem;
     }
 </style>
 
 <div class="container-fluid vh-100 bg-light p-2 overflow-hidden">
     <div class="row g-0 h-100 overflow-hidden">
         <!-- CONTENEDOR IZQUIERDO -->
-        <div class="d-none d-lg-flex col-lg-6 rounded-4 gradient-bg flex-column p-4" 
-             style="overflow: hidden; height: 100%;">
-            <!-- Logo -->
+        <div class="d-none d-lg-flex col-lg-6 rounded-4 gradient-bg flex-column p-4"
+            style="overflow: hidden; height: 100%;">
             <div class="mb-4">
                 <div style="width: 80px; height: 80px;">
                     <img src="logo-cabs.svg" alt="Logo CABS Computación">
                 </div>
             </div>
-
-            <!-- Encabezado principal -->
             <div class="mt-auto">
                 <h2 class="text-white fw-semibold">Accede de forma sencilla</h2>
                 <h2 class="text-white fw-semibold">al catálogo de productos de CABS Computación</h2>
             </div>
         </div>
 
-        <!-- CONTENEDOR DERECHO - CON SCROLL VERTICAL -->
-        <div class="col-12 col-lg-6 d-flex align-items-start justify-content-center p-4 p-sm-5" 
-             style="overflow-y: auto; height: 100%;" >
+        <!-- CONTENEDOR DERECHO -->
+        <div class="col-12 col-lg-6 d-flex align-items-start justify-content-center p-4 p-sm-5"
+            style="overflow-y: auto; height: 100%;">
             <div class="w-100" style="max-width: 40.625rem;">
-                <!-- Icono para retroceder -->
+                <!-- Botón regresar -->
                 <div class="mb-3">
-                    <a routerLink="/pre-registro/datos-personales" 
-                       class="text-decoration-none cursor-pointer d-inline-flex align-items-center gap-2"
-                       style="color: #4a5568; transition: all 0.2s ease;"
-                       onmouseover="this.style.color='#1e3a8a'; this.style.transform='translateX(-4px)';"
-                       onmouseout="this.style.color='#4a5568'; this.style.transform='translateX(0)';">
-                        <svg xmlns="http://www.w3.org/2000/svg" 
-                             fill="none" 
-                             viewBox="0 0 24 24" 
-                             stroke-width="2" 
-                             stroke="currentColor" 
-                             width="24" 
-                             height="24">
-                            <path stroke-linecap="round" 
-                                  stroke-linejoin="round" 
-                                  d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                    <a routerLink="/pre-registro/datos-personales"
+                        class="text-decoration-none cursor-pointer d-inline-flex align-items-center gap-2"
+                        style="color: #4a5568; transition: all 0.2s ease;"
+                        onmouseover="this.style.color='#1e3a8a'; this.style.transform='translateX(-4px)';"
+                        onmouseout="this.style.color='#4a5568'; this.style.transform='translateX(0)';">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" width="24" height="24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
                         </svg>
                         <span class="fw-medium">Regresar</span>
                     </a>
                 </div>
 
-                <!-- Encabezado del formulario -->
+                <!-- Encabezado -->
                 <div class="text-start mb-4">
                     <h2 class="h1 fw-bold text-dark mb-2">Domicilio</h2>
                     <p class="fs-5 fw-semibold text-secondary">Ingresa tu dirección completa.</p>
                 </div>
-                
-                <!-- Formulario Reactivo de Angular -->
-                <form>
-                    <!-- FILA: País y Estado (2 columnas - ambos SELECT) -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label for="paisInput" class="form-label fw-semibold mb-2">
-                                País <span class="text-danger">*</span>
-                            </label>
-                            <select class="form-select form-select-lg" 
-                                    id="paisInput"
-                                    formControlName="pais">
-                                <option value="" disabled selected>Selecciona tu país</option>
-                                <option value="Mexico">México</option>
-                                <option value="USA">Estados Unidos</option>
-                                <option value="Canada">Canadá</option>
-                                <option value="España">España</option>
-                                <option value="Colombia">Colombia</option>
-                                <option value="Argentina">Argentina</option>
-                                <option value="Chile">Chile</option>
-                                <option value="Peru">Perú</option>
-                            </select>
-                            <div *ngIf="loginForm.get('pais')?.touched && loginForm.get('pais')?.invalid"
-                                class="invalid-feedback d-block">
-                                Selecciona un país
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="estadoInput" class="form-label fw-semibold mb-2">
-                                Estado <span class="text-danger">*</span>
-                            </label>
-                            <select class="form-select form-select-lg" 
-                                    id="estadoInput"
-                                    formControlName="estado">
-                                <option value="" disabled selected>Selecciona tu estado</option>
-                                <option value="Colima">Colima</option>
-                                <option value="Durango">Durango</option>
 
-                            </select>
-                            <div *ngIf="loginForm.get('estado')?.touched && loginForm.get('estado')?.invalid"
-                                class="invalid-feedback d-block">
-                                Selecciona un estado
-                            </div>
-                        </div>
+                <!-- Mensaje de error -->
+                @if (errorMessage()) {
+                    <div class="alert alert-danger mb-4">
+                        {{ errorMessage() }}
+                    </div>
+                }
+
+                <!-- Formulario -->
+                <form [formGroup]="domicilioForm" (ngSubmit)="onSubmit()">
+                    <!-- País (fijo México) -->
+                    <div class="mb-4">
+                        <label for="paisInput" class="form-label fw-semibold mb-2">
+                            País <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="paisInput" formControlName="pais"
+                            [readonly]="true" [disabled]="true">
                     </div>
 
-                    <!-- Campo: Ciudad (input largo - ancho completo) -->
+                    <!-- Estado -->
+                    <div class="mb-4">
+                        <label for="estadoInput" class="form-label fw-semibold mb-2">
+                            Estado <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select form-select-lg" id="estadoInput" formControlName="estado"
+                            [class.is-invalid]="estadoControl?.touched && estadoControl?.invalid"
+                            (change)="onStateChange($event)">
+                            <option value="" disabled>Selecciona tu estado</option>
+                            @for (state of states(); track state.d_estado) {
+                                <option [value]="state.d_estado">{{ state.d_estado }}</option>
+                            }
+                        </select>
+                        @if (isLoadingStates()) {
+                            <div class="spinner-border spinner-border-sm loading-spinner-sm text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        }
+                        @if (estadoControl?.touched && estadoControl?.invalid) {
+                            <div class="invalid-feedback d-block">
+                                Selecciona un estado
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Ciudad -->
                     <div class="mb-4">
                         <label for="ciudadInput" class="form-label fw-semibold mb-2">
                             Ciudad <span class="text-danger">*</span>
                         </label>
+                        <select class="form-select form-select-lg" id="ciudadInput" formControlName="ciudad"
+                            [class.is-invalid]="ciudadControl?.touched && ciudadControl?.invalid"
+                            (change)="onCityChange($event)">
+                            <option value="" disabled>Selecciona tu ciudad</option>
+                            @for (city of cities(); track city.d_ciudad) {
+                                <option [value]="city.d_ciudad">{{ city.d_ciudad }}</option>
+                            }
+                        </select>
+                        @if (isLoadingCities()) {
+                            <div class="spinner-border spinner-border-sm loading-spinner-sm text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        }
+                        @if (ciudadControl?.touched && ciudadControl?.invalid) {
+                            <div class="invalid-feedback d-block">
+                                Selecciona una ciudad
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Código Postal (INPUT, no SELECT) -->
+                    <div class="mb-4">
+                        <label for="codigoPostalInput" class="form-label fw-semibold mb-2">
+                            Código Postal <span class="text-danger">*</span>
+                        </label>
                         <input type="text" 
                                class="form-control form-control-lg" 
-                               id="ciudadInput"
-                               formControlName="ciudad"
-                               placeholder="Tu ciudad">
-                        <div *ngIf="loginForm.get('ciudad')?.touched && loginForm.get('ciudad')?.invalid"
-                            class="invalid-feedback d-block">
-                            La ciudad es requerida
-                        </div>
+                               id="codigoPostalInput" 
+                               formControlName="codigoPostal"
+                               placeholder="Ej: 29000"
+                               maxlength="5"
+                               [class.is-invalid]="codigoPostalControl?.touched && codigoPostalControl?.invalid">
+                        @if (isLoadingSettlements()) {
+                            <div class="spinner-border spinner-border-sm loading-spinner-sm text-primary mt-2" role="status">
+                                <span class="visually-hidden">Buscando...</span>
+                            </div>
+                        }
+                        @if (codigoPostalControl?.touched && codigoPostalControl?.invalid) {
+                            <div class="invalid-feedback d-block">
+                                Ingresa un código postal válido de 5 dígitos
+                            </div>
+                        }
                     </div>
 
-                    <!-- FILA: Código Postal y Colonia (2 columnas) -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label for="codigoPostalInput" class="form-label fw-semibold mb-2">
-                                Código Postal <span class="text-danger">*</span>
-                            </label>
-                            <select class="form-select form-select-lg" 
-                                    id="codigoPostalInput"
-                                    formControlName="codigoPostal">
-                                <option value="" disabled selected>Selecciona tu CP</option>
-                                <option value="01000">01000</option>
-                                <option value="02000">02000</option>
-                                <option value="03000">03000</option>
-                                <option value="04000">04000</option>
-                                <option value="05000">05000</option>
-                                <option value="06000">06000</option>
-                                <option value="07000">07000</option>
-                                <option value="08000">08000</option>
-                                <option value="09000">09000</option>
-                                <option value="10000">10000</option>
+                    <!-- Colonia (SELECT o INPUT según haya datos) -->
+                    <div class="mb-4">
+                        <label for="coloniaInput" class="form-label fw-semibold mb-2">
+                            Colonia <span class="text-danger">*</span>
+                        </label>
+                        @if (settlements().length > 0) {
+                            <select class="form-select form-select-lg" id="coloniaInput" formControlName="colonia"
+                                [class.is-invalid]="coloniaControl?.touched && coloniaControl?.invalid"
+                                (change)="onSettlementChange($event)">
+                                <option value="" disabled>Selecciona tu colonia</option>
+                                @for (settlement of settlements(); track settlement.d_asenta) {
+                                    <option [value]="settlement.d_asenta">{{ settlement.d_asenta }}</option>
+                                }
                             </select>
-                            <div *ngIf="loginForm.get('codigoPostal')?.touched && loginForm.get('codigoPostal')?.invalid"
-                                class="invalid-feedback d-block">
-                                El código postal es requerido
+                        } @else {
+                            <input type="text" 
+                                   class="form-control form-control-lg" 
+                                   id="coloniaInput" 
+                                   formControlName="colonia"
+                                   placeholder="Escribe tu colonia"
+                                   [class.is-invalid]="coloniaControl?.touched && coloniaControl?.invalid">
+                        }
+                        @if (coloniaControl?.touched && coloniaControl?.invalid) {
+                            <div class="invalid-feedback d-block">
+                                Selecciona o escribe tu colonia
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="coloniaInput" class="form-label fw-semibold mb-2">
-                                Colonia <span class="text-danger">*</span>
-                            </label>
-                            <select class="form-select form-select-lg" 
-                                    id="coloniaInput"
-                                    formControlName="colonia">
-                                <option value="" disabled selected>Selecciona tu colonia</option>
-                                <option value="Centro">Centro</option>
-                                <option value="Roma">Roma</option>
-                                <option value="Condesa">Condesa</option>
-                                <option value="Polanco">Polanco</option>
-                                <option value="DelValle">Del Valle</option>
-                                <option value="Napoles">Nápoles</option>
-                                <option value="Narvarte">Narvarte</option>
-                                <option value="Portales">Portales</option>
-                                <option value="Coyoacan">Coyoacán</option>
-                                <option value="SanAngel">San Ángel</option>
-                            </select>
-                            <div *ngIf="loginForm.get('colonia')?.touched && loginForm.get('colonia')?.invalid"
-                                class="invalid-feedback d-block">
-                                La colonia es requerida
-                            </div>
-                        </div>
+                        }
                     </div>
 
-                    <!-- Campo: Calle (input largo) -->
+                    <!-- Calle -->
                     <div class="mb-4">
                         <label for="calleInput" class="form-label fw-semibold mb-2">
                             Calle <span class="text-danger">*</span>
                         </label>
-                        <input type="text" 
-                               class="form-control form-control-lg" 
-                               id="calleInput"
-                               formControlName="calle"
-                               placeholder="Nombre de la calle">
-                        <div *ngIf="loginForm.get('calle')?.touched && loginForm.get('calle')?.invalid"
-                            class="invalid-feedback d-block">
-                            La calle es requerida
-                        </div>
+                        <input type="text" class="form-control form-control-lg" id="calleInput" formControlName="calle"
+                            placeholder="Nombre de la calle"
+                            [class.is-invalid]="domicilioForm.get('calle')?.touched && domicilioForm.get('calle')?.invalid">
+                        @if (domicilioForm.get('calle')?.touched && domicilioForm.get('calle')?.invalid) {
+                            <div class="invalid-feedback d-block">
+                                La calle es requerida
+                            </div>
+                        }
                     </div>
 
-                    <!-- FILA: N° Exterior y N° Interior (2 columnas) -->
+                    <!-- N° Exterior y N° Interior -->
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <label for="numExteriorInput" class="form-label fw-semibold mb-2">
                                 N° Exterior <span class="text-danger">*</span>
                             </label>
-                            <input type="text" 
-                                   class="form-control form-control-lg" 
-                                   id="numExteriorInput"
-                                   formControlName="numExterior"
-                                   placeholder="123">
-                            <div *ngIf="loginForm.get('numExterior')?.touched && loginForm.get('numExterior')?.invalid"
-                                class="invalid-feedback d-block">
-                                El número exterior es requerido
-                            </div>
+                            <input type="text" class="form-control form-control-lg" id="numExteriorInput"
+                                formControlName="numExterior" placeholder="123"
+                                [class.is-invalid]="domicilioForm.get('numExterior')?.touched && domicilioForm.get('numExterior')?.invalid">
+                            @if (domicilioForm.get('numExterior')?.touched && domicilioForm.get('numExterior')?.invalid) {
+                                <div class="invalid-feedback d-block">
+                                    El número exterior es requerido
+                                </div>
+                            }
                         </div>
                         <div class="col-md-6">
                             <label for="numInteriorInput" class="form-label fw-semibold mb-2">
                                 N° Interior
                             </label>
-                            <input type="text" 
-                                   class="form-control form-control-lg" 
-                                   id="numInteriorInput"
-                                   formControlName="numInterior"
-                                   placeholder="123 (opcional)">
+                            <input type="text" class="form-control form-control-lg" id="numInteriorInput"
+                                formControlName="numInterior" placeholder="123 (opcional)">
                         </div>
                     </div>
 
-                    <!-- Botón de envío -->
-                    <button type="submit" 
-                            routerLink="/pre-registro/cuenta"
-                            class="btn btn-lg w-100 fw-semibold py-2 mb-4"
-                            style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
-                                border: none;
-                                color: white;
-                                border-radius: 8px;
-                                transition: all 0.3s ease;
-                                box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                        Siguiente
-                    </button>
+                    <!-- Botones -->
+                    <div class="mb-3">
+                        <ui-boton type="submit" tipo="primario" text="Siguiente" size="lg" widthType="full"
+                            [disabled]="domicilioForm.invalid">
+                        </ui-boton>
+                    </div>
                 </form>
             </div>
         </div>

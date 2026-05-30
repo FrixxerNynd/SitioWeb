@@ -3,11 +3,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RecaptchaService } from '../../../../services/RecaptchaService';
+import { UiBoton } from '../../../../components/shared/boton/boton';
 
 
 @Component({
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule, CommonModule],
+  imports: [ReactiveFormsModule, RouterModule, CommonModule,UiBoton],
   templateUrl: './cuenta.html',
 })
 export class PageCuenta implements OnInit, OnDestroy{

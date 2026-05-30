@@ -3,6 +3,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { CookieService } from './cookie.service'; 
+
 
 // ============================================
 // INTERFACES
@@ -188,17 +190,18 @@ export class Subcategory {
 })
 export class ExcelNorteCatalogoService {
     private http = inject(HttpClient);
+    private cookieService = inject(CookieService); // Inyectar CookieService
     private baseUrl = environment.apiExcelUrl;
     private apiKey = environment.Authorization;
 
     private imagenesCache = new Map<string, string>();
 
-    // Método con headers de autenticación
     private async get<T>(endpoint: string): Promise<T> {
         const url = `${this.baseUrl}/${endpoint}`;
         console.log(`🌐 GET: ${url}`);
         
-        const token = localStorage.getItem('token');
+        // CAMBIADO: usar cookieService en lugar de localStorage
+        const token = this.cookieService.getCookie('token');
         
         let headers = new HttpHeaders({
             'Content-Type': 'application/json'
@@ -206,10 +209,12 @@ export class ExcelNorteCatalogoService {
         
         if (token) {
             headers = headers.set('Authorization', `Bearer ${token}`);
-            console.log('🔑 Usando token de autenticación');
+            console.log('🔑 Usando token de autenticación desde cookie');
         } else if (this.apiKey) {
             headers = headers.set('Authorization', this.apiKey);
             console.log('🔑 Usando API key del environment');
+        } else {
+            console.warn('⚠️ No hay token ni API key disponible');
         }
         
         try {

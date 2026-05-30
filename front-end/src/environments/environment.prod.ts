@@ -1,6 +1,7 @@
 export const environment = {
     production: true,
-    apiExcelUrl: '/api-exel',  // Proxy en producción
+    apiExcelUrl: '/api-exel',
     Authorization: '',    
-    apiCabsUrl: '/api'          // Proxy en producción
+    apiCabsUrl: '/api',
+    apiMexicoUrl: '/api-mexico'
 };

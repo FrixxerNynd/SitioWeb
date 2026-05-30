@@ -54,7 +54,7 @@
                 </div>
 
                 <!-- Formulario Reactivo de Angular -->
-                <form>
+                <form [formGroup]="loginForm" (ngSubmit)="siguiente()">
                     <!-- Campo: RFC -->
                     <div class="mb-4">
                         <label for="rfcInput" class="form-label fw-semibold mb-2">
@@ -67,13 +67,14 @@
                             RFC requerido o formato inválido
                         </div>
                     </div>
+
                     <!-- Campo: Subir constancia fiscal -->
                     <div class="mb-4">
                         <label for="constanciaInput" class="form-label fw-semibold mb-2">
                             Subir tu constancia fiscal <span class="text-danger">*</span>
                         </label>
                         <input type="file" class="form-control form-control-lg" id="constanciaInput"
-                            formControlName="constancia" accept=".pdf,.jpg,.png">
+                            formControlName="constancia" accept=".pdf,.jpg,.png" (change)="onFileSelected($event)">
                         <div *ngIf="loginForm.get('constancia')?.touched && loginForm.get('constancia')?.invalid"
                             class="invalid-feedback d-block">
                             La constancia fiscal es requerida
