@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
-  selector: 'app-inputs',
+  selector: 'ui-inputs',
   imports: [CommonModule],
   templateUrl: './inputs.html',
   styleUrl: './inputs.css',
@@ -34,11 +34,11 @@ export class Inputs implements ControlValueAccessor {
   writeValue(val: any) {
     this.value = val;
   }
-  
+
   registerOnChange(fn: any) {
     this.onChange = fn;
   }
-  
+
   registerOnTouched(fn: any) {
     this.onTouched = fn;
   }

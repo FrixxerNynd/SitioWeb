@@ -1,24 +1,36 @@
-<div class="cards-grid">
-  <div class="producto-card">
-    <div class="imagen-container">
+<div class="producto-card">
+  <div class="imagen-container">
+    @if (imagen) {
       <img [src]="imagen" [alt]="nombre" class="producto-imagen" />
-      <span class="descuento-badge" *ngIf="descuento > 0"> {{ descuento }}% </span>
+    } @else {
+      <i class="bi bi-image fs-1 text-secondary"></i>
+    }
+  </div>
+
+  <div class="producto-info">
+    <span class="stock-badge" [class]="stockClass">Stock: {{ stock }}</span>
+
+    <h3 class="producto-nombre" [title]="nombre">
+      {{ nombre.length > 50 ? (nombre | slice: 0 : 50) + '...' : nombre }}
+    </h3>
+
+    <p class="producto-marca">{{ marca }} • {{ categoria }}</p>
+
+    <div class="precios">
+      @if (tieneOferta) {
+        <span class="precio-original">${{ precioOriginal }}</span>
+        <span class="precio-actual">${{ precio }}</span>
+        <span class="descuento-badge">-{{ descuento }}%</span>
+      } @else {
+        <span class="precio-actual">${{ precio }}</span>
+      }
     </div>
 
-    <div class="producto-info">
-      <h3 class="producto-nombre">{{ nombre }}</h3>
-
-      <div class="precios">
-        <span class="precio-actual">${{ precio }}</span>
-        <span class="precio-original" *ngIf="precioOriginal !== precio">
-          ${{ precioOriginal }}
-        </span>
-      </div>
-
-      <div class="acciones">
-        <button class="btn-agregar" (click)="onAgregar()">Agregar</button>
-        <a class="btn-detalles" href="url">Ver detalles</a>
-      </div>
+    <div class="acciones">
+      <button class="btn-agregar" (click)="onAgregar()">Agregar</button>
+      <a class="btn-detalles" [routerLink]="['/catalogo-producto/detalles-producto', productoId]">
+        Ver detalles
+      </a>
     </div>
   </div>
 </div>

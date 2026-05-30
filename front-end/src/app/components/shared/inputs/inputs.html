@@ -16,20 +16,20 @@
       (blur)="onTouched()"
       [class.error]="hasError"
     />
-    <button 
-      *ngIf="type === 'password'" 
-      type="button" 
-      class="password-toggle"
+    <button
+      *ngIf="type === 'password'"
+      type="button"
+      class="btn btn-link text-decoration-none password-toggle"
       (click)="togglePassword()"
     >
-      {{ mostrarPassword ? '🙈' : '👁️' }}
+      <i [ngClass]="mostrarPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
     </button>
   </div>
 
   <!-- Select Dropdown -->
   <div *ngIf="type === 'select'" class="input-wrapper">
-    <select 
-      [value]="value" 
+    <select
+      [value]="value"
       (change)="onInput($event)"
       (blur)="onTouched()"
       [class.error]="hasError"
