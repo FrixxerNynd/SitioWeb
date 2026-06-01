@@ -2,12 +2,16 @@
   <div class="container">
     <div class="container-fluid">
       <!-- titulo -->
-      <div class="container-orders-card p-4 mb-4">
-        <div class="row mb-4">
+      <div class="card rounded-3 border-2 border-zinc-200 p-4 bg-white overflow-hidden my-4">
+        <!-- <div class="row mb-4">
           <div class="col-12">
             <h2 class="fw-bold text-dark m-0">Mis órdenes</h2>
             <p class="text-muted small m-0 mt-1">Revisa fácilmente tus órdenes aquí.</p>
           </div>
+        </div> -->
+        <div class="flex flex-col gap-2">
+          <h2 class="fw-bold text-dark m-0">Mis órdenes</h2>
+          <p class="text-muted small m-0 mt-1">Revisa fácilmente tus órdenes aquí.</p>
         </div>
         <!-- buscar y borrar -->
         <div class="row g-3 align-items-end mb-4">
@@ -72,305 +76,298 @@
             </button>
           </div>
         </div>
+      </div>
 
-        <!-- TARJETAS TOTAL GASTADO -->
-        <div class="row g-3 mb-4">
-          <div class="col-12 col-sm-6 col-xl-3">
-            <div class="card shadow-sm border border-light-subtle bg-white p-3 h-100">
-              <div class="text-secondary small fw-medium mb-1 d-flex align-items-center gap-1">
-                <i class="bi bi-currency-dollar"></i> Total gastado
-              </div>
-              <h2 class="fw-bold text-dark my-1">{{ totalGastado | currency }}</h2>
-              <span class="text-muted small">Suma total de todas tus compras</span>
+      <!-- TARJETAS TOTAL GASTADO -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card rounded-3 border-2 border-zinc-200 bg-white p-3 h-100">
+            <div class="text-secondary small fw-medium mb-1 d-flex align-items-center gap-1">
+              <i class="fi fi-sr-usd-circle"></i>Total gastado
             </div>
-          </div>
-
-          <div class="col-12 col-sm-6 col-xl-3">
-            <div class="card shadow-sm border border-light-subtle bg-white p-3 h-100">
-              <div class="text-secondary small fw-medium mb-1 d-flex align-items-center gap-1">
-                <i class="bi bi-credit-card-2-back"></i> Crédito disponible
-              </div>
-              <h2 class="fw-bold text-dark my-1">{{ creditoDisponible | currency }}</h2>
-              <span class="text-muted small">Crédito que te queda por usar</span>
-            </div>
-          </div>
-
-          <div class="col-12 col-sm-6 col-xl-3">
-            <div class="card shadow-sm border border-light-subtle bg-white p-3 h-100">
-              <div class="text-secondary small fw-medium mb-1 d-flex align-items-center gap-1">
-                <i class="bi bi-file-earmark-text"></i> Total de órdenes
-              </div>
-              <h2 class="fw-bold text-dark my-1">{{ totalOrdenes }}</h2>
-              <span class="text-muted small">Cantidad total de compras realizadas</span>
-            </div>
-          </div>
-
-          <div class="col-12 col-sm-6 col-xl-3">
-            <div class="card shadow-sm border border-light-subtle bg-white p-3 h-100">
-              <div class="text-secondary small fw-medium mb-1 d-flex align-items-center gap-1">
-                <i class="bi bi-clock"></i> Órdenes procesando
-              </div>
-              <h2 class="fw-bold text-dark my-1">{{ ordenesProcesando }}</h2>
-              <span class="text-muted small">Compras que aún están en curso</span>
-            </div>
+            <h2 class="fw-bold text-dark my-1">{{ totalGastado | currency }}</h2>
+            <span class="text-muted small">Suma total de todas tus compras</span>
           </div>
         </div>
 
-        <!-- TABLAS (me falta editar) -->
-        <div class="card shadow-sm border border-light-subtle bg-white rounded-3 overflow-hidden">
-          <div *ngIf="ordenes.length > 0">
-            <div class="table-responsive">
-              <table class="table table-hover align-middle mb-0">
-                <thead
-                  class="table-light text-secondary small text-uppercase border-bottom border-light-subtle"
-                >
-                  <tr>
-                    <th class="ps-4 py-3 text-secondary fw-semibold">Orden</th>
-                    <th class="py-3 text-secondary fw-semibold">Fecha</th>
-                    <th class="py-3 text-secondary fw-semibold">Tipo de pago</th>
-                    <th class="py-3 text-secondary fw-semibold">Total</th>
-                    <th class="py-3 text-secondary fw-semibold">Estado</th>
-                    <th class="text-end pe-4 py-3 text-secondary fw-semibold">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let orden of ordenes" class="border-bottom border-light-subtle">
-                    <td class="ps-4 py-3 fw-normal text-dark">{{ orden.id }}</td>
-                    <td class="py-3 text-secondary fw-normal">{{ orden.fecha }}</td>
-                    <td class="py-3 text-secondary fw-normal">{{ orden.tipoPago }}</td>
-                    <td class="py-3 text-dark fw-normal">{{ orden.total | currency }}</td>
-                    <td class="py-3">
-                      <span
-                        class="badge px-2 py-1 rounded-1 fw-semibold"
-                        [ngClass]="{
-                          'bg-success-subtle text-success': orden.estado === 'Entregada',
-                          'bg-danger-subtle text-danger': orden.estado === 'Cancelada',
-                          'bg-info-subtle text-info': orden.estado === 'Procesando',
-                        }"
-                      >
-                        {{ orden.estado }}
-                      </span>
-                    </td>
-                    <td class="text-end pe-4 py-3">
-                      <button
-                        class="btn btn-link text-dark p-0 border-0"
-                        type="button"
-                        data-bs-toggle="offcanvas"
-                        data-bs-target="#drawerDetalleOrden"
-                        (click)="seleccionarOrden(orden)"
-                      >
-                        <i class="bi bi-eye fs-5"></i>
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card rounded-3 border-2 border-zinc-200 bg-white p-3 h-100">
+            <div class="text-secondary small fw-medium mb-1 d-flex align-items-center gap-1">
+              <i class="fi fi-sr-credit-card"></i> Crédito disponible
             </div>
-
-            <div
-              class="d-flex justify-content-between align-items-center p-3 border-top border-light-subtle bg-white"
-            >
-              <div class="small text-secondary">
-                {{ totalItemsRegistros }}
-              </div>
-              <div class="d-flex align-items-center gap-3">
-                <div class="d-flex align-items-center gap-2 small text-secondary">
-                  <span>Filas por página:</span>
-                  <select
-                    class="form-select form-select-sm border-0 bg-transparent py-0 pe-4"
-                    style="box-shadow: none"
-                  >
-                    <option>7</option>
-                  </select>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                  <button
-                    class="btn btn-sm btn-light border border-light-subtle px-2 py-1 rounded-2"
-                    type="button"
-                  >
-                    <i class="bi bi-chevron-left text-secondary small"></i>
-                  </button>
-                  <span class="small text-dark fw-medium">{{ paginaActual }}</span>
-                  <button
-                    class="btn btn-sm btn-light border border-light-subtle px-2 py-1 rounded-2"
-                    type="button"
-                  >
-                    <i class="bi bi-chevron-right text-secondary small"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
+            <h2 class="fw-bold text-dark my-1">{{ creditoDisponible | currency }}</h2>
+            <span class="text-muted small">Crédito que te queda por usar</span>
           </div>
+        </div>
 
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card rounded-3 border-2 border-zinc-200 bg-white p-3 h-100">
+            <div class="text-secondary small fw-medium mb-1 flex align-items-center gap-1">
+              <i class="fi fi-sr-duplicate"></i> Total de órdenes
+            </div>
+            <h2 class="fw-bold text-dark my-1">{{ totalOrdenes }}</h2>
+            <span class="text-muted small">Cantidad total de compras realizadas</span>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card rounded-3 border-2 border-zinc-200 bg-white p-3 h-100">
+            <div class="text-secondary small fw-medium mb-1 d-flex align-items-center gap-1">
+              <i class="fi fi-sr-clock-three"></i> Órdenes procesando
+            </div>
+            <h2 class="fw-bold text-dark my-1">{{ ordenesProcesando }}</h2>
+            <span class="text-muted small">Compras que aún están en curso</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLAS  -->
+      <div
+        class="card rounded-3 border-2 border-zinc-200 bg-white border-radius: 5px overflow-hidden my-4"
+      >
+        <div *ngIf="ordenes.length > 0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle border-2 border-zinc-200 mb-0">
+              <thead class="table-light text-secondary small text-uppercase border-bottom">
+                <tr>
+                  <th class="px-6 py-4 text-center text-secondary fw-semibold">Orden</th>
+                  <th class="px-6 py-4 text-center text-secondary fw-semibold">Fecha</th>
+                  <th class="px-6 py-4 text-center text-secondary fw-semibold">Tipo de pago</th>
+                  <th class="px-6 py-4 text-center text-secondary fw-semibold">Total</th>
+                  <th class="px-6 py-4 text-center text-secondary fw-semibold">Estado</th>
+                  <th class="px-6 py-4 text-center text-secondary fw-semibold">Acciones</th>
+                </tr>
+              </thead>
+              <!-- contenido de la tabla -->
+              <tbody>
+                <tr *ngFor="let orden of ordenes" class="border-bottom border-zinc-200">
+                  <td class="px-6 py-4 text-center text-secondary">{{ orden.id }}</td>
+                  <td class="px-6 py-4 text-center text-secondary">{{ orden.fecha }}</td>
+                  <td class="px-6 py-4 text-center text-secondary">{{ orden.tipoPago }}</td>
+                  <td class="px-6 py-4 text-center text-secondary">{{ orden.total | currency }}</td>
+                  <td class="py-3 text-center px-6">
+                    <span
+                      class="badge py-1 rounded-1 fw-semibold"
+                      [ngClass]="{
+                        'bg-success-subtle text-success': orden.estado === 'Entregada',
+                        'bg-danger-subtle text-danger': orden.estado === 'Cancelada',
+                        'bg-info-subtle text-info': orden.estado === 'Procesando',
+                      }"
+                    >
+                      {{ orden.estado }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-center text-secondary">
+                    <button
+                      class="btn text-dark p-0 border-0"
+                      type="button"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modalDetalleOrden"
+                      (click)="seleccionarOrden(orden)"
+                    >
+                      <i class="fi fi-rr-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- footer -->
           <div
-            *ngIf="ordenes.length === 0"
-            class="d-flex flex-column align-items-center justify-content-center py-5 bg-white"
+            class="table-footer flex-shrink-0 px-4 py-3 border-top bg-light d-flex align-items-center justify-content-between"
           >
-            <div class="my-4 text-center">
-              <div
-                class="mb-3 d-inline-flex p-3 bg-warning-subtle rounded-circle text-warning align-items-center justify-content-center"
-                style="width: 64px; height: 64px"
-              >
-                <i class="bi bi-search fs-3"></i>
-              </div>
-              <h4 class="fw-bold text-dark mb-2">No se encontraron órdenes</h4>
-              <p class="text-secondary small mb-0">
-                Prueba ajustar tus filtros de búsqueda.
-                <a
-                  href="javascript:void(0)"
-                  class="text-primary text-decoration-underline fw-normal"
-                  (click)="limpiarFiltros()"
-                  >Limpiar filtro</a
+            <span class="text-secondary small">{{ totalItemsRegistros }}</span>
+
+            <div class="d-flex align-items-center gap-3">
+              <div class="d-flex align-items-center gap-2">
+                <span class="text-secondary small">Filas por página:</span>
+                <select
+                  class="form-select form-select-sm"
+                  style="width: auto"
+                  (change)="cambiarFilasPorPagina($event)"
                 >
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tarjeta (me falta editar, pregunta como sacar infoo) -->
-        <div
-          class="offcanvas offcanvas-end border-0 shadow"
-          tabindex="-1"
-          id="drawerDetalleOrden"
-          aria-labelledby="drawerDetalleOrdenLabel"
-          style="width: 450px; background-color: #f8f9fa"
-        >
-          <div *ngIf="ordenSeleccionada">
-            <div
-              class="p-4 bg-white d-flex justify-content-between align-items-start border-bottom border-light-subtle"
-            >
-              <div>
-                <h3 class="fw-bold text-dark m-0" id="drawerDetalleOrdenLabel">
-                  {{ ordenSeleccionada.id }}
-                </h3>
-                <span class="text-secondary small">Detalles de la orden</span>
-              </div>
-              <button
-                type="button"
-                class="btn-close shadow-none"
-                data-bs-dismiss="offcanvas"
-                aria-label="Close"
-              ></button>
-            </div>
-
-            <div class="offcanvas-body p-4">
-              <div class="bg-white rounded-3 p-3 mb-3 border border-light-subtle">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <span class="text-secondary small">Estado</span>
-                  <span
-                    class="badge px-2 py-1 rounded-1 fw-semibold"
-                    [ngClass]="{
-                      'bg-success-subtle text-success': ordenSeleccionada.estado === 'Entregada',
-                      'bg-danger-subtle text-danger': ordenSeleccionada.estado === 'Cancelada',
-                      'bg-info-subtle text-info': ordenSeleccionada.estado === 'Procesando',
-                    }"
-                  >
-                    {{ ordenSeleccionada.estado }}
-                  </span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <span class="text-secondary small">Fecha de pedido</span>
-                  <span class="text-dark small fw-medium">{{ ordenSeleccionada.fecha }}</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                  <span class="text-secondary small">Cliente</span>
-                  <span class="text-dark small fw-medium">{{
-                    ordenSeleccionada.cliente || 'MYL9997'
-                  }}</span>
-                </div>
+                  <option *ngFor="let op of opcionesFilasPorPagina" [value]="op">{{ op }}</option>
+                </select>
               </div>
 
-              <h6 class="text-secondary small fw-semibold mb-2">Envío y Factura</h6>
-              <div class="bg-white rounded-3 p-3 mb-4 border border-light-subtle">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <span class="text-secondary small">Transportista</span>
-                  <span class="text-dark small fw-medium text-uppercase">{{
-                    ordenSeleccionada.transportista || 'REVISAR SELECCION'
-                  }}</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                  <span class="text-secondary small">Nº Factura</span>
-                  <span class="text-dark small fw-medium">{{
-                    ordenSeleccionada.numFactura || '0'
-                  }}</span>
-                </div>
-              </div>
-
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <h6 class="text-secondary small fw-semibold m-0">Productos</h6>
-                <span class="badge bg-info-subtle text-info rounded-1 fw-semibold small">
-                  {{ ordenSeleccionada.productos?.length || 0 }} Productos
-                </span>
-              </div>
-
-              <div class="mb-4">
-                <div
-                  *ngFor="let prod of ordenSeleccionada.productos"
-                  class="d-flex align-items-center justify-content-between p-3 bg-white border border-light-subtle rounded-3 mb-2"
-                >
-                  <div class="d-flex align-items-center gap-3">
-                    <img
-                      [src]="prod.imagen || 'assets/placeholder-prod.png'"
-                      class="rounded border border-light-subtle object-fit-cover"
-                      style="width: 48px; height: 48px"
-                    />
-                    <div>
-                      <div class="text-dark fw-semibold small text-uppercase">
-                        {{ prod.nombre }}
-                      </div>
-                      <div class="text-secondary x-small text-uppercase">
-                        {{ prod.sku }} • {{ prod.cantidad }} un. x
-                        {{ prod.precioUnitario | currency }}
-                      </div>
-                    </div>
-                  </div>
-                  <span class="text-dark fw-semibold small">{{
-                    prod.precioUnitario * prod.cantidad | currency
-                  }}</span>
-                </div>
-              </div>
-
-              <h6 class="text-secondary small fw-semibold mb-2">Resumen financieros</h6>
-              <div class="bg-white rounded-3 p-3 border border-light-subtle mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <span class="text-secondary small">Subtotal</span>
-                  <span class="text-dark small fw-medium">{{
-                    ordenSeleccionada.subtotal | currency
-                  }}</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <span class="text-secondary small">Flete</span>
-                  <span class="text-dark small fw-medium">{{
-                    ordenSeleccionada.flete || 0 | currency
-                  }}</span>
-                </div>
-                <div
-                  class="d-flex justify-content-between align-items-center border-bottom border-light-subtle pb-3 mb-3"
-                >
-                  <span class="text-secondary small">IVA(16%)</span>
-                  <span class="text-dark small fw-medium">{{
-                    ordenSeleccionada.iva | currency
-                  }}</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-end">
-                  <span class="text-secondary small fw-medium">Total</span>
-                  <span class="text-dark h4 fw-bold m-0">{{
-                    ordenSeleccionada.total | currency
-                  }}</span>
-                </div>
-              </div>
-
-              <div class="text-end">
+              <div class="d-flex align-items-center gap-2">
                 <button
-                  type="button"
-                  class="btn btn-light border border-light-subtle text-secondary px-4 py-2 rounded-2 small"
-                  data-bs-dismiss="offcanvas"
+                  class="btn btn-sm btn-outline-secondary px-2 py-1"
+                  (click)="paginaAnterior()"
+                  [disabled]="paginaActual === 1"
                 >
-                  Cerrar
+                  <i class="fi fi-rr-angle-left"></i>
+                </button>
+                <span class="text-secondary small">{{ paginaActual }}/{{ totalPaginas }}</span>
+                <button
+                  class="btn btn-sm btn-outline-secondary px-2 py-1"
+                  (click)="paginaSiguiente()"
+                  [disabled]="paginaActual === totalPaginas"
+                >
+                  <i class="fi fi-rr-angle-right"></i>
                 </button>
               </div>
             </div>
           </div>
+        </div>
+
+        <div
+          *ngIf="ordenes.length === 0"
+          class="d-flex flex-column align-items-center justify-content-center py-5 bg-white"
+        >
+          <div class="my-4 text-center">
+            <div
+              class="mb-3 d-inline-flex p-3 bg-warning-subtle rounded-circle text-warning align-items-center justify-content-center"
+              style="width: 64px; height: 64px"
+            >
+              <i class="bi bi-search fs-3"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">No se encontraron órdenes</h4>
+            <p class="text-secondary small mb-0">
+              Prueba ajustar tus filtros de búsqueda.
+              <a
+                href="javascript:void(0)"
+                class="text-primary text-decoration-underline fw-normal"
+                (click)="limpiarFiltros()"
+                >Limpiar filtro</a
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalDetalleOrden" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable" style="max-width: 450px">
+    <div class="modal-content border-0 shadow" style="background-color: #f8f9fa">
+      <div
+        class="p-4 bg-white d-flex justify-content-between align-items-start border-bottom border-light-subtle"
+      >
+        <div>
+          <h3 class="fw-bold text-dark m-0">{{ ordenSeleccionada?.id }}</h3>
+          <span class="text-secondary small">Detalles de la orden</span>
+        </div>
+        <button
+          type="button"
+          class="btn-close shadow-none"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div class="modal-body p-4">
+        <div class="bg-white rounded-3 p-3 mb-3 border border-light-subtle">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-secondary small">Estado</span>
+            <span
+              class="badge px-2 py-1 rounded-1 fw-semibold"
+              [ngClass]="{
+                'bg-success-subtle text-success': ordenSeleccionada?.estado === 'Entregada',
+                'bg-danger-subtle text-danger': ordenSeleccionada?.estado === 'Cancelada',
+                'bg-info-subtle text-info': ordenSeleccionada?.estado === 'Procesando',
+              }"
+            >
+              {{ ordenSeleccionada?.estado }}
+            </span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-secondary small">Fecha de pedido</span>
+            <span class="text-dark small fw-medium">{{ ordenSeleccionada?.fecha }}</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="text-secondary small">Cliente</span>
+            <span class="text-dark small fw-medium">{{
+              ordenSeleccionada?.cliente || 'MYL9997'
+            }}</span>
+          </div>
+        </div>
+
+        <h6 class="text-secondary small fw-semibold mb-2">Envío y Factura</h6>
+        <div class="bg-white rounded-3 p-3 mb-4 border border-light-subtle">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-secondary small">Transportista</span>
+            <span class="text-dark small fw-medium text-uppercase">{{
+              ordenSeleccionada?.transportista || 'REVISAR SELECCION'
+            }}</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="text-secondary small">Nº Factura</span>
+            <span class="text-dark small fw-medium">{{
+              ordenSeleccionada?.numFactura || '0'
+            }}</span>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="text-secondary small fw-semibold m-0">Productos</h6>
+          <span class="badge bg-info-subtle text-info rounded-1 fw-semibold small">
+            {{ ordenSeleccionada?.productos?.length || 0 }} Productos
+          </span>
+        </div>
+
+        <div class="mb-4">
+          <div
+            *ngFor="let prod of ordenSeleccionada?.productos"
+            class="d-flex align-items-center justify-content-between p-3 bg-white border border-light-subtle rounded-3 mb-2"
+          >
+            <div class="d-flex align-items-center gap-3">
+              <img
+                [src]="prod.imagen"
+                class="rounded border border-light-subtle object-fit-cover"
+                style="width: 48px; height: 48px"
+              />
+              <div>
+                <div class="text-dark fw-semibold small text-uppercase">
+                  {{ prod.nombre }}
+                </div>
+                <div class="text-secondary x-small text-uppercase">
+                  {{ prod.sku }} • {{ prod.cantidad }} un. x
+                  {{ prod.precioUnitario | currency }}
+                </div>
+              </div>
+            </div>
+            <span class="text-dark fw-semibold small">{{
+              prod.precioUnitario * prod.cantidad | currency
+            }}</span>
+          </div>
+        </div>
+
+        <h6 class="text-secondary small fw-semibold mb-2">Resumen financiero</h6>
+        <div class="bg-white rounded-3 p-3 border border-light-subtle mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-secondary small">Subtotal</span>
+            <span class="text-dark small fw-medium">{{
+              ordenSeleccionada?.subtotal | currency
+            }}</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-secondary small">Flete</span>
+            <span class="text-dark small fw-medium">{{
+              ordenSeleccionada?.flete || 0 | currency
+            }}</span>
+          </div>
+          <div
+            class="d-flex justify-content-between align-items-center border-bottom border-light-subtle pb-3 mb-3"
+          >
+            <span class="text-secondary small">IVA(16%)</span>
+            <span class="text-dark small fw-medium">{{ ordenSeleccionada?.iva | currency }}</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-end">
+            <span class="text-secondary small fw-medium">Total</span>
+            <span class="text-dark h4 fw-bold m-0">{{ ordenSeleccionada?.total | currency }}</span>
+          </div>
+        </div>
+
+        <div class="text-end">
+          <button
+            type="button"
+            class="btn btn-light border border-light-subtle text-secondary px-4 py-2 rounded-2 small"
+            data-bs-dismiss="modal"
+          >
+            Cerrar
+          </button>
         </div>
       </div>
     </div>
