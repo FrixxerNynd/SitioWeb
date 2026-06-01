@@ -86,6 +86,8 @@ app.get('/test-redis', async (req, res) => {
     }
 });
 
+
+
 app.get('/productos', async (req, res) =>{
     try {
         const data = await ExelService.fetchExternalProductsWithCache();
@@ -101,7 +103,30 @@ app.get('/productos', async (req, res) =>{
         });
     }
 });
-
+/////esto es para probar que si funciona
+app.get('/test-exel-todo', async (req, res) => {
+    try {
+        console.log("🧪 TEST - Parámetros recibidos:", req.query);
+        
+        // Llamar al servicio con los parámetros que lleguen (deberían ignorarse)
+        const productos = await ExelService.fetchExternalProductsWithCache(req.query);
+        
+        // Mostrar información útil para la verificación
+        res.json({
+            success: true,
+            mensaje: "Verificando que trae TODOS los productos",
+            parametrosQueLlegaron: req.query,
+            totalProductos: productos?.length || productos?.datos?.length || 0,
+            primeros3: productos?.slice?.(0, 3) || productos?.datos?.slice?.(0, 3) || [],
+            nota: "Si los parámetros son ignorados, el total NO cambia entre pruebas"
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            error: error.message 
+        });
+    }
+});
 
 async function startServer() {
     // Intentar conectar a Redis pero NO dejar que detenga el servidor

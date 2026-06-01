@@ -1,22 +1,23 @@
-import prisma from "../config/db";
-import ExelService from "./exel.service";
-import logger from "../utils/logger";
-import PedidoCreateDto from "../dtos/pedido-create.dto.js";
-import PedidoResponseDto from "../dtos/pedido-response.dto.js";
+import prisma from "../config/db.js";
+import ExelService from "./exel.service.js";
+import logger from "../utils/logger.js";
+import PedidoCreateDto from "../utils/DTO's/Request/PedidocreateDto.js";
+import PedidoResponseDto from "../utils/DTO's/Response/PedidoResponseDto.js";
 
-// Dirección estática de la sucursal central obtenida de los requerimientos de diseño (Pág. 3)
+// Dirección estática de la sucursal central
 const CABS_SUCURSAL_ADDRESS = {
-  street: "Beatriz Prada", // [cite: 118, 119]
-  extNum: "450", // [cite: 126, 127]
+  street: "Beatriz Prada",
+  extNum: "450",
   intNum: "N/A",
-  neighborhood: "Col. Jardines de Durango", // [cite: 120, 121]
-  city: "Victoria de Durango", // [cite: 128, 129]
-  state: "Durango", // [cite: 122, 123]
-  cp: "34020", // [cite: 130, 132]
-  country: "México", // [cite: 131, 133]
+  neighborhood: "Col. Jardines de Durango",
+  city: "Victoria de Durango",
+  state: "Durango",
+  cp: "34020",
+  country: "México",
 };
 
 class CartService {
+
   // Obtener carrito de un usuario con los cálculos financieros al día
   async getCart(userId) {
     let cart = await prisma.cart.findUnique({
@@ -34,26 +35,8 @@ class CartService {
 
     const updated = await this.recalculateCartTotals(cart.id);
     return new PedidoResponseDto(updated);
-  
+  }
 
-        if (quantity <= 0) {
-            // Eliminar ítem del carrito (Acción "Quitar" en PDF)
-            await prisma.cartItem.deleteMany({
-                where: { cartId: cart.id, productId }
-            });
-        } else {
-            // 🔥 SOLO ESTA LÍNEA CAMBIA - usa el método con caché
-            const externalData = await ExelService.fetchExternalProductsWithCache({ id: productId });
-            const externalProduct = externalData?.datos?.find(p => p.id === productId);
-            
-            if (!externalProduct) throw new Error("El producto seleccionado ya no existe en el catálogo.");
-             
-            const availableStock = parseInt(externalProduct.stock || 0); //
-            if (quantity > availableStock) {
-                throw new Error(`Stock insuficiente. Solo quedan ${availableStock} unidades disponibles.`);
-            }
-        }
-    }
   // PANTALLA 1: Agregar, modificar o remover ítems validando el stock de Exel del Norte
   async updateItemQuantity(userId, productId, quantity) {
     const cart = await prisma.cart.findUnique({
@@ -61,67 +44,58 @@ class CartService {
       include: { items: true },
     });
 
+    if (!cart) throw new Error("Carrito no encontrado para este usuario.");
+
     if (quantity <= 0) {
-      // Eliminar ítem del carrito (Acción "Quitar" en PDF)
+      // Eliminar ítem del carrito
       await prisma.cartItem.deleteMany({
         where: { cartId: cart.id, productId },
       });
     } else {
-      // Regla de Negocio: Validar existencias reales en tiempo real con el catálogo externo
-      const externalData = await ExelService.fetchExternalProducts({
-        id: productId,
-      });
-      const externalProduct = externalData?.find((p) => p.id === productId);
+      // ✅ USA CACHÉ: Trae TODOS los productos de Redis (o de la API si no hay caché)
+      //    El resultado ya viene en formato ProductosResponseDto[], NO en el formato crudo de la API
+      const allProducts = await ExelService.fetchExternalProductsWithCache();
 
-            if (existingItem) {
-                await prisma.cartItem.update({
-                    where: { id: existingItem.id },
-                    data: { quantity, totalPrice: parseFloat(externalProduct.precio) * quantity }
-                });
-            } else {
-                await prisma.cartItem.create({
-                    data: {
-                        cartId: cart.id,
-                        productId,
-                        sku: externalProduct.sku,
-                        name: externalProduct.nombre,
-                        price: parseFloat(externalProduct.precio),
-                        quantity,
-                        totalPrice: parseFloat(externalProduct.precio) * quantity
-                    }
-                });
-            }
-        }
-    
-      const availableStock = parseInt(externalProduct.stock || 0); //
+      // Busca el producto específico dentro del array cacheado
+      const product = allProducts?.find((p) => p.id === productId);
+
+      if (!product) {
+        throw new Error("El producto seleccionado ya no existe en el catálogo.");
+      }
+
+      // Validar stock disponible
+      const availableStock = parseInt(product.stock || 0);
       if (quantity > availableStock) {
         throw new Error(
-          `Stock insuficiente. Solo quedan ${availableStock} unidades disponibles.`,
+          `Stock insuficiente. Solo quedan ${availableStock} unidades disponibles.`
         );
       }
 
-      const existingItem = cart.items.find(
-        (item) => item.productId === productId,
-      );
+      // Insertar o actualizar el ítem en el carrito
+      const existingItem = cart.items.find((item) => item.productId === productId);
 
       if (existingItem) {
         await prisma.cartItem.update({
           where: { id: existingItem.id },
-          data: { quantity, totalPrice: externalProduct.precio * quantity },
+          data: {
+            quantity,
+            totalPrice: parseFloat(product.precio) * quantity,
+          },
         });
       } else {
         await prisma.cartItem.create({
           data: {
             cartId: cart.id,
             productId,
-            sku: externalProduct.sku, //
-            name: externalProduct.nombre, //
-            price: externalProduct.precio, //
+            sku: product.sku,
+            name: product.nombre,
+            price: parseFloat(product.precio),
             quantity,
-            totalPrice: externalProduct.precio * quantity,
+            totalPrice: parseFloat(product.precio) * quantity,
           },
         });
       }
+    }
 
     const updated = await this.recalculateCartTotals(cart.id);
     return new PedidoResponseDto(updated);
@@ -130,6 +104,8 @@ class CartService {
   // PANTALLA 1: Cambiar el tipo de pago asignado (Efectivo, Transferencia, Crédito)
   async setPaymentType(userId, paymentType) {
     const cart = await prisma.cart.findUnique({ where: { userId } });
+    if (!cart) throw new Error("Carrito no encontrado.");
+
     const updated = await prisma.cart.update({
       where: { id: cart.id },
       data: { paymentType },
@@ -144,27 +120,31 @@ class CartService {
       where: { userId },
       include: { items: true },
     });
+    if (!cart) throw new Error("Carrito no encontrado.");
+
     let shippingAddress = null;
     let shippingCost = 0.0;
 
     if (method === "Sucursal") {
       shippingAddress = CABS_SUCURSAL_ADDRESS;
-      shippingCost = 0.0; // Recoger en sucursal es gratis según diseño [cite: 42, 114]
+      shippingCost = 0.0; // Recoger en sucursal es gratis
     } else if (method === "Domicilio") {
-      if (!addressId)
+      if (!addressId) {
         throw new Error(
-          "Debe seleccionar una dirección registrada para la entrega a domicilio.",
+          "Debe seleccionar una dirección registrada para la entrega a domicilio."
         );
+      }
 
       const address = await prisma.userAddress.findFirst({
         where: { id: parseInt(addressId), userId },
       });
-      if (!address)
+      if (!address) {
         throw new Error("La dirección de entrega seleccionada no existe.");
+      }
 
       shippingAddress = address;
-      // Regla del PDF: Envío menor a $2,000 genera un cargo por flete de $90.00
-      shippingCost = cart.subtotal < 2000 ? 90.0 : 0.0; // [cite: 85, 225, 269]
+      // Regla: Envío menor a $2,000 genera un cargo por flete de $90.00
+      shippingCost = cart.subtotal < 2000 ? 90.0 : 0.0;
     } else {
       throw new Error("Método de entrega inválido.");
     }
@@ -174,7 +154,6 @@ class CartService {
       data: {
         deliveryMethod: method,
         shippingCost,
-        // Almacenamos la estructura completa de dirección de forma estática en formato JSON para el pedido
         frozenAddress: JSON.stringify(shippingAddress),
       },
     });
@@ -190,10 +169,13 @@ class CartService {
       include: { items: true },
     });
 
-    if (!cart.items || cart.items.length === 0)
+    if (!cart) throw new Error("Carrito no encontrado.");
+    if (!cart.items || cart.items.length === 0) {
       throw new Error("El carrito está vacío.");
-    if (!cart.deliveryMethod)
+    }
+    if (!cart.deliveryMethod) {
       throw new Error("No ha seleccionado el método de entrega.");
+    }
 
     const pedidoDto = new PedidoCreateDto({
       usuarioId: userId,
@@ -231,10 +213,10 @@ class CartService {
         include: { items: true },
       });
 
-      // 2. Limpiar items del carrito del usuario ya procesado
+      // 2. Limpiar items del carrito procesado
       await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
 
-      // 3. Resetear montos del contenedor del carrito
+      // 3. Resetear montos del carrito
       await tx.cart.update({
         where: { id: cart.id },
         data: {
@@ -247,13 +229,13 @@ class CartService {
       });
 
       logger.info(
-        `Pedido #${order.id} generado exitosamente para el usuario ${userId}`,
+        `Pedido #${order.id} generado exitosamente para el usuario ${userId}`
       );
       return new PedidoResponseDto(order);
     });
   }
 
-  // Lógica interna reutilizable para el cálculo de totales financieros en tiempo real
+  // Lógica interna reutilizable para el cálculo de totales financieros
   async recalculateCartTotals(cartId) {
     const cart = await prisma.cart.findUnique({
       where: { id: cartId },
@@ -264,7 +246,7 @@ class CartService {
     let shippingCost = cart.shippingCost;
 
     if (cart.deliveryMethod === "Domicilio") {
-      shippingCost = subtotal < 2000 ? 90.0 : 0.0; //
+      shippingCost = subtotal < 2000 ? 90.0 : 0.0;
     }
 
     const total = subtotal + shippingCost;
