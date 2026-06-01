@@ -4,6 +4,7 @@ namespace back_cabs.CRM.DTOs.Legacy
     public class AutorizarClienteRequestDto
     {
         // Datos financieros — todos opcionales; si vienen null se respeta el valor actual
+        public int Id { get; set; }
         public int? ListaPrecio { get; set; }
         public double? LimiteCredito { get; set; }
         public int? DiasCredito { get; set; }

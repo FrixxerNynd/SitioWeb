@@ -201,20 +201,25 @@ namespace CRM.DTOs.Request
 
     public class UserClientRequestDto
     {
-        public string Contraseña { get; set; } = string.Empty;
+        
         public string Nombre { get; set; } = string.Empty;
         public string ApellidoPaterno { get; set; } = string.Empty;
         public string ApellidoMaterno { get; set; } = string.Empty;
+        [Required(ErrorMessage = "El RFC es obligatorio")]
         public string RFC { get; set; } = string.Empty;
+        [Required(ErrorMessage = "El CURP es obligatorio")]
         public string CURP { get; set; } = string.Empty;
+        [Required(ErrorMessage = "El Teléfono es obligatorio")]
         public string Telefono { get; set; } = string.Empty;
+        [Required(ErrorMessage = "El Email es obligatorio")]
         public string Email { get; set; } = string.Empty;
         public string Email2 { get; set; } = string.Empty;
-            public string Email3 { get; set; } = string.Empty;
-        public string Ubicacion { get; set; } = string.Empty;
+        public string Email3 { get; set; } = string.Empty;
+        [Required(ErrorMessage = "La contraseña es obligatoria")]
+        public string Contraseña { get; set; } = string.Empty;
         public string Estado { get; set; } = string.Empty;
         public string RecaptchaToken { get; set; } = string.Empty;
-        public UbicacionDetalleDto? UbicacionDetalle { get; set; }
+        public UbicacionDetalleDto? Direccion { get; set; }
     }
 
 }

@@ -29,5 +29,10 @@ namespace back_cabs.CRM.Interfaces.Legacy
         /// Validar correo y contraseñas de un cliente para login (soporte legacy)
         /// </summary>
         Task<AdmCliente?> ValidateCredentialsAsync(string email, string contrasena);
+
+        /// <summary>
+        /// Autorizar un pre-registro de cliente nuevo
+        /// </summary>
+        Task<ServiceResult<AdmClienteConDomicilioResponseDto>> AutorizarClienteAsync(int idCliente, AutorizarClienteRequestDto autorizacionData);
     }
 }

@@ -8,7 +8,7 @@
       "^/api-exel": ""
     },
     "headers": {
-      "Authorization": ""
+      "Authorization": "API_6196eef5a6a5cc36c14885c19c55c81057e603c4"
     }
   },
   "/api-mexico": {

@@ -22,6 +22,7 @@
 
 using CRM.DTOs.Request;
 using CRM.DTOs.Response;
+using back_cabs.CRM.DTOs.Legacy;
 using back_cabs.CRM.services.Auth;
 using back_cabs.CRM.Interfaces.Legacy;
 using back_cabs.CRM.models.Auth;
@@ -92,12 +93,12 @@ namespace back_cabs.CRM.controllers.Auth
             try
             {
                 //Validar reCAPTCHA v2
-                var recaptchaValido = await _recaptchaService.ValidarV2Async(request.RecaptchaToken);
-                if (!recaptchaValido)
-                {
-                    _logger.LogWarning("Registro bloqueado por reCAPTCHA v2 para email: {Email}", request.Email);
-                    return BadRequest(new { message = "Por favor completa el reCAPTCHA." });
-                }
+                // var recaptchaValido = await _recaptchaService.ValidarV2Async(request.RecaptchaToken);
+                // if (!recaptchaValido)
+                // {
+                //     _logger.LogWarning("Registro bloqueado por reCAPTCHA v2 para email: {Email}", request.Email);
+                //     return BadRequest(new { message = "Por favor completa el reCAPTCHA." });
+                // }
                 
                 _logger.LogInformation("Iniciando registro de cliente para email: {Email}", request?.Email);
                 // Validación básica del request
@@ -222,6 +223,77 @@ namespace back_cabs.CRM.controllers.Auth
         }
 
         /// <summary>
+        /// Autorizar cliente nuevo en preregistro
+        /// </summary>
+        /// <response code="200">Cliente autorizado exitosamente</response>
+        /// <response code="404">Cliente no encontrado</response>
+        /// <response code="500">Error interno del servidor</response>
+        [HttpPut("autorizar-cliente")]
+        [Authorize]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> AutorizarCliente([FromBody] AutorizarClienteRequestDto request)
+        {
+            try
+            {
+                _logger.LogInformation("Iniciando autorización de cliente para email: {Id}", request?.Id);
+
+                // Validación básica del request
+                if (request == null)
+                {
+                    _logger.LogWarning("Request de autorización recibido como null");
+                    return BadRequest(UtilidadesManejoErrores.CreateErrorResponse(
+                        TipoError.ErrorValidacion,
+                        "Los datos del cliente son requeridos",
+                        "Request body cannot be null"));
+                }
+
+                // Procesar la autorización
+                var resultado = await _admClienteService.AutorizarClienteAsync(request.Id, request);
+
+                _logger.LogInformation("Cliente autorizado exitosamente: {Id}", request?.Id);
+
+                // Retornar respuesta exitosa con código 200 OK
+                return Ok(resultado);
+            }
+            catch (FluentValidation.ValidationException ex)
+            {
+                _logger.LogWarning("Errores de validación en autorización: {Errores}",
+                    string.Join(", ", ex.Errors.Select(e => e.ErrorMessage)));
+
+                // Crear respuesta estructurada con errores de validación
+                var erroresValidacion = ex.Errors
+                    .GroupBy(e => e.PropertyName)
+                    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+
+                return BadRequest(UtilidadesManejoErrores.CreateErrorResponse(
+                    TipoError.ErrorValidacion,
+                    "Errores de validación en los datos proporcionados",
+                    System.Text.Json.JsonSerializer.Serialize(erroresValidacion)));
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("no encontrado"))
+            {
+                _logger.LogWarning("Cliente no encontrado para autorización: {Id}", request?.Id);
+
+                return NotFound(UtilidadesManejoErrores.CreateErrorResponse(
+                    TipoError.ErrorNoEncontrado,
+                    "Cliente no encontrado",
+                    ex.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inesperado durante autorización de cliente: {Id}", request?.Id);
+
+                return StatusCode(500, UtilidadesManejoErrores.CreateErrorResponse(
+                    TipoError.ErrorServidorInterno,
+                    "Error interno del servidor",
+                    "Ocurrió un error inesperado durante el proceso de autorización"));
+            }
+        }
+
+
+        /// <summary>
         /// ✅ MEJORA 5: Obtiene un token CSRF para proteger requests subsecuentes
         /// </summary>
         /// <remarks>
@@ -312,12 +384,12 @@ namespace back_cabs.CRM.controllers.Auth
             try
             {
                 //Validar reCAPTCHA V3
-                 var recaptchaValido = await _recaptchaService.ValidarV3Async(request.RecaptchaToken);
-                if (!recaptchaValido)
-                {
-                     _logger.LogWarning("Login bloqueado por reCAPTCHA v3 para email: {Email}", request.Email);
-                    return BadRequest(new { message = "Validación de seguridad fallida. Intenta de nuevo." });
-                }
+                //  var recaptchaValido = await _recaptchaService.ValidarV3Async(request.RecaptchaToken);
+                // if (!recaptchaValido)
+                // {
+                //      _logger.LogWarning("Login bloqueado por reCAPTCHA v3 para email: {Email}", request.Email);
+                //     return BadRequest(new { message = "Validación de seguridad fallida. Intenta de nuevo." });
+                // }
 
                 // Validar credenciales con base de datos
                 var usuario = await _usuarioAuthService.ValidarCredencialesAsync(request.Email, request.Password);

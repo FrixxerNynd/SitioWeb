@@ -41,15 +41,15 @@ namespace back_cabs.CRM.repositories.Legacy
                 }
 
                 //Validar que no exista un domicilio igual para el mismo cliente
-                var domicilioExistente = await _context.AdmDomicilios
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(d =>
-                        d.CIdCatalogo == domicilio.CIdCatalogo);
-                if (domicilioExistente != null)
-                {
-                    _logger.LogWarning("⚠️ Ya existe un domicilio para el cliente {IdCliente}", domicilio.CIdCatalogo);
-                    throw new Exception($"Ya existe un domicilio para el cliente {domicilio.CIdCatalogo}");
-                }
+                // var domicilioExistente = await _context.AdmDomicilios
+                //     .AsNoTracking()
+                //     .FirstOrDefaultAsync(d =>
+                //         d.CIdCatalogo == domicilio.CIdCatalogo);
+                // if (domicilioExistente != null)
+                // {
+                //     _logger.LogWarning("⚠️ Ya existe un domicilio para el cliente {IdCliente}", domicilio.CIdCatalogo);
+                //     throw new Exception($"Ya existe un domicilio para el cliente {domicilio.CIdCatalogo}");
+                // }
 
                 //Obtener siguiente ID
                 var maxId = await _context.AdmDomicilios
