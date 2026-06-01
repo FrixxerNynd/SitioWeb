@@ -44,3 +44,6 @@ Thumbs.db
 
 pnpm-lock.yaml
 pnpm-workspace.yaml
+
+proxy.conf.json
+src/environments/environment.*
