@@ -3,12 +3,6 @@
     <div class="container-fluid">
       <!-- titulo -->
       <div class="card rounded-3 border-2 border-zinc-200 p-4 bg-white overflow-hidden my-4">
-        <!-- <div class="row mb-4">
-          <div class="col-12">
-            <h2 class="fw-bold text-dark m-0">Mis órdenes</h2>
-            <p class="text-muted small m-0 mt-1">Revisa fácilmente tus órdenes aquí.</p>
-          </div>
-        </div> -->
         <div class="flex flex-col gap-2">
           <h2 class="fw-bold text-dark m-0">Mis órdenes</h2>
           <p class="text-muted small m-0 mt-1">Revisa fácilmente tus órdenes aquí.</p>
@@ -57,23 +51,26 @@
             />
           </div>
 
-          <div class="col-12 col-md-2 d-flex gap-2">
-            <button
-              class="btn btn-outline-secondary w-50 text-dark border-light-subtle bg-white"
-              type="button"
-              (click)="limpiarFiltros()"
-              style="height: 40px; border-radius: 5px"
-            >
-              Limpiar
-            </button>
-            <button
-              class="btn btn-outline-secondary w-50 text-dark border-light-subtle bg-white"
-              type="button"
-              (click)="buscarOrdenes()"
-              style="height: 40px; border-radius: 5px"
-            >
-              Buscar
-            </button>
+          <!-- Botones corregidos -->
+          <div class="col-12 col-md-2">
+            <div class="d-flex flex-column flex-sm-row gap-2">
+              <button
+                class="btn btn-outline-secondary text-dark border-light-subtle bg-white w-100 w-sm-auto"
+                type="button"
+                (click)="limpiarFiltros()"
+                style="height: 40px; border-radius: 5px"
+              >
+                Limpiar
+              </button>
+              <button
+                class="btn btn-outline-secondary text-dark border-light-subtle bg-white w-100 w-sm-auto"
+                type="button"
+                (click)="buscarOrdenes()"
+                style="height: 40px; border-radius: 5px"
+              >
+                Buscar
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -86,7 +83,7 @@
               <i class="fi fi-sr-usd-circle"></i>Total gastado
             </div>
             <h2 class="fw-bold text-dark my-1">{{ totalGastado | currency }}</h2>
-            <span class="text-muted small">Suma total de todas tus compras</span>
+            <span class="text-muted small d-none d-sm-block">Suma total de todas tus compras</span>
           </div>
         </div>
 
@@ -96,7 +93,7 @@
               <i class="fi fi-sr-credit-card"></i> Crédito disponible
             </div>
             <h2 class="fw-bold text-dark my-1">{{ creditoDisponible | currency }}</h2>
-            <span class="text-muted small">Crédito que te queda por usar</span>
+            <span class="text-muted small d-none d-sm-block">Crédito que te queda por usar</span>
           </div>
         </div>
 
@@ -106,7 +103,7 @@
               <i class="fi fi-sr-duplicate"></i> Total de órdenes
             </div>
             <h2 class="fw-bold text-dark my-1">{{ totalOrdenes }}</h2>
-            <span class="text-muted small">Cantidad total de compras realizadas</span>
+            <span class="text-muted small d-none d-sm-block">Cantidad total de compras realizadas</span>
           </div>
         </div>
 
@@ -116,12 +113,12 @@
               <i class="fi fi-sr-clock-three"></i> Órdenes procesando
             </div>
             <h2 class="fw-bold text-dark my-1">{{ ordenesProcesando }}</h2>
-            <span class="text-muted small">Compras que aún están en curso</span>
+            <span class="text-muted small d-none d-sm-block">Compras que aún están en curso</span>
           </div>
         </div>
       </div>
 
-      <!-- TABLAS  -->
+      <!-- TABLA  -->
       <div
         class="card rounded-3 border-2 border-zinc-200 bg-white border-radius: 5px overflow-hidden my-4"
       >
@@ -156,7 +153,7 @@
                     >
                       {{ orden.estado }}
                     </span>
-                  </td>
+                    </td>
                   <td class="px-6 py-4 text-center text-secondary">
                     <button
                       class="btn text-dark p-0 border-0"
@@ -167,18 +164,18 @@
                     >
                       <i class="fi fi-rr-eye"></i>
                     </button>
-                  </td>
+                    </td>
                 </tr>
               </tbody>
             </table>
           </div>
           <!-- footer -->
           <div
-            class="table-footer flex-shrink-0 px-4 py-3 border-top bg-light d-flex align-items-center justify-content-between"
+            class="table-footer flex-shrink-0 px-4 py-3 border-top bg-light d-flex align-items-center justify-content-between flex-wrap gap-2"
           >
             <span class="text-secondary small">{{ totalItemsRegistros }}</span>
 
-            <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
               <div class="d-flex align-items-center gap-2">
                 <span class="text-secondary small">Filas por página:</span>
                 <select
@@ -239,6 +236,7 @@
   </div>
 </div>
 
+<!-- Modal -->
 <div class="modal fade" id="modalDetalleOrden" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable" style="max-width: 450px">
     <div class="modal-content border-0 shadow" style="background-color: #f8f9fa">
