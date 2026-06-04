@@ -3,12 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { CookieService } from './cookie.service'; 
-
-
-// ============================================
-// INTERFACES
-// ============================================
+import { CookieService } from './cookie.service';
 
 export interface IProduct {
     id: string;
@@ -62,10 +57,6 @@ export interface IApiResponse<T> {
     mensaje: string;
     datos: T;
 }
-
-// ============================================
-// MODELOS
-// ============================================
 
 export class Brand {
     id: string;
@@ -181,16 +172,12 @@ export class Subcategory {
     }
 }
 
-// ============================================
-// SERVICIO CON AUTENTICACIÓN
-// ============================================
-
 @Injectable({
     providedIn: 'root'
 })
 export class ExcelNorteCatalogoService {
     private http = inject(HttpClient);
-    private cookieService = inject(CookieService); // Inyectar CookieService
+    private cookieService = inject(CookieService);
     private baseUrl = environment.apiExcelUrl;
     private apiKey = environment.Authorization;
 
@@ -200,7 +187,6 @@ export class ExcelNorteCatalogoService {
         const url = `${this.baseUrl}/${endpoint}`;
         console.log(`🌐 GET: ${url}`);
         
-        // CAMBIADO: usar cookieService en lugar de localStorage
         const token = this.cookieService.getCookie('token');
         
         let headers = new HttpHeaders({
@@ -226,8 +212,6 @@ export class ExcelNorteCatalogoService {
         }
     }
 
-    // ========== MÉTODOS DE IMÁGENES ==========
-    
     async getImagenesProducto(productId: string): Promise<IImagenProducto[]> {
         try {
             const data = await this.get<IApiResponse<IImagenProducto[]>>(`imagenes/${productId}`);
@@ -262,8 +246,6 @@ export class ExcelNorteCatalogoService {
         }
     }
 
-    // ========== PRODUCTOS ==========
-    
     async getProducts(): Promise<IProduct[]> {
         try {
             const imagenesData = await this.get<any>('imagenes');
@@ -330,8 +312,6 @@ export class ExcelNorteCatalogoService {
         }
     }
 
-    // ========== MÉTODOS AUXILIARES ==========
-    
     private extraerMarcaInfo(referencia: string, sku: string): { id: string; nombre: string } {
         const match = (referencia || sku).match(/^([A-Za-z0-9]+)/);
         const codigo = match ? match[1] : 'GEN';
@@ -382,8 +362,6 @@ export class ExcelNorteCatalogoService {
         return `Producto ${referencia}`;
     }
 
-    // ========== MARCAS ==========
-    
     async getAllBrands(): Promise<Brand[]> {
         try {
             const response = await this.get<any>('marcas');
@@ -414,44 +392,36 @@ export class ExcelNorteCatalogoService {
         return brands.find(b => b.id === id) || null;
     }
 
-    // ========== CATEGORÍAS ==========
-    
-// front-end/src/app/services/exel-api-base.service.ts
-
-async getAllCategories(): Promise<Category[]> {
-    try {
-        const response = await this.get<any>('categorias');
-        
-        console.log('📦 Respuesta de categorías:', response);
-        
-        // Verificar la estructura de la respuesta
-        if (response && response.resultado === true && response.datos && Array.isArray(response.datos)) {
-            console.log(`✅ ${response.datos.length} categorías obtenidas`);
+    async getAllCategories(): Promise<Category[]> {
+        try {
+            const response = await this.get<any>('categorias');
             
-            // Mostrar primeras 5 categorías para debug
-            console.log('📋 Ejemplo de categorías:', response.datos.slice(0, 5));
+            console.log('📦 Respuesta de categorías:', response);
             
-            return response.datos.map((cat: any) => new Category({
-                id_categoria: cat.id,
-                nombre_categoria: cat.nombre
-            }));
+            if (response && response.resultado === true && response.datos && Array.isArray(response.datos)) {
+                console.log(`✅ ${response.datos.length} categorías obtenidas`);
+                
+                console.log('📋 Ejemplo de categorías:', response.datos.slice(0, 5));
+                
+                return response.datos.map((cat: any) => new Category({
+                    id_categoria: cat.id_categoria,
+                    nombre_categoria: cat.nombre_categoria
+                }));
+            }
+            
+            console.warn('⚠️ No se encontraron categorías en la respuesta');
+            return [];
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            return [];
         }
-        
-        console.warn('⚠️ No se encontraron categorías en la respuesta');
-        return [];
-    } catch (error) {
-        console.error('Error fetching categories:', error);
-        return [];
     }
-}
 
     async getCategoryById(id: string): Promise<Category | null> {
         const categories = await this.getAllCategories();
         return categories.find(c => c.id === id) || null;
     }
 
-    // ========== SUBCATEGORÍAS ==========
-    
     async getAllSubcategories(): Promise<Subcategory[]> {
         try {
             const response = await this.get<any>('subcategorias');
@@ -482,8 +452,6 @@ async getAllCategories(): Promise<Category[]> {
         return subcategories.find(sub => sub.id === id) || null;
     }
 
-    // ========== MÉTODOS UTILITARIOS ==========
-    
     async loadAllCatalogs(): Promise<{
         brands: Brand[];
         categories: Category[];
