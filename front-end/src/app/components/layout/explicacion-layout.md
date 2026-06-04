@@ -1,3 +1,4 @@
+
 # Directorio `layout`
 
 ## Propósito

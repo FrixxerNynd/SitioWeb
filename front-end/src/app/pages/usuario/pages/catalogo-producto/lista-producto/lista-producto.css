@@ -1,223 +1,531 @@
+/* Skeleton Loader Styles */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.bg-opacity-25 {
+  --bs-bg-opacity: 0.25;
+}
+
+/* Asegurar que las tarjetas skeleton tengan la misma altura */
+.card {
+  transition: all 0.3s ease;
+}
+
+/* Mejorar skeleton de imágenes */
+.bg-secondary.bg-opacity-10 {
+  background-color: rgba(108, 117, 125, 0.1);
+}
+
+/* Tamaños para skeleton */
+.h-3 {
+  height: 0.75rem;
+}
+
+.h-4 {
+  height: 1rem;
+}
+
+.h-5 {
+  height: 1.25rem;
+}
+
+.h-8 {
+  height: 2rem;
+}
+
+.h-10 {
+  height: 2.5rem;
+}
+
+.w-16 {
+  width: 4rem;
+}
+
+.w-20 {
+  width: 5rem;
+}
+
+.w-24 {
+  width: 6rem;
+}
+
+.w-25 {
+  width: 25%;
+}
+
+.w-28 {
+  width: 7rem;
+}
+
+.w-32 {
+  width: 8rem;
+}
+
+.w-36 {
+  width: 9rem;
+}
+
+.w-40 {
+  width: 10rem;
+}
+
+.w-48 {
+  width: 12rem;
+}
+
+.w-50 {
+  width: 50%;
+}
+
+.w-64 {
+  width: 16rem;
+}
+
+.w-75 {
+  width: 75%;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+/* Estilos de la tarjeta de producto */
+.producto-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid #e0e0e0;
+  padding: 16px;
+}
+
+.imagen-container {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.producto-imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.descuento-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background-image: linear-gradient(to bottom, #31408f, #021669);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 1;
+}
+
+.producto-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.producto-nombre {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  line-height: 1.4;
+  max-height: calc(1.4em * 3);
+  font-size: 16px;
+}
+
+.precios {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.precio-actual {
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #31408f;
+}
+
+.precio-original {
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #9CA3AF;
+  text-decoration: line-through;
+}
+
+.acciones {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-agregar,
+.btn-detalles {
+  flex: 1;
+  padding: 10px 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+  color: #021669;
+}
+
+.btn-agregar {
+  background-image: linear-gradient(to bottom, #31408f, #021669);
+  color: white;
+}
+
+.btn-agregar:hover {
+  transform: scale(1.02);
+}
+
+.btn-agregar:active,
+.btn-detalles:active {
+  transform: scale(0.98);
+}
+
+.producto-marca {
+  font-size: 13px;
+  color: #999;
+  margin: 0 0 8px 0;
+}
+
+/* Estilos para las etiquetas de filtros */
+.filtros-aplicados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.btn-enlace {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  padding: 5px 10px 5px 12px;
+  font-size: 13.6px;
+  color: #2563EB;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.filtro-etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px 5px 12px;
+  background-image: linear-gradient(to bottom, #31408f, #021669);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: white;
+}
+
+.filtro-etiqueta .btn-close-etiqueta {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.filtro-etiqueta .btn-close-etiqueta svg {
+  width: 12px;
+  height: 12px;
+}
+
 /* Double Range Slider */
 .double-range-container {
-    position: relative;
-    width: 100%;
-    height: 30px;
-    margin: 10px 0;
+  position: relative;
+  width: 100%;
+  height: 30px;
+  margin: 10px 0;
 }
 
 .slider-track {
-    position: absolute;
-    top: 12px;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background-color: #e0e0e0;
-    border-radius: 4px;
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
 }
 
 .double-range-input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: none;
-    pointer-events: none;
-    -webkit-appearance: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: none;
+  pointer-events: none;
+  -webkit-appearance: none;
 }
 
 .double-range-input::-webkit-slider-thumb {
-    pointer-events: auto;
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background-color: #0d6efd;
-    border: 2px solid white;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
+  pointer-events: auto;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-image: linear-gradient(to bottom, #31408f, #021669);
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
 .double-range-input::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
-    background-color: #0b5ed7;
+  transform: scale(1.2);
+  background-color: #0b5ed7;
 }
 
 .double-range-input::-webkit-slider-runnable-track {
-    height: 4px;
-    background: transparent;
-    border: none;
+  height: 4px;
+  background: transparent;
+  border: none;
 }
 
 /* Firefox */
 .double-range-input::-moz-range-thumb {
-    pointer-events: auto;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background-color: #0d6efd;
-    border: 2px solid white;
-    cursor: pointer;
+  pointer-events: auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #0d6efd;
+  border: 2px solid white;
+  cursor: pointer;
 }
 
 .double-range-input::-moz-range-track {
-    height: 4px;
-    background: transparent;
+  height: 4px;
+  background: transparent;
 }
 
 /* Relleno entre las bolas */
 .double-range-container::before {
-    content: '';
-    position: absolute;
-    top: 12px;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(to right,
-            #e0e0e0 0%,
-            #e0e0e0 var(--min-pos, 0%),
-            #0d6efd var(--min-pos, 0%),
-            #0d6efd var(--max-pos, 100%),
-            #e0e0e0 var(--max-pos, 100%),
-            #e0e0e0 100%);
-    border-radius: 4px;
-    pointer-events: none;
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right,
+      #e0e0e0 0%,
+      #e0e0e0 var(--min-pos, 0%),
+      #0d6efd var(--min-pos, 0%),
+      #0d6efd var(--max-pos, 100%),
+      #e0e0e0 var(--max-pos, 100%),
+      #e0e0e0 100%);
+  border-radius: 4px;
+  pointer-events: none;
 }
 
 .bg-contenedor-rojo {
-    background-color: red;
+  background-color: red;
 }
 
 .bg-contenedor-azul {
-    background-color: #e3f2fd;
-    padding: 10px 15px;
-    border-radius: 8px;
-    border-left: 4px solid #0d6efd;
-    width: 100%;
-    display: block;
-    margin-bottom: 10px;
+  background-color: #e3f2fd;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border-left: 4px solid #0d6efd;
+  width: 100%;
+  display: block;
+  margin-bottom: 10px;
 }
 
 /* Solo estilos personalizados mínimos que Bootstrap no cubre */
 .bg-red-custom {
-    background-color: #dc3545;
+  background-color: #dc3545;
 }
 
 .border-left-custom {
-    border-left: 1px solid #dee2e6;
+  border-left: 1px solid #dee2e6;
 }
 
 /* Título principal */
 .titulo-catalogo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 1.5rem;
-    color: #212529;
-    padding-left: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  color: #212529;
+  padding-left: 0;
 }
 
 @media (max-width: 768px) {
-    .border-left-custom {
-        border-left: none;
-        border-top: 1px solid #dee2e6;
-    }
+  .border-left-custom {
+    border-left: none;
+    border-top: 1px solid #dee2e6;
+  }
 }
 
 .cursor-pointer {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .transition-hover:hover {
-    transform: translateY(-2px);
-    transition: all 0.2s ease;
+  transform: translateY(-2px);
+  transition: all 0.2s ease;
 }
 
 /* Estilos unificados para las tarjetas de filtros */
 .filtro-card {
-    border-bottom: 0.0938rem solid #e0e0e0;
-    overflow: hidden;
+  border-bottom: 0.0938rem solid #e0e0e0;
+  overflow: hidden;
 }
 
 .filtro-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0px 8px 0px;
-    font-weight: 600;
-    font-size: 1rem;
-    color: #212529;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0px 8px 0px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #212529;
 }
 
 .filtro-card-body {
-    max-height: 12.5rem;
-    overflow-y: auto;
+  max-height: 12.5rem;
+  overflow-y: auto;
 }
 
-/* Estilos para los items de filtro */
-
-
 .filtro-label:hover {
-    color: #0d6efd;
+  color: #0d6efd;
 }
 
 .badge-count {
-    font-size: 0.7rem;
-    margin-left: 0.5rem;
+  font-size: 0.7rem;
+  margin-left: 0.5rem;
 }
 
 /* Estilos del icono chevron */
 .icono-chevron-down {
-    width: 24px;
-    height: 24px;
+  width: 24px;
+  height: 24px;
 }
 
-
-/* En lista-producto.css */
 .filtro-label {
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    color: #495057;
-    margin-left: 0.5rem;
-    white-space: nowrap;      /* Evita salto de línea */
-    overflow: hidden;         /* Oculta el contenido que se desborda */
-    text-overflow: ellipsis;  /* Agrega "..." */
-    max-width: calc(100% - 30px); /* Ajusta el ancho máximo */
-    display: inline-block;
-    vertical-align: middle;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #495057;
+  margin-left: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 30px);
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .filtro-item {
-    margin-bottom: 0.5rem;
-    width: 100%;
-    display: flex;
-    align-items: flex-start;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
 }
 
 .form-check-input {
-    flex-shrink: 0;
-    margin-top: 0.2rem;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
 }
 
 .btn-gradient {
-    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
-    border: none;
-    color: white;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 .btn-gradient:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-.bt-secundarioñ{
-    background: white;
-    border: 1px solid  oklch(27.4% 0.006 286.033);
-    color: oklch(27.4% 0.006 286.033);
-    border-radius: 8px;
-    cursor: pointer;
+.bt-secundarioñ {
+  background: white;
+  border: 1px solid oklch(27.4% 0.006 286.033);
+  color: oklch(27.4% 0.006 286.033);
+  border-radius: 8px;
+  cursor: pointer;
 }
 
+/* Utilidades adicionales */
+.rounded-pill {
+  border-radius: 50rem !important;
+}
+
+.me-2 {
+  margin-right: 0.5rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-3 {
+  margin-bottom: 1rem;
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}
+
+.mt-4 {
+  margin-top: 1.5rem;
+}
+
+.mt-5 {
+  margin-top: 3rem;
+}
+
+.flex-grow-1 {
+  flex-grow: 1 !important;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 1rem;
+}

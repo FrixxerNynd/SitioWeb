@@ -8,7 +8,7 @@ import { PageSolicitarCorreo } from './auth/recuperar-contraseña/pages/solicita
 import { PageVerificarCodigo } from './auth/recuperar-contraseña/pages/verificar-codigo/verificar-codigo';
 import { PageNuevaContrasena } from './auth/recuperar-contraseña/pages/nueva-contrasena/nueva-contrasena';
 import { PageListaProducto } from './pages/usuario/pages/catalogo-producto/lista-producto/lista-producto';
-import { PageDetalleProducto } from './pages/usuario/pages/catalogo-producto/detalle-producto/detalle-producto';
+// import { PageDetalleProducto } from './pages/usuario/pages/catalogo-producto/detalle-producto/detalle-producto';
 import { ListaOrdenPague } from './pages/usuario/pages/orden-compra/lista-orden/lista-orden';
 import { MainLayout } from './layouts/main-layout/main-layout';
 import { AuthLayout } from './layouts/auth-layout/auth-layout';
@@ -45,13 +45,12 @@ export const routes: Routes = [
     {
         path: '',
         component: MainLayout,
-        canActivate: [AuthGuard],
         children: [
             {
                 path: 'catalogo-producto',
                 children: [
                     { path: 'lista-producto', component: PageListaProducto },
-                    { path: 'detalles-producto/:id', component: PageDetalleProducto },
+                    // { path: 'detalles-producto/:id', component: PageDetalleProducto },
                     { path: 'detalles-producto', redirectTo: 'lista-producto', pathMatch: 'full' },
                     { path: '', redirectTo: 'lista-producto', pathMatch: 'full' }
                 ]
