@@ -34,28 +34,37 @@ class CartService {
 
     const updated = await this.recalculateCartTotals(cart.id);
     return new PedidoResponseDto(updated);
-  
 
-        if (quantity <= 0) {
-            // Eliminar ítem del carrito (Acción "Quitar" en PDF)
-            await prisma.cartItem.deleteMany({
-                where: { cartId: cart.id, productId }
-            });
-        } else {
-            // 🔥 SOLO ESTA LÍNEA CAMBIA - usa el método con caché
-            const externalData = await ExelService.fetchExternalProductsWithCache({ id: productId });
-            const externalProduct = externalData?.datos?.find(p => p.id === productId);
-            
-            if (!externalProduct) throw new Error("El producto seleccionado ya no existe en el catálogo.");
-             
-            const availableStock = parseInt(externalProduct.stock || 0); //
-            if (quantity > availableStock) {
-                throw new Error(`Stock insuficiente. Solo quedan ${availableStock} unidades disponibles.`);
-            }
-        }
+    if (quantity <= 0) {
+      // Eliminar ítem del carrito (Acción "Quitar" en PDF)
+      await prisma.cartItem.deleteMany({
+        where: { cartId: cart.id, productId },
+      });
+    } else {
+      // 🔥 SOLO ESTA LÍNEA CAMBIA - usa el método con caché
+      const externalData = await ExelService.fetchExternalProductsWithCache({
+        id: productId,
+      });
+      const externalProduct = externalData?.datos?.find(
+        (p) => p.id === productId,
+      );
+
+      if (!externalProduct)
+        throw new Error(
+          "El producto seleccionado ya no existe en el catálogo.",
+        );
+
+      const availableStock = parseInt(externalProduct.stock || 0); //
+      if (quantity > availableStock) {
+        throw new Error(
+          `Stock insuficiente. Solo quedan ${availableStock} unidades disponibles.`,
+        );
+      }
     }
+  }
   // PANTALLA 1: Agregar, modificar o remover ítems validando el stock de Exel del Norte
   async updateItemQuantity(userId, productId, quantity) {
+    const precioTotal = externalProduct.precio * 1.1;
     const cart = await prisma.cart.findUnique({
       where: { userId },
       include: { items: true },
@@ -73,55 +82,58 @@ class CartService {
       });
       const externalProduct = externalData?.find((p) => p.id === productId);
 
-            if (existingItem) {
-                await prisma.cartItem.update({
-                    where: { id: existingItem.id },
-                    data: { quantity, totalPrice: parseFloat(externalProduct.precio) * quantity }
-                });
-            } else {
-                await prisma.cartItem.create({
-                    data: {
-                        cartId: cart.id,
-                        productId,
-                        sku: externalProduct.sku,
-                        name: externalProduct.nombre,
-                        price: parseFloat(externalProduct.precio),
-                        quantity,
-                        totalPrice: parseFloat(externalProduct.precio) * quantity
-                    }
-                });
-            }
-        }
-    
-      const availableStock = parseInt(externalProduct.stock || 0); //
-      if (quantity > availableStock) {
-        throw new Error(
-          `Stock insuficiente. Solo quedan ${availableStock} unidades disponibles.`,
-        );
-      }
-
-      const existingItem = cart.items.find(
-        (item) => item.productId === productId,
-      );
-
       if (existingItem) {
         await prisma.cartItem.update({
           where: { id: existingItem.id },
-          data: { quantity, totalPrice: externalProduct.precio * quantity },
+          data: {
+            quantity,
+            totalPrice: parseFloat(precioTotal) * quantity,
+          },
         });
       } else {
         await prisma.cartItem.create({
           data: {
             cartId: cart.id,
             productId,
-            sku: externalProduct.sku, //
-            name: externalProduct.nombre, //
-            price: externalProduct.precio, //
+            sku: externalProduct.sku,
+            name: externalProduct.nombre,
+            price: parseFloat(precioTotal),
             quantity,
-            totalPrice: externalProduct.precio * quantity,
+            totalPrice: parseFloat(precioTotal) * quantity,
           },
         });
       }
+    }
+
+    const availableStock = parseInt(externalProduct.stock || 0); //
+    if (quantity > availableStock) {
+      throw new Error(
+        `Stock insuficiente. Solo quedan ${availableStock} unidades disponibles.`,
+      );
+    }
+
+    const existingItem = cart.items.find(
+      (item) => item.productId === productId,
+    );
+
+    if (existingItem) {
+      await prisma.cartItem.update({
+        where: { id: existingItem.id },
+        data: { quantity, totalPrice: precioTotal * quantity },
+      });
+    } else {
+      await prisma.cartItem.create({
+        data: {
+          cartId: cart.id,
+          productId,
+          sku: externalProduct.sku, //
+          name: externalProduct.nombre, //
+          price: precioTotal, //
+          quantity,
+          totalPrice: precioTotal * quantity,
+        },
+      });
+    }
 
     const updated = await this.recalculateCartTotals(cart.id);
     return new PedidoResponseDto(updated);
