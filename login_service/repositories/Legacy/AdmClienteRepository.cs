@@ -2,6 +2,7 @@ using back_cabs.CRM.contexts;
 using back_cabs.CRM.DTOs.Legacy;
 using back_cabs.CRM.Interfaces.Legacy;
 using back_cabs.CRM.models.legacy;
+using back_cabs.CRM.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Any;
 
@@ -263,34 +264,30 @@ namespace back_cabs.CRM.repositories.Legacy
         }
 
         /// <summary>
-        /// Validar credenciales (soporte legacy)
+        /// Obtener cliente por email principal(email1) para validacion en nueva tabla
         /// </summary>
-        public async Task<AdmCliente?> ValidateCredentialsAsync(string email, string contrasena)
+        public async Task<AdmCliente?> GetByEmailAsync (string email)
         {
             try
             {
                 var cliente = await _context.AdmClientes
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(c =>
-                        (c.CEmail1.ToLower() == email.ToLower() ||
-                         c.CEmail2.ToLower() == email.ToLower() ||
-                         c.CEmail3.ToLower() == email.ToLower()) &&
-                        c.CTextoExtra1 == contrasena);
+                    .FirstOrDefaultAsync(c => c.CEmail1.ToLower() == email.ToLower());
 
                 if (cliente != null)
                 {
-                    _logger.LogInformation("✅ Credenciales válidas para cliente: {Email}", email);
+                    _logger.LogInformation("✅ Cliente encontrado con email: {Email}", email);
                 }
                 else
                 {
-                    _logger.LogWarning("⚠️ Credenciales inválidas para cliente: {Email}", email);
+                    _logger.LogWarning("⚠️ Cliente no encontrado con email: {Email}", email);
                 }
 
                 return cliente;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Error al validar credenciales para cliente: {Email}", email);
+                _logger.LogError(ex, "❌ Error al obtener cliente por email: {Email}", email);
                 throw;
             }
         }

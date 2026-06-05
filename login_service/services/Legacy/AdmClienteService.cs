@@ -2,10 +2,12 @@ using back_cabs.CRM.contexts;
 using back_cabs.CRM.DTOs.Legacy;
 using back_cabs.CRM.Interfaces.Legacy;
 using back_cabs.CRM.models.legacy;
+using back_cabs.CRM.Middleware;
 using CRM.DTOs.Request;
 using Microsoft.EntityFrameworkCore;
 using back_cabs.CRM.DTOs.ServiceResponse;
-using Microsoft.OpenApi.Any;
+using back_cabs.CRM.Interfaces.Auth;
+using back_cabs.CRM.models.Auth;
 
 namespace back_cabs.CRM.services.Legacy
 {
@@ -14,9 +16,11 @@ namespace back_cabs.CRM.services.Legacy
     /// OPTIMIZADO CON REDIS para búsquedas rápidas
     /// </summary>
     public class AdmClienteService : IAdmClienteService
-    {
+    {   
         private readonly IAdmClienteRepository _repository;
         private readonly LegacyCompacReadOnlyContext _context;
+        private readonly WriteContext _writeContext;
+        private readonly IUsuarioAuthRepository _repositoryAuth;
         private readonly ILogger<AdmClienteService> _logger;
         private readonly ICacheService _cacheService;
 
@@ -25,12 +29,16 @@ namespace back_cabs.CRM.services.Legacy
 
         public AdmClienteService(
             IAdmClienteRepository repository,
+            IUsuarioAuthRepository repositoryAuth,
             LegacyCompacReadOnlyContext context,
+            WriteContext writeContext,
             ILogger<AdmClienteService> logger,
             ICacheService cacheService)
         {
             _repository = repository;
             _context = context;
+            _writeContext = writeContext;
+            _repositoryAuth = repositoryAuth;
             _logger = logger;
             _cacheService = cacheService;
         }
@@ -167,7 +175,7 @@ namespace back_cabs.CRM.services.Legacy
                 CWhatsapp = clientData.Telefono,
 
                 //Campos Extra
-                CTextoExtra1 = clientData.Contraseña,
+                CTextoExtra1 = clientData.Contraseña, // Contraseña cifrada con SHA-256
                 CTextoExtra2 = "Cliente registrado desde sitio web",
                 CTextoExtra3 = "",
                 CTextoExtra4 = "",
@@ -186,6 +194,14 @@ namespace back_cabs.CRM.services.Legacy
             };
             var clienteInsertado = await _repository.InsertAsync(nuevoCliente);
 
+            //Insertar contraseña hasheada en tabla auth_usuarios-clientes
+            var password = new Auth_cliente
+            {
+                Id_Cliente = clienteInsertado.CIdClienteProveedor,
+                password = ApiUtilities.GenerateSha256Hash(clientData.Contraseña)
+            };
+            var passInsertado = await _repositoryAuth.InsertPassword(password);
+
             _logger.LogInformation("Nuevo cliente registrado con ID {IdCliente} y RFC {RFC}", clienteInsertado.CIdClienteProveedor, nuevoCliente.CRfc);
 
             // Crear domicilio predeterminado para el cliente
@@ -193,21 +209,21 @@ namespace back_cabs.CRM.services.Legacy
             {
                 CIdCatalogo = clienteInsertado.CIdClienteProveedor,
                 CTipoCatalogo = 1, // Cliente
-                CTipoDireccion = 1, // 1 Fiscal / 0 Normal
-                CNombreCalle = clientData.UbicacionDetalle.Calle,
-                CNumeroExterior = clientData.UbicacionDetalle.NumeroExterior,
-                CNumeroInterior = clientData.UbicacionDetalle.NumeroInterior,
-                CColonia = clientData.UbicacionDetalle.Colonia,
-                CCodigoPostal = clientData.UbicacionDetalle.CodigoPostal,
-                CCiudad = clientData.UbicacionDetalle.Ciudad,
-                CMunicipio = clientData.UbicacionDetalle.Municipio,
-                CEstado = clientData.UbicacionDetalle.Estado,
-                CPais = clientData.UbicacionDetalle.Pais,
+                CTipoDireccion = 0, // 0 Fiscal / 1 Normal
+                CNombreCalle = clientData.Direccion?.Calle ?? "",
+                CNumeroExterior = clientData.Direccion?.NumeroExterior ?? "",
+                CNumeroInterior = clientData.Direccion?.NumeroInterior ?? "",
+                CColonia = clientData.Direccion?.Colonia ?? "",
+                CCodigoPostal = clientData.Direccion?.CodigoPostal ?? "",
+                CCiudad = clientData.Direccion?.Ciudad ?? "",
+                CMunicipio = clientData.Direccion?.Municipio ?? "",
+                CEstado = clientData.Direccion?.Estado ?? "",
+                CPais = clientData.Direccion?.Pais ?? "",
 
                 //Datos de contacto del domicilio
-                CTelefono1 = clientData.UbicacionDetalle.Telefono1,
-                CTelefono2 = clientData.UbicacionDetalle.Telefono2,
-                CTelefono3 = clientData.UbicacionDetalle.TelefonoCompleto,
+                CTelefono1 = clientData.Telefono,
+                CTelefono2 = clientData.Direccion?.Telefono2 ?? "",
+                CTelefono3 = clientData.Direccion?.TelefonoCompleto ?? "",
                 CTelefono4 = clientData.Telefono, // También guardamos el teléfono principal del cliente
 
 
@@ -367,7 +383,7 @@ namespace back_cabs.CRM.services.Legacy
         public async Task<AdmCliente?> ValidateCredentialsAsync(string email, string contrasena)
         {
             // Validar en el repositorio de clientes para soporte legacy
-            var cliente = await _repository.ValidateCredentialsAsync(email, contrasena);
+            var cliente = await _repository.GetByEmailAsync(email);
             if (cliente == null)
             {
                 _logger.LogWarning("⚠️ Credenciales inválidas para email: {Email}", email);
@@ -576,6 +592,65 @@ namespace back_cabs.CRM.services.Legacy
             return partes.Any()
                 ? string.Join("\n", partes)
                 : "Sin ubicación";
+        }
+        /// <summary>
+        /// Busca un cliente por RFC o email (para flujo de recuperación de contraseña)
+        /// </summary>
+        public async Task<AdmCliente?> BuscarPorRfcOEmailAsync(string? rfc, string? email)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(rfc) && string.IsNullOrWhiteSpace(email))
+                    return null;
+
+                return await _context.AdmClientes
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c =>
+                        (!string.IsNullOrEmpty(rfc) && c.CRfc.ToLower() == rfc.ToLower()) ||
+                        (!string.IsNullOrEmpty(email) && (
+                            c.CEmail1.ToLower() == email.ToLower() ||
+                            c.CEmail2.ToLower() == email.ToLower() ||
+                            c.CEmail3.ToLower() == email.ToLower()
+                        ))
+                    );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error al buscar cliente por RFC/email");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Actualiza la contraseña cifrada de un cliente legacy (CTextoExtra1 con SHA-256)
+        /// </summary>
+        public async Task<bool> ActualizarContrasenaAsync(string email, string nuevaPassword)
+        {
+            try
+            {
+                var cliente = await _context.AdmClientes
+                    .FirstOrDefaultAsync(c =>
+                        c.CEmail1.ToLower() == email.ToLower() ||
+                        c.CEmail2.ToLower() == email.ToLower() ||
+                        c.CEmail3.ToLower() == email.ToLower());
+
+                if (cliente == null)
+                {
+                    _logger.LogWarning("⚠️ Cliente no encontrado para actualizar contraseña: {Email}", email);
+                    return false;
+                }
+
+                cliente.CTextoExtra1 = ApiUtilities.GenerateSha256Hash(nuevaPassword);
+                await _repository.UpdateAsync(cliente);
+
+                _logger.LogInformation("✅ Contraseña actualizada para cliente legacy: {Email}", email);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error al actualizar contraseña de cliente legacy: {Email}", email);
+                throw;
+            }
         }
     }
 }

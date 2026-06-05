@@ -64,6 +64,22 @@ namespace back_cabs.CRM.repositories.Auth
             }
         }
 
+        public async Task<Auth_cliente> InsertPassword (Auth_cliente datos)
+        {
+            try
+            {
+                _writeContext.Auth_Clientes.Add(datos);
+                await _writeContext.SaveChangesAsync();
+                _logger.LogInformation("Contraseña insertada con exito para usuario con ID {Id}", datos.Id_Cliente);
+                return datos;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al insertar contraseña para usuario con ID {Id}", datos.Id_Cliente);
+                throw;
+            }
+        }
+
         // 📖 IMPLEMENTACIÓN DE LECTURAS
 
         public async Task<UsuarioAuth?> GetByEmailAsync(string email)
@@ -171,6 +187,52 @@ namespace back_cabs.CRM.repositories.Auth
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error validando credenciales para usuario: {Email}", email);
+                throw;
+            }
+        }
+
+        public async Task<Auth_cliente?> ValidateClientCredentialsAync(int id, string password)
+        {
+            _logger.LogInformation("Validando credenciales para cliente con ID {Id}", id);
+            try
+            {
+                var datosCliente = await _readContext.Auth_Clientes
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.Id_Cliente == id);
+
+                if (datosCliente == null)
+                {
+                    _logger.LogWarning("Cliente con ID {Id} no encontrado", id);
+                    return null;
+                }
+
+                // Validar contraseña (soportar tanto Password en texto plano como Hash)
+                bool contrasenaValida = false;
+
+                // Primero intentar con password en texto plano
+                if (!string.IsNullOrEmpty(datosCliente.password) && datosCliente.password == password)
+                {
+                    contrasenaValida = true;
+                }
+                // Si no, intentar con hash
+                else if (!string.IsNullOrEmpty(datosCliente.password))
+                {
+                    var contrasenaHash = ApiUtilities.GenerateSha256Hash(password);
+                    contrasenaValida = datosCliente.password == contrasenaHash;
+                }
+
+                if (!contrasenaValida)
+                {
+                    _logger.LogWarning("Contraseña inválida para cliente con ID {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Credenciales válidas para cliente con ID {Id}", id);
+                return datosCliente;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error validando credenciales para cliente con ID {Id}", id);
                 throw;
             }
         }

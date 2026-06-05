@@ -34,8 +34,8 @@ namespace back_cabs.CRM.Interfaces.Legacy
         Task<models.legacy.AdmCliente?> GetByIdWithDomicilioAsync(int idCliente, int? tipoDireccion = 1);
 
         /// <summary>
-        /// Validar credenciales (soporte legacy)
+        /// Obtener cliente por email principal
         /// </summary>
-        Task<models.legacy.AdmCliente?> ValidateCredentialsAsync(string email, string contrasena);
+        Task<AdmCliente?> GetByEmailAsync(string email);
     }
 }

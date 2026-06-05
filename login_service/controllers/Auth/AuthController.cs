@@ -59,6 +59,7 @@ namespace back_cabs.CRM.controllers.Auth
         private readonly IAntiforgery _antiforgery;
         private readonly EmailService _emailService;
         private readonly RecaptchaService _recaptchaService;
+        private readonly HmacOtpService _otpService;
 
 
         public AuthController(
@@ -68,16 +69,17 @@ namespace back_cabs.CRM.controllers.Auth
             IAntiforgery antiforgery,
             EmailService emailService,
             IAdmClienteService admClienteService,
-            RecaptchaService recaptchaService)
+            RecaptchaService recaptchaService,
+            HmacOtpService otpService)
         {
             _usuarioAuthService = usuarioAuthService ?? throw new ArgumentNullException(nameof(usuarioAuthService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _antiforgery = antiforgery ?? throw new ArgumentNullException(nameof(antiforgery));
-            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService)); // <-- Y aquí
+            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
             _admClienteService = admClienteService ?? throw new ArgumentNullException(nameof(admClienteService));
             _recaptchaService = recaptchaService;
-
+            _otpService = otpService ?? throw new ArgumentNullException(nameof(otpService));
         }
         ///<summary>
         /// Registrar un nuevo cliente en el sistema
@@ -838,77 +840,126 @@ namespace back_cabs.CRM.controllers.Auth
         /// <returns>Confirmación del cambio de contraseña</returns>
         /// <response code="200">Contraseña cambiada exitosamente</response>
         /// <response code="400">Contraseña actual incorrecta</response>
-        /// <response code="401">Token inválido</response>
-        /// <response code="500">Error interno del servidor</response>
-
         [HttpPost("recuperar-cuenta")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> RecuperarCuenta([FromBody] SolicitudRecuperacionDto request)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(request.Email))
-                    return BadRequest(new { message = "El email es requerido" });
+                // Validar que venga al menos un identificador
+                if (string.IsNullOrWhiteSpace(request.Email) && string.IsNullOrWhiteSpace(request.Rfc))
+                    return BadRequest(new { message = "Se requiere email o RFC para recuperar la cuenta." });
 
-                // Buscar usuario por email
-                var usuario = await _usuarioAuthService.ObtenerUsuarioPorEmailAsync(request.Email);
-                if (usuario == null)
-                    return BadRequest(new { message = "No existe usuario con ese email" });
+                string? emailDestino = null;
 
-                // Generar token de 6 dígitos
-                var token = new Random().Next(100000, 999999).ToString();
-
-                // Guardar token en BD con expiración
-                var tokenRecuperacion = new RecuperacionPasswordToken
+                // ── 1. Buscar en UsuariosAuth (usuarios internos) por email ──────────
+                if (!string.IsNullOrWhiteSpace(request.Email))
                 {
-                    Email = request.Email,
-                    Token = token,
-                    Expiracion = DateTime.UtcNow.AddMinutes(10),
-                    Usado = false
-                };
-                await _usuarioAuthService.GuardarTokenRecuperacionAsync(tokenRecuperacion);
+                    var usuarioInterno = await _usuarioAuthService.ObtenerUsuarioPorEmailAsync(request.Email);
+                    if (usuarioInterno != null)
+                    {
+                        emailDestino = usuarioInterno.Email;
+                        _logger.LogInformation("Recuperación solicitada para usuario interno: {Email}", emailDestino);
+                    }
+                }
 
-                // Enviar correo
-                await _emailService.EnviarTokenRecuperacionAsync(request.Email, token);
+                // ── 2. Si no se encontró internamente, buscar en AdmClientes ─────────
+                if (emailDestino == null)
+                {
+                    var clienteLegacy = await _admClienteService.BuscarPorRfcOEmailAsync(
+                        rfc: request.Rfc,
+                        email: request.Email);
 
-                return Ok(new { message = "Correo de recuperación enviado" });
+                    if (clienteLegacy != null)
+                    {
+                        emailDestino = !string.IsNullOrWhiteSpace(clienteLegacy.CEmail1) ? clienteLegacy.CEmail1
+                                     : !string.IsNullOrWhiteSpace(clienteLegacy.CEmail2) ? clienteLegacy.CEmail2
+                                     : clienteLegacy.CEmail3;
+
+                        if (!string.IsNullOrWhiteSpace(emailDestino))
+                            _logger.LogInformation("Recuperación solicitada para cliente legacy RFC: {Rfc}", request.Rfc);
+                    }
+                }
+
+                // ── 3. Respuesta genérica si no se encontró (no revelar si existe) ──
+                if (string.IsNullOrWhiteSpace(emailDestino))
+                {
+                    _logger.LogWarning("Recuperación para RFC/email no registrado: {Rfc}/{Email}",
+                        request.Rfc, request.Email);
+                    // Misma respuesta intencionalmente para no revelar si el email existe
+                    return Ok(new { message = "Si existe una cuenta con ese dato, recibirás un correo de recuperación." });
+                }
+
+                // ── 4. Generar código OTP HMAC (sin BD) ────────────────────────────
+                var codigo = _otpService.GenerarCodigo(emailDestino);
+
+                // ── 5. Enviar correo ─────────────────────────────────────────────
+                await _emailService.EnviarTokenRecuperacionAsync(emailDestino, codigo);
+
+                return Ok(new { message = "Si existe una cuenta con ese dato, recibirás un correo de recuperación." });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al procesar solicitud de recuperación de cuenta para email: {Email}. Detalles: {Message}", request.Email, ex.Message);
+                _logger.LogError(ex, "Error al procesar solicitud de recuperación. RFC: {Rfc} / Email: {Email}",
+                    request.Rfc, request.Email);
                 return StatusCode(500, new { message = "Error interno del servidor" });
             }
         }
 
         [HttpPost("cambiar-contraseña-recuperacion")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CambiarContrasenaRecuperacion([FromBody] CambioContrasenaRecuperacionDto request)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.NuevoPassword) || string.IsNullOrWhiteSpace(request.Token))
-                    return BadRequest(new { message = "Email, nueva contraseña y token son requeridos" });
+                if (string.IsNullOrWhiteSpace(request.Email) ||
+                    string.IsNullOrWhiteSpace(request.NuevoPassword) ||
+                    string.IsNullOrWhiteSpace(request.Token))
+                    return BadRequest(new { message = "Email, nueva contraseña y código son requeridos." });
 
-                // Validar token en BD
-                var tokenRecuperacion = await _usuarioAuthService.ObtenerTokenRecuperacionAsync(request.Email, request.Token);
-                if (tokenRecuperacion == null || tokenRecuperacion.Usado || tokenRecuperacion.Expiracion < DateTime.UtcNow)
-                    return BadRequest(new { message = "Token inválido o expirado" });
+                // ── 1. Validar código OTP HMAC (sin BD) ───────────────────────────
+                if (!_otpService.ValidarCodigo(request.Email, request.Token))
+                    return BadRequest(new { message = "Código inválido o expirado. Solicita un nuevo correo de recuperación." });
 
-                // Cambiar contraseña del usuario
-                var actualizado = await _usuarioAuthService.ActualizarContrasenaPorEmailAsync(request.Email, request.NuevoPassword);
+                // ── 2. Determinar tipo de usuario (re-buscar por email) ───────────
+                bool actualizado;
+                var usuarioInterno = await _usuarioAuthService.ObtenerUsuarioPorEmailAsync(request.Email);
+
+                if (usuarioInterno != null)
+                {
+                    // Usuario interno: actualizar en UsuariosAuth con hash SHA-256
+                    _logger.LogInformation("Cambiando contraseña de usuario interno: {Email}", request.Email);
+                    actualizado = await _usuarioAuthService.ActualizarContrasenaPorEmailAsync(
+                        request.Email, request.NuevoPassword);
+                }
+                else
+                {
+                    // Cliente legacy: actualizar CTextoExtra1 en AdmClientes con hash SHA-256
+                    _logger.LogInformation("Cambiando contraseña de cliente legacy: {Email}", request.Email);
+                    actualizado = await _usuarioAuthService.ActualizarContrasenaClienteLegacyPorEmailAsync(
+                        request.Email, request.NuevoPassword);
+                }
+
                 if (!actualizado)
-                    return StatusCode(500, new { message = "Error al actualizar la contraseña" });
+                    return StatusCode(500, new { message = "Error al actualizar la contraseña. Contacta al soporte." });
 
-                // Marcar token como usado
-                await _usuarioAuthService.MarcarTokenRecuperacionUsadoAsync(tokenRecuperacion.Id);
+                _logger.LogInformation("Contraseña cambiada exitosamente para: {Email}", request.Email);
 
-                // Retornar URL de confirmación
-                return Ok(new { url = "https://frontend-app/confirmacion-cambio" });
+                return Ok(new { message = "Contraseña actualizada exitosamente." });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al cambiar contraseña de recuperación para email: {Email}. Detalles: {Message}", request.Email, ex.Message);
-                return StatusCode(500, new { message = "Error interno del servidor" });
+                _logger.LogError(ex, "Error al cambiar contraseña de recuperación para email: {Email}", request.Email);
+                return StatusCode(500, new { message = "Error interno del servidor." });
             }
         }
+
         [HttpPost("change-password")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]

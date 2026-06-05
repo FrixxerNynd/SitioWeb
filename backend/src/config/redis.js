@@ -9,7 +9,7 @@ class RedisClient {
 
     async connect() {
         try {
-            // 🔥 CAMBIAR EL PUERTO A 63679
+            // 🔥 CAMBIAR EL PUERTO A 6379
             this.client = createClient({
                 url: 'redis://localhost:6379'  // ← Puerto corregido
             });

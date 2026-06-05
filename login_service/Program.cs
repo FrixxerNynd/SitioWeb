@@ -186,6 +186,7 @@ builder.Services.AddScoped<back_cabs.CRM.Interfaces.Legacy.IAdmClienteRepository
 builder.Services.AddScoped<IServicioJwt, ServicioJwt>(); // ✅ Ahora usa interfaz para mejor testabilidad
 builder.Services.AddScoped<UsuarioAuthService>();
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddSingleton<HmacOtpService>(); // OTP stateless (sin BD)
 
 // ═══════════════════════════════════════════════════════════════
 // SERVICIOS DE GENERACIÓN DE PDFs

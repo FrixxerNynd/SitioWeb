@@ -72,5 +72,12 @@ namespace back_cabs.CRM.Interfaces.Auth
         /// <param name="ids">Lista de IDs</param>
         /// <returns>Lista de usuarios encontrados</returns>
         Task<IEnumerable<UsuarioAuth>> GetByIdsAsync(IEnumerable<int> ids);
+
+        /// <summary>
+        /// Inserta la contraseña de un usuario
+        /// </summary>
+        /// <param name="datos">Datos del usuario</param>
+        /// <returns>Usuario actualizado</returns>
+        Task<Auth_cliente> InsertPassword (Auth_cliente datos);
     }
 }

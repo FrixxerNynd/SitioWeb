@@ -568,6 +568,16 @@ namespace back_cabs.CRM.services.Auth
 
             return rol.ToUpper().Trim();
         }
+
+        /// <summary>
+        /// Actualiza la contraseña de un cliente legacy por email, delegando al servicio legacy.
+        /// La contraseña se almacena con hash SHA-256 en CTextoExtra1.
+        /// </summary>
+        public async Task<bool> ActualizarContrasenaClienteLegacyPorEmailAsync(string email, string nuevaPassword)
+        {
+            return await _admClienteService.ActualizarContrasenaAsync(email, nuevaPassword);
+        }
+
         ///<summary>
         /// Guarda el token de recuperación de contraseña en la base de datos
         /// </summary>

@@ -1,6 +1,5 @@
 using back_cabs.CRM.models.Auth;
 
-using back_cabs.CRM.models;
 using Microsoft.EntityFrameworkCore;
 
 namespace back_cabs.CRM.contexts;
@@ -27,6 +26,8 @@ public class ReadOnlyContext : DbContext
     /// </summary>
     public DbSet<RecuperacionPasswordToken> RecuperacionPasswordTokens { get; set; } = null!;
 
+    public DbSet<Auth_cliente> Auth_Clientes { get; set; } = null!;
+
   
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,6 +38,13 @@ public class ReadOnlyContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Email).IsUnique();
+        });
+
+        modelBuilder.Entity<Auth_cliente>(entity =>
+        {
+            entity.HasKey(e => e.Id_Cliente);
+            entity.Property(e => e.password);
+            
         });
     }
 }

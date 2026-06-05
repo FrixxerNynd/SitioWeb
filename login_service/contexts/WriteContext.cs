@@ -30,6 +30,8 @@ public class WriteContext : DbContext
     /// </summary>
     public DbSet<RecuperacionPasswordToken> RecuperacionPasswordTokens { get; set; } = null!;
 
+    public DbSet<Auth_cliente> Auth_Clientes { get; set; } = null!;
+
 
     // ═══════════════════════════════════════════════════════════════
 
@@ -44,6 +46,10 @@ public class WriteContext : DbContext
             entity.HasIndex(e => e.Email).IsUnique();
         });
 
-    
+        modelBuilder.Entity<Auth_cliente>(entity =>
+        {
+            entity.HasKey(e => e.Id_Cliente);
+            entity.Property(e => e.password).HasColumnName("password");
+        });
     }
 }

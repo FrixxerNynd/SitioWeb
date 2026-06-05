@@ -34,5 +34,15 @@ namespace back_cabs.CRM.Interfaces.Legacy
         /// Autorizar un pre-registro de cliente nuevo
         /// </summary>
         Task<ServiceResult<AdmClienteConDomicilioResponseDto>> AutorizarClienteAsync(int idCliente, AutorizarClienteRequestDto autorizacionData);
+
+        /// <summary>
+        /// Busca un cliente por RFC o email (para flujo de recuperación de contraseña)
+        /// </summary>
+        Task<AdmCliente?> BuscarPorRfcOEmailAsync(string? rfc, string? email);
+
+        /// <summary>
+        /// Actualiza la contraseña (cifrada) de un cliente legacy por email
+        /// </summary>
+        Task<bool> ActualizarContrasenaAsync(string email, string nuevaPassword);
     }
 }
