@@ -7,246 +7,290 @@
 
     <!-- Layout padre con dos columnas -->
     <div class="row g-0 bg-white overflow-hidden rounded-4">
-      <!-- Contenedor izquierdo (25%) - FILTROS -->
-      <div class="col-12 col-md-3 col-lg-3 bg-light p-3">
+      <!-- Contenedor izquierdo (25%) - FILTROS CON SKELETON -->
+      <div class="col-12 col-md-3 col-lg-3 bg-light">
         <h5 class="fw-bold mb-3">Opciones de filtros</h5>
         <hr />
-        <!-- Filtro por categorías -->
-        <div class="filtro-card">
-          <div class="filtro-card-header" (click)="toggleCategoria()">
-            Categorías
-            <svg
-              class="cursor-pointer"
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              @if (categoriaDesplegable()) {
-                <path
-                  fill-rule="evenodd"
-                  d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z"
-                />
-              } @else {
-                <path
-                  fill-rule="evenodd"
-                  d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-                />
-              }
-            </svg>
+        
+        @if (isLoading()) {
+          <!-- SKELETON FILTROS -->
+          <div>
+            <!-- Categorías skeleton -->
+            <div class="filtro-card">
+              <div class="filtro-card-header">
+                <div class="h-4 bg-secondary bg-opacity-25 rounded animate-pulse w-32"></div>
+                <div class="h-4 w-4 bg-secondary bg-opacity-25 rounded animate-pulse"></div>
+              </div>
+              <div class="filtro-card-body">
+                @for (item of [1,2,3,4,5]; track item) {
+                  <div class="filtro-item mb-2">
+                    <div class="h-4 w-4 bg-secondary bg-opacity-25 rounded animate-pulse me-2"></div>
+                    <div class="h-4 bg-secondary bg-opacity-25 rounded animate-pulse w-75"></div>
+                  </div>
+                }
+              </div>
+            </div>
+            
+            <!-- Marcas skeleton -->
+            <div class="filtro-card mt-3">
+              <div class="filtro-card-header">
+                <div class="h-4 bg-secondary bg-opacity-25 rounded animate-pulse w-24"></div>
+                <div class="h-4 w-4 bg-secondary bg-opacity-25 rounded animate-pulse"></div>
+              </div>
+              <div class="filtro-card-body">
+                @for (item of [1,2,3,4,5]; track item) {
+                  <div class="filtro-item mb-2">
+                    <div class="h-4 w-4 bg-secondary bg-opacity-25 rounded animate-pulse me-2"></div>
+                    <div class="h-4 bg-secondary bg-opacity-25 rounded animate-pulse w-75"></div>
+                  </div>
+                }
+              </div>
+            </div>
+            
+            <!-- Precio skeleton -->
+            <div class="filtro-card mt-3">
+              <div class="filtro-card-header">
+                <div class="h-4 bg-secondary bg-opacity-25 rounded animate-pulse w-28"></div>
+                <div class="h-4 w-4 bg-secondary bg-opacity-25 rounded animate-pulse"></div>
+              </div>
+              <div class="filtro-card-body">
+                <div class="h-8 bg-secondary bg-opacity-25 rounded animate-pulse w-100 mb-2"></div>
+                <div class="h-4 bg-secondary bg-opacity-25 rounded animate-pulse w-100"></div>
+              </div>
+            </div>
+            
+            <!-- Botones skeleton -->
+            <div class="d-flex gap-2 mt-4">
+              <div class="h-10 bg-secondary bg-opacity-25 rounded animate-pulse flex-grow-1"></div>
+              <div class="h-10 bg-secondary bg-opacity-25 rounded animate-pulse flex-grow-1"></div>
+            </div>
           </div>
-          @if (categoriaDesplegable()) {
-            <div class="filtro-card-body">
-              @for (cat of categories(); track cat.id) {
+        } @else {
+          <!-- CONTENIDO REAL DE FILTROS -->
+          <div>
+            <!-- Filtro por categorías -->
+            <div class="filtro-card">
+              <div class="filtro-card-header" (click)="toggleCategoria()">
+                Por Categorías
+                <svg class="cursor-pointer" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  @if (categoriaDesplegable()) {
+                  <path fill-rule="evenodd"
+                    d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z" />
+                  } @else {
+                  <path fill-rule="evenodd"
+                    d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" />
+                  }
+                </svg>
+              </div>
+              @if (categoriaDesplegable()) {
+              <div class="filtro-card-body">
+                @for (cat of categories(); track cat.id_categoria) {
                 <div class="filtro-item">
-                  <input
-                    class="form-check-input cursor-pointer"
-                    type="checkbox"
-                    [id]="'categoria_' + cat.id"
-                    [checked]="isCategorySelected(cat.id)"
-                    (change)="toggleCategory(cat.id)"
-                  />
-                  <label
-                    class="form-check-label filtro-label"
-                    [for]="'categoria_' + cat.id"
-                    title="{{ cat.nombre }}"
-                  >
-                    {{ cat.nombre }}
+                  <input class="form-check-input cursor-pointer" type="checkbox" [id]="'categoria_' + cat.id_categoria"
+                    [checked]="isCategorySelected(cat.id_categoria)" (change)="toggleCategory(cat.id_categoria)" />
+                  <label class="form-check-label filtro-label" [for]="'categoria_' + cat.id_categoria"
+                    title="{{ cat.nombre_categoria }}">
+                    {{ cat.nombre_categoria }}
                   </label>
                 </div>
+                }
+              </div>
               }
             </div>
-          }
-        </div>
 
-        <!-- Filtro por marcas -->
-        <div class="filtro-card">
-          <div class="filtro-card-header" (click)="toggleMarca()">
-            Marcas
-            <svg
-              class="cursor-pointer"
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
+            <!-- Filtro por marcas -->
+            <div class="filtro-card">
+              <div class="filtro-card-header" (click)="toggleMarca()">
+                Por Marcas
+                <svg class="cursor-pointer" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  @if (marcaDesplegable()) {
+                  <path fill-rule="evenodd"
+                    d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z" />
+                  } @else {
+                  <path fill-rule="evenodd"
+                    d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" />
+                  }
+                </svg>
+              </div>
               @if (marcaDesplegable()) {
-                <path
-                  fill-rule="evenodd"
-                  d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z"
-                />
-              } @else {
-                <path
-                  fill-rule="evenodd"
-                  d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-                />
-              }
-            </svg>
-          </div>
-          @if (marcaDesplegable()) {
-            <div class="filtro-card-body">
-              @for (brand of brands(); track brand.id) {
+              <div class="filtro-card-body">
+                @for (brand of brands(); track brand.id) {
                 <div class="filtro-item">
-                  <input
-                    class="form-check-input cursor-pointer"
-                    type="checkbox"
-                    [id]="'marca_' + brand.id"
-                    [checked]="isBrandSelected(brand.id)"
-                    (change)="toggleBrand(brand.id)"
-                  />
-                  <label
-                    class="form-check-label filtro-label text-wrap"
-                    [for]="'marca_' + brand.id"
-                  >
+                  <input class="form-check-input cursor-pointer" type="checkbox" [id]="'marca_' + brand.id"
+                    [checked]="isBrandSelected(brand.id)" (change)="toggleBrand(brand.id)" />
+                  <label class="form-check-label filtro-label text-wrap" [for]="'marca_' + brand.id">
                     {{ brand.nombre }}
                   </label>
                 </div>
+                }
+              </div>
               }
             </div>
-          }
-        </div>
 
-        <!-- Filtro por rango de precios -->
-        <div class="filtro-card mb-3">
-          <div class="filtro-card-header" (click)="togglePrecio()">
-            Rango de precios
-            <svg
-              class="cursor-pointer"
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
+            <!-- Filtro por rango de precios -->
+            <div class="filtro-card mb-3">
+              <div class="filtro-card-header" (click)="togglePrecio()">
+                Rango de precios
+                <svg class="cursor-pointer" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  @if (precioDesplegable()) {
+                  <path fill-rule="evenodd"
+                    d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z" />
+                  } @else {
+                  <path fill-rule="evenodd"
+                    d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" />
+                  }
+                </svg>
+              </div>
               @if (precioDesplegable()) {
-                <path
-                  fill-rule="evenodd"
-                  d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z"
-                />
-              } @else {
-                <path
-                  fill-rule="evenodd"
-                  d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-                />
+              <div class="filtro-card-body">
+                <div class="row g-2 mb-3">
+                  <div class="col-6">
+                    <input type="number" class="form-control form-control-sm" placeholder="Mínimo"
+                      [(ngModel)]="tempPrecioMinimo" (input)="actualizarRangoMinimo()" />
+                  </div>
+                  <div class="col-6">
+                    <input type="number" class="form-control form-control-sm" placeholder="Máximo"
+                      [(ngModel)]="tempPrecioMaximo" (input)="actualizarRangoMaximo()" />
+                  </div>
+                </div>
+
+                <div class="double-range-container">
+                  <div class="slider-track"></div>
+                  <input type="range" class="double-range-input min-range" [min]="rangoMinimoAbsoluto"
+                    [max]="rangoMaximoAbsoluto" [(ngModel)]="tempPrecioMinimo" (input)="actualizarRangoMinimo()" />
+                  <input type="range" class="double-range-input max-range" [min]="rangoMinimoAbsoluto"
+                    [max]="rangoMaximoAbsoluto" [(ngModel)]="tempPrecioMaximo" (input)="actualizarRangoMaximo()" />
+                </div>
+
+                <div class="d-flex justify-content-between mt-2">
+                </div>
+              </div>
               }
-            </svg>
-          </div>
-          @if (precioDesplegable()) {
-            <div class="filtro-card-body">
-              <div class="row g-2 mb-3">
-                <div class="col-6">
-                  <input
-                    type="number"
-                    class="form-control form-control-sm"
-                    placeholder="Mínimo"
-                    [(ngModel)]="tempPrecioMinimo"
-                    (input)="actualizarRangoMinimo()"
-                  />
-                </div>
-                <div class="col-6">
-                  <input
-                    type="number"
-                    class="form-control form-control-sm"
-                    placeholder="Máximo"
-                    [(ngModel)]="tempPrecioMaximo"
-                    (input)="actualizarRangoMaximo()"
-                  />
-                </div>
-              </div>
-
-              <div class="double-range-container">
-                <div class="slider-track"></div>
-                <input
-                  type="range"
-                  class="double-range-input min-range"
-                  [min]="rangoMinimoAbsoluto"
-                  [max]="rangoMaximoAbsoluto"
-                  [(ngModel)]="tempPrecioMinimo"
-                  (input)="actualizarRangoMinimo()"
-                />
-                <input
-                  type="range"
-                  class="double-range-input max-range"
-                  [min]="rangoMinimoAbsoluto"
-                  [max]="rangoMaximoAbsoluto"
-                  [(ngModel)]="tempPrecioMaximo"
-                  (input)="actualizarRangoMaximo()"
-                />
-              </div>
-
-              <div class="d-flex justify-content-between mt-2">
-                <small class="text-muted">{{ formatPrice(tempPrecioMinimo().toString()) }}</small>
-                <small class="text-muted">{{ formatPrice(tempPrecioMaximo().toString()) }}</small>
-              </div>
             </div>
-          }
-        </div>
-        <!-- Mostrar productos sin stock -->
-        <div class="filtro-item">
-          <input class="form-check-input cursor-pointer" type="checkbox" />
-          <label class="form-check-label filtro-label text-wrap">
-            Mostrar productos sin stock
-          </label>
-        </div>
-
-        <!-- Botones de acción -->
-        <div class="d-flex gap-2 mt-4">
-          <button class="btn btn-gradient flex-grow-1" (click)="aplicarFiltros()">
-            Aplicar filtro
-          </button>
-          <button
-            class="btn bt-secundarioñ flex-grow-1"
-            (click)="limpiarFiltros()"
-            [disabled]="!hasTempFilters()"
-          >
-            Limpiar filtro
-          </button>
-        </div>
-      </div>
-
-      <!-- Contenedor derecho (75%) - PRODUCTOS -->
-      <div class="col-12 col-md-9 col-lg-9 p-3" style="background: #f8f9fa">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <span class="fw-bold mb-0" style="color: oklch(44.2% 0.017 285.786)">
-            Mostrando {{ getRangoInicio() }}-{{ getRangoFin() }} de
-            {{ totalResultados() }} resultados
-          </span>
-          <span class="badge bg-primary fs-6 px-3 py-2"> </span>
-        </div>
-
-        <!-- Loading State -->
-        @if (isLoading()) {
-          <div class="text-center py-5">
-            <div
-              class="spinner-border text-primary"
-              style="width: 3rem; height: 3rem"
-              role="status"
-            >
-              <span class="visually-hidden">Cargando...</span>
+            
+            <!-- Mostrar productos sin stock -->
+            <div class="filtro-item">
+              <input class="form-check-input cursor-pointer" type="checkbox" />
+              <label class="form-check-label filtro-label text-wrap">
+                Mostrar productos sin stock
+              </label>
             </div>
-            <p class="mt-3 text-muted">Cargando productos...</p>
+
+            <!-- Botones de acción -->
+            <div class="d-flex gap-2 mt-4">
+              <button class="btn btn-gradient flex-grow-1" (click)="aplicarFiltros()">
+                Aplicar filtro
+              </button>
+              <button class="btn bt-secundarioñ flex-grow-1" (click)="limpiarFiltros()" [disabled]="!hasTempFilters()">
+                Limpiar filtro
+              </button>
+            </div>
           </div>
         }
+      </div>
 
-        <!-- Grid de productos -->
-        @if (!isLoading()) {
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
-            @for (product of paginatedProducts(); track product.id) {
-              <ui-producto-card
-                [imagen]="product.imagen_url ?? ''"
-                [nombre]="product.nombre"
-                [oferta]="product.oferta"
-                [stock]="+product.stock"
-                [marca]="product.marca_nombre"
-                [categoria]="product.categoria_nombre"
-                [precio]="+product.precio"
-                [id]="product.id"
-                (agregar)="agregarAlCarrito(product)"
-              />
-            }
+      <!-- Contenedor derecho (75%) - PRODUCTOS CON SKELETON -->
+      <div class="col-12 col-md-9 col-lg-9 px-3" style="background: #f8f9fa">
+        
+        @if (isLoading()) {
+          <!-- SKELETON LOADER DE PRODUCTOS -->
+          <div class="w-100">
+            <!-- Header skeleton -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="h-4 bg-secondary bg-opacity-25 rounded animate-pulse w-50"></div>
+            </div>
+
+            <!-- Filtros aplicados skeleton -->
+            <div class="filtros-aplicados mb-3">
+              <div class="h-4 bg-secondary bg-opacity-25 rounded animate-pulse w-25"></div>
+              <div class="h-8 bg-secondary bg-opacity-25 rounded-pill animate-pulse w-32"></div>
+              <div class="h-8 bg-secondary bg-opacity-25 rounded-pill animate-pulse w-40"></div>
+              <div class="h-8 bg-secondary bg-opacity-25 rounded-pill animate-pulse w-36"></div>
+            </div>
+
+            <!-- Grid de productos skeleton con los estilos de la tarjeta real -->
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+              @for (item of [1,2,3,4,5,6,7,8,9,10,11,12]; track item) {
+                <div class="col">
+                  <div class="producto-card">
+                    <!-- Imagen skeleton -->
+                    <div class="imagen-container">
+                      <div class="bg-secondary bg-opacity-10 w-100 h-100 d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <div class="spinner-border text-primary" style="width: 2rem; height: 2rem;" role="status">
+                          <span class="visually-hidden">Cargando...</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="producto-info">
+                      <!-- Marca skeleton -->
+                      <div class="h-3 bg-secondary bg-opacity-25 rounded animate-pulse w-25 mb-2"></div>
+                      <!-- Nombre skeleton -->
+                      <div class="h-5 bg-secondary bg-opacity-25 rounded animate-pulse w-75 mb-2"></div>
+                      <!-- Precios skeleton -->
+                      <div class="precios">
+                        <div class="h-5 bg-secondary bg-opacity-25 rounded animate-pulse w-20"></div>
+                        <div class="h-4 bg-secondary bg-opacity-25 rounded animate-pulse w-16"></div>
+                      </div>
+                      <!-- Botones skeleton -->
+                      <div class="acciones">
+                        <div class="h-10 bg-secondary bg-opacity-25 rounded animate-pulse flex-grow-1"></div>
+                        <div class="h-10 bg-secondary bg-opacity-25 rounded animate-pulse flex-grow-1"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Paginación skeleton -->
+            <div class="mt-5 d-flex justify-content-center">
+              <div class="h-8 bg-secondary bg-opacity-25 rounded animate-pulse w-64"></div>
+            </div>
           </div>
+        } @else {
+          <!-- CONTENIDO REAL -->
+          <div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <span class="fw-bold mb-0" style="color: oklch(44.2% 0.017 285.786)">
+                Mostrando {{ getRangoInicio() }}-{{ getRangoFin() }} de
+                {{ totalResultados() }} resultados
+              </span>
+            </div>
 
-          <!-- Paginación -->
-          @if (totalPagesCalculated() > 1) {
+            <!-- Etiquetas de filtros aplicados -->
+            @if (activeFiltersList().length > 0) {
+            <div class="filtros-aplicados">
+              <span class="fw-bold mb-0" style="color: oklch(44.2% 0.017 285.786)">Filtro aplicado</span>
+              @for (filter of activeFiltersList(); track filter.id) {
+              <div class="filtro-etiqueta">
+                <span>{{ filter.label }}: {{ filter.value }}</span>
+                <button class="btn-close-etiqueta" (click)="removeFilter(filter.type, filter.value)"
+                  title="Eliminar filtro">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 24px; height: 24px">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              }
+              <a class="btn-enlace" (click)="limpiarFiltros()">
+                Limpiar filtro 
+              </a>
+            </div>
+            }
+
+            <!-- Grid de productos -->
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+              @for (product of paginatedProducts(); track product.id) {
+              <ui-producto-card [imagen]="product.imagen_url ?? ''" [nombre]="product.nombre" [oferta]="product.oferta"
+                [stock]="+product.stock" [marca]="product.marca_nombre" [categoria]="product.categoria_nombre"
+                [precio]="roundPrice(product.precio)" [precioOriginal]="roundPrice(product.precio_sin_oferta)"
+                [id]="product.id" (agregar)="agregarAlCarrito(product)" />
+              }
+            </div>
+
+            <!-- Paginación -->
+            @if (totalPagesCalculated() > 1) {
             <nav class="mt-5">
               <ul class="pagination justify-content-center">
                 <li class="page-item" [class.disabled]="currentPage() === 1">
@@ -254,15 +298,15 @@
                 </li>
 
                 @for (page of getPageNumbers(); track $index) {
-                  @if (page === -1) {
-                    <li class="page-item disabled">
-                      <span class="page-link">...</span>
-                    </li>
-                  } @else {
-                    <li class="page-item" [class.active]="currentPage() === page">
-                      <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
-                    </li>
-                  }
+                @if (page === -1) {
+                <li class="page-item disabled">
+                  <span class="page-link">...</span>
+                </li>
+                } @else {
+                <li class="page-item" [class.active]="currentPage() === page">
+                  <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                </li>
+                }
                 }
 
                 <li class="page-item" [class.disabled]="currentPage() === totalPagesCalculated()">
@@ -270,10 +314,10 @@
                 </li>
               </ul>
             </nav>
-          }
+            }
 
-          <!-- No results -->
-          @if (filteredProducts().length === 0 && !isLoading()) {
+            <!-- No results -->
+            @if (filteredProducts().length === 0 && !isLoading()) {
             <div class="text-center py-5">
               <i class="bi bi-inbox fs-1 text-muted"></i>
               <p class="mt-3 text-muted">
@@ -281,7 +325,8 @@
               </p>
               <button class="btn btn-primary" (click)="limpiarFiltros()">Limpiar filtros</button>
             </div>
-          }
+            }
+          </div>
         }
       </div>
     </div>

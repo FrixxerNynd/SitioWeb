@@ -15,6 +15,22 @@ export interface IProduct {
     subcategoria_nombre: string;
     categoria_id: string;
     categoria_nombre: string;
+    imagen_url?: string;
+}
+
+export interface IImagenProducto {
+    id: string;
+    producto_id: string;
+    url: string;
+    principal: boolean;
+    orden: number;
+}
+
+export interface IBrand {
+    id: string;
+    nombre: string;
+    logo_url?: string;
+    descripcion?: string;
 }
 
 export interface ICategory {
@@ -25,15 +41,30 @@ export interface ICategory {
 export interface ISubcategory {
     id_subcategoria: string;
     nombre_subcategoria: string;
-}
-
-export interface IBrand {
-    id: string;
-    nombre: string;
+    id_categoria?: string;
+    nombre_categoria?: string;
 }
 
 export interface IApiResponse<T> {
     resultado: boolean;
     mensaje: string;
     datos: T;
+}
+
+export interface IApiBrandsResponse {
+    resultado: boolean;
+    mensaje: string;
+    datos: IBrand[];
+}
+
+export interface IApiCategoriesResponse {
+    resultado: boolean;
+    mensaje: string;
+    datos: ICategory[];
+}
+
+export interface IApiSubcategoriesResponse {
+    resultado: boolean;
+    mensaje: string;
+    datos: ISubcategory[];
 }
