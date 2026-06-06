@@ -64,7 +64,6 @@ class CartService {
   }
   // PANTALLA 1: Agregar, modificar o remover ítems validando el stock de Exel del Norte
   async updateItemQuantity(userId, productId, quantity) {
-    const precioTotal = externalProduct.precio * 1.1;
     const cart = await prisma.cart.findUnique({
       where: { userId },
       include: { items: true },
@@ -80,7 +79,12 @@ class CartService {
       const externalData = await ExelService.fetchExternalProducts({
         id: productId,
       });
+      //primero lo crea, luego le suma el 10%
       const externalProduct = externalData?.find((p) => p.id === productId);
+      const precioTotal = externalProduct.precio * 1.1; //aqui suma :D
+      const existingItem = cart.items.find(
+        (item) => item.productId === productId,
+      );
 
       if (existingItem) {
         await prisma.cartItem.update({
@@ -111,10 +115,6 @@ class CartService {
         `Stock insuficiente. Solo quedan ${availableStock} unidades disponibles.`,
       );
     }
-
-    const existingItem = cart.items.find(
-      (item) => item.productId === productId,
-    );
 
     if (existingItem) {
       await prisma.cartItem.update({
