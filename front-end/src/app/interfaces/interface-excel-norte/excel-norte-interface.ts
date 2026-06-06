@@ -15,7 +15,8 @@ export interface IProduct {
     subcategoria_nombre: string;
     categoria_id: string;
     categoria_nombre: string;
-    imagen_url?: string;
+    imagenes?: string[];       
+    imagen_principal?: string | null;    
 }
 
 export interface IImagenProducto {

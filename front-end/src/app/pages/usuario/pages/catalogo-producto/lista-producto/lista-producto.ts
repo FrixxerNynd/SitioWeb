@@ -59,6 +59,20 @@ export class PageListaProducto implements OnInit {
     searchInputValue = '';
     
     currentUser: any = null;
+
+    progressLeft = computed(() => {
+        const min = this.tempPrecioMinimo();
+        const minAbs = this.rangoMinimoAbsoluto;
+        const maxAbs = this.rangoMaximoAbsoluto;
+        return ((min - minAbs) / (maxAbs - minAbs)) * 100 + '%';
+    });
+
+    progressRight = computed(() => {
+        const max = this.tempPrecioMaximo();
+        const minAbs = this.rangoMinimoAbsoluto;
+        const maxAbs = this.rangoMaximoAbsoluto;
+        return 100 - ((max - minAbs) / (maxAbs - minAbs)) * 100 + '%';
+    });
     
     // ========== SEÑALES COMPUTADAS ==========
     

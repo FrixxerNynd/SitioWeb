@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Inputs } from '../../../../../components/shared/inputs/inputs';
+import * as bootstrap from 'bootstrap';
 
 @Component({
   selector: 'app-lista-orden',
@@ -88,6 +89,11 @@ export class ListaOrdenPague implements OnInit {
 
   seleccionarOrden(orden: any) {
     this.ordenSeleccionada = orden;
+    const modalEl = document.getElementById('modalDetalleOrden');
+    if (modalEl) {
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+    }
   }
 
   paginaAnterior() {
