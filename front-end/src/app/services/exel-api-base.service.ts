@@ -21,7 +21,6 @@ export class ExcelNorteCatalogoService {
     private async get<T>(endpoint: string, params?: { [key: string]: string }): Promise<T> {
         let url = `${this.baseUrl}/${endpoint}`;
         
-        // Agregar parámetros query string si existen
         if (params) {
             const queryParams = new URLSearchParams();
             Object.keys(params).forEach(key => {
@@ -117,14 +116,12 @@ export class ExcelNorteCatalogoService {
 
     // Obtener imagen de un producto (con caché)
     async getImagenProducto(claveProducto: string): Promise<string | null> {
-        // Verificar caché
         if (this.imagenesCache.has(claveProducto)) {
             console.log(`📦 Imagen en caché para: ${claveProducto}`);
             return this.imagenesCache.get(claveProducto) || null;
         }
         
         try {
-            // Usar params correctamente
             const respuesta = await this.get<any>('imagenes', { clave_producto: claveProducto });
 
             if (respuesta?.RESULT && respuesta.DATA && respuesta.DATA.length > 0) {
@@ -138,50 +135,6 @@ export class ExcelNorteCatalogoService {
         } catch (error) {
             console.error(`Error al obtener imagen de ${claveProducto}:`, error);
             return null;
-        }
-    }
-
-    // Obtener todos los productos (con imágenes)
-    async getAllProducts(): Promise<IProduct[]> {
-        try {
-            const respuesta = await this.get<IApiResponse<any[]>>('productos');
-
-            if (respuesta.resultado === true && respuesta.datos) {
-                console.log(`📦 ${respuesta.datos.length} productos obtenidos`);
-
-                const productos: IProduct[] = [];
-
-                // Cargar productos uno por uno para mejor control
-                for (const product of respuesta.datos) {                    
-                    productos.push({
-                        id: product.id,
-                        referencia: product.referencia,
-                        sku: product.sku,
-                        nombre: product.nombre,
-                        stock: product.stock,
-                        precio: product.precio,
-                        precio_oferta: product.precio_oferta,
-                        precio_sin_oferta: product.precio_sin_oferta,
-                        oferta: product.oferta,
-                        moneda: product.moneda,
-                        marca_id: product.marca_id,
-                        marca_nombre: product.marca_nombre,
-                        subcategoria_id: product.subcategoria_id || "",
-                        subcategoria_nombre: product.subcategoria_nombre || "",
-                        categoria_id: product.categoria_id || "",
-                        categoria_nombre: product.categoria_nombre || "",
-                    });
-                }
-
-                console.log(`✅ ${productos.length} productos cargados`);
-                return productos;
-            }
-
-            return [];
-
-        } catch (error) {
-            console.error('Error al obtener los productos:', error);
-            return [];
         }
     }
 
@@ -202,8 +155,183 @@ export class ExcelNorteCatalogoService {
         }
     }
 
-    // Formatear precio
-    formatPrice(price: number | string): string {
+    // Obtener todas las imágenes de múltiples productos (optimizado)
+    async getImagenesMultiplesProductos(clavesProducto: string[]): Promise<Map<string, string[]>> {
+        const imagenesMap = new Map<string, string[]>();
+        
+        const batchSize = 10;
+        for (let i = 0; i < clavesProducto.length; i += batchSize) {
+            const batch = clavesProducto.slice(i, i + batchSize);
+            const promises = batch.map(clave => this.getImagenesProducto(clave));
+            const resultados = await Promise.all(promises);
+            
+            batch.forEach((clave, index) => {
+                imagenesMap.set(clave, resultados[index]);
+            });
+        }
+        
+        return imagenesMap;
+    }
+
+    // Obtener todas las imágenes principales de productos (optimizado)
+    async getImagenesPrincipalesMultiples(clavesProducto: string[]): Promise<Map<string, string | null>> {
+        const imagenesMap = new Map<string, string | null>();
+        
+        const batchSize = 10;
+        for (let i = 0; i < clavesProducto.length; i += batchSize) {
+            const batch = clavesProducto.slice(i, i + batchSize);
+            const promises = batch.map(clave => this.getImagenProducto(clave));
+            const resultados = await Promise.all(promises);
+            
+            batch.forEach((clave, index) => {
+                imagenesMap.set(clave, resultados[index]);
+            });
+        }
+        
+        return imagenesMap;
+    }
+
+    // Obtener todos los productos (con imágenes optimizado)
+    async getAllProducts(includeImages: boolean = true): Promise<IProduct[]> {
+        try {
+            const respuesta = await this.get<IApiResponse<any[]>>('productos');
+
+            if (respuesta.resultado === true && respuesta.datos) {
+                console.log(`📦 ${respuesta.datos.length} productos obtenidos`);
+
+                const productos: IProduct[] = [];
+
+                // Crear los productos base sin imágenes (todos como strings)
+                for (const product of respuesta.datos) {                    
+                    productos.push({
+                        id: String(product.id),
+                        referencia: product.referencia,
+                        sku: product.sku,
+                        nombre: product.nombre,
+                        stock: String(product.stock),
+                        precio: String(product.precio),
+                        precio_oferta: product.precio_oferta ? String(product.precio_oferta) : null,
+                        precio_sin_oferta: String(product.precio_sin_oferta || product.precio),
+                        oferta: Boolean(product.oferta),
+                        moneda: product.moneda,
+                        marca_id: String(product.marca_id),
+                        marca_nombre: product.marca_nombre,
+                        subcategoria_id: String(product.subcategoria_id || ""),
+                        subcategoria_nombre: product.subcategoria_nombre || "",
+                        categoria_id: String(product.categoria_id || ""),
+                        categoria_nombre: product.categoria_nombre || "",
+                        imagenes: [],
+                        imagen_principal: null
+                    });
+                }
+
+                if (includeImages && productos.length > 0) {
+                    console.log('Cargando imágenes para todos los productos...');
+                    
+                    const referencias = productos.map(p => p.referencia || p.sku).filter(ref => ref);
+                    
+                    const imagenesPrincipales = await this.getImagenesPrincipalesMultiples(referencias);
+                    const todasImagenes = await this.getImagenesMultiplesProductos(referencias);
+                    
+                    for (const producto of productos) {
+                        const clave = producto.referencia || producto.sku;
+                        if (clave) {
+                            producto.imagen_principal = imagenesPrincipales.get(clave) || null;
+                            producto.imagenes = todasImagenes.get(clave) || [];
+                            
+                            if (producto.imagen_principal) {
+                                console.log(`✅ Imagen cargada para: ${producto.nombre}`);
+                            }
+                        }
+                    }
+                    
+                    console.log(`✅ Imágenes cargadas para ${productos.length} productos`);
+                }
+
+                return productos;
+            }
+
+            return [];
+
+        } catch (error) {
+            console.error('Error al obtener los productos:', error);
+            return [];
+        }
+    }
+
+    // Obtener productos por categoría con imágenes
+    async getProductsByCategory(categoriaId: string, includeImages: boolean = true): Promise<IProduct[]> {
+        const allProducts = await this.getAllProducts(false);
+        // Comparación directa de strings
+        const filteredProducts = allProducts.filter(p => p.categoria_id === categoriaId);
+        
+        if (includeImages && filteredProducts.length > 0) {
+            const referencias = filteredProducts.map(p => p.referencia || p.sku).filter(ref => ref);
+            const imagenesPrincipales = await this.getImagenesPrincipalesMultiples(referencias);
+            const todasImagenes = await this.getImagenesMultiplesProductos(referencias);
+            
+            for (const producto of filteredProducts) {
+                const clave = producto.referencia || producto.sku;
+                if (clave) {
+                    producto.imagen_principal = imagenesPrincipales.get(clave) || null;
+                    producto.imagenes = todasImagenes.get(clave) || [];
+                }
+            }
+        }
+        
+        return filteredProducts;
+    }
+
+    // Obtener productos por marca con imágenes
+    async getProductsByBrand(marcaId: string, includeImages: boolean = true): Promise<IProduct[]> {
+        const allProducts = await this.getAllProducts(false);
+        // Comparación directa de strings
+        const filteredProducts = allProducts.filter(p => p.marca_id === marcaId);
+        
+        if (includeImages && filteredProducts.length > 0) {
+            const referencias = filteredProducts.map(p => p.referencia || p.sku).filter(ref => ref);
+            const imagenesPrincipales = await this.getImagenesPrincipalesMultiples(referencias);
+            const todasImagenes = await this.getImagenesMultiplesProductos(referencias);
+            
+            for (const producto of filteredProducts) {
+                const clave = producto.referencia || producto.sku;
+                if (clave) {
+                    producto.imagen_principal = imagenesPrincipales.get(clave) || null;
+                    producto.imagenes = todasImagenes.get(clave) || [];
+                }
+            }
+        }
+        
+        return filteredProducts;
+    }
+
+    // Obtener un solo producto con sus imágenes
+    async getProductById(productId: string): Promise<IProduct | null> {
+        try {
+            // Obtener todos los productos (sin imágenes para optimizar)
+            const allProducts = await this.getAllProducts(false);
+            // Comparación directa de strings
+            const product = allProducts.find(p => p.id === productId);
+            
+            if (product) {
+                const clave = product.referencia || product.sku;
+                if (clave) {
+                    // Cargar imágenes solo para este producto
+                    product.imagen_principal = await this.getImagenProducto(clave);
+                    product.imagenes = await this.getImagenesProducto(clave);
+                }
+                return product;
+            }
+            
+            return null;
+        } catch (error) {
+            console.error(`Error al obtener producto ${productId}:`, error);
+            return null;
+        }
+    }
+
+    // Formatear precio (conversión a número solo para formato)
+    formatPrice(price: string | number): string {
         const num = typeof price === 'string' ? parseFloat(price) : price;
         if (isNaN(num)) return '$0.00';
         
@@ -218,5 +346,17 @@ export class ExcelNorteCatalogoService {
     clearImageCache(): void {
         this.imagenesCache.clear();
         console.log('🗑️ Caché de imágenes limpiada');
+    }
+
+    // Precargar imágenes para productos visibles
+    async preloadImagesForProducts(productos: IProduct[]): Promise<void> {
+        const referencias = productos
+            .map(p => p.referencia || p.sku)
+            .filter(ref => ref && !this.imagenesCache.has(ref));
+        
+        if (referencias.length > 0) {
+            console.log(`🖼️ Precargando ${referencias.length} imágenes...`);
+            await this.getImagenesPrincipalesMultiples(referencias);
+        }
     }
 }

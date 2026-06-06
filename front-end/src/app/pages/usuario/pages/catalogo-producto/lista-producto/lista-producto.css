@@ -16,17 +16,14 @@
   --bs-bg-opacity: 0.25;
 }
 
-/* Asegurar que las tarjetas skeleton tengan la misma altura */
 .card {
   transition: all 0.3s ease;
 }
 
-/* Mejorar skeleton de imágenes */
 .bg-secondary.bg-opacity-10 {
   background-color: rgba(108, 117, 125, 0.1);
 }
 
-/* Tamaños para skeleton */
 .h-3 {
   height: 0.75rem;
 }
@@ -99,7 +96,6 @@
   width: 100%;
 }
 
-/* Estilos de la tarjeta de producto */
 .producto-card {
   background: white;
   border-radius: 12px;
@@ -218,7 +214,6 @@
   margin: 0 0 8px 0;
 }
 
-/* Estilos para las etiquetas de filtros */
 .filtros-aplicados {
   display: flex;
   flex-wrap: wrap;
@@ -270,91 +265,100 @@
   height: 12px;
 }
 
-/* Double Range Slider */
-.double-range-container {
-  position: relative;
+.price-input {
   width: 100%;
-  height: 30px;
-  margin: 10px 0;
+  display: flex;
+  margin: 20px 0 25px;
+  gap: 10px;
+}
+
+.price-input .field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 45px;
+  align-items: center;
+  gap: 8px;
+}
+
+.field span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #495057;
+}
+
+.field input {
+  width: 100%;
+  height: 100%;
+  outline: none;
+  font-size: 16px;
+  border-radius: 5px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.price-input .separator {
+  width: 40px;
+  display: flex;
+  font-size: 19px;
+  align-items: center;
+  justify-content: center;
+  color: #495057;
+}
+
+.slider-container {
+  position: relative;
+  height: 5px;
+  margin: 20px 0;
 }
 
 .slider-track {
   position: absolute;
-  top: 12px;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background-color: #e0e0e0;
-  border-radius: 4px;
+  width: 100%;
+  height: 5px;
+  background-color: #ddd;
+  border-radius: 5px;
 }
 
-.double-range-input {
+.progress-bar {
   position: absolute;
-  top: 0;
-  left: 0;
+  height: 5px;
+  background-image: linear-gradient(to right, #31408f, #021669);
+  border-radius: 5px;
+}
+
+.range-min, .range-max {
+  position: absolute;
   width: 100%;
-  height: 100%;
+  height: 5px;
   background: none;
   pointer-events: none;
   -webkit-appearance: none;
+  top: 0;
 }
 
-.double-range-input::-webkit-slider-thumb {
-  pointer-events: auto;
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
+.range-min::-webkit-slider-thumb,
+.range-max::-webkit-slider-thumb {
+  height: 17px;
+  width: 17px;
   border-radius: 50%;
   background-image: linear-gradient(to bottom, #31408f, #021669);
-  border: 2px solid white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-}
-
-.double-range-input::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  background-color: #0b5ed7;
-}
-
-.double-range-input::-webkit-slider-runnable-track {
-  height: 4px;
-  background: transparent;
-  border: none;
-}
-
-/* Firefox */
-.double-range-input::-moz-range-thumb {
   pointer-events: auto;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background-color: #0d6efd;
-  border: 2px solid white;
+  -webkit-appearance: none;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
   cursor: pointer;
+  border: 2px solid white;
 }
 
-.double-range-input::-moz-range-track {
-  height: 4px;
-  background: transparent;
-}
-
-/* Relleno entre las bolas */
-.double-range-container::before {
-  content: '';
-  position: absolute;
-  top: 12px;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(to right,
-      #e0e0e0 0%,
-      #e0e0e0 var(--min-pos, 0%),
-      #0d6efd var(--min-pos, 0%),
-      #0d6efd var(--max-pos, 100%),
-      #e0e0e0 var(--max-pos, 100%),
-      #e0e0e0 100%);
-  border-radius: 4px;
-  pointer-events: none;
+.range-min::-moz-range-thumb,
+.range-max::-moz-range-thumb {
+  height: 17px;
+  width: 17px;
+  border: none;
+  border-radius: 50%;
+  background-image: linear-gradient(to bottom, #31408f, #021669);
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .bg-contenedor-rojo {
@@ -371,7 +375,6 @@
   margin-bottom: 10px;
 }
 
-/* Solo estilos personalizados mínimos que Bootstrap no cubre */
 .bg-red-custom {
   background-color: #dc3545;
 }
@@ -380,7 +383,6 @@
   border-left: 1px solid #dee2e6;
 }
 
-/* Título principal */
 .titulo-catalogo {
   font-size: 1.5rem;
   font-weight: bold;
@@ -405,7 +407,6 @@
   transition: all 0.2s ease;
 }
 
-/* Estilos unificados para las tarjetas de filtros */
 .filtro-card {
   border-bottom: 0.0938rem solid #e0e0e0;
   overflow: hidden;
@@ -435,7 +436,6 @@
   margin-left: 0.5rem;
 }
 
-/* Estilos del icono chevron */
 .icono-chevron-down {
   width: 24px;
   height: 24px;
@@ -489,7 +489,6 @@
   cursor: pointer;
 }
 
-/* Utilidades adicionales */
 .rounded-pill {
   border-radius: 50rem !important;
 }
