@@ -3,6 +3,9 @@
 
 import jwt from "jsonwebtoken";
 import axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const LOGIN_SERVICE_URL = process.env.LOGIN_SERVICE_URL || "http://localhost:5176";
@@ -98,7 +101,8 @@ export const validateToken = async (req, res, next) => {
             issuer: process.env.ISSUER,
             audience: process.env.AUDIENCE,
         });
-        req.user = normalizeClaims(decoded);
+        req.user = decoded;
+        console.log("USUARIO DECODIFICADO: ", req.user)
         return next();
     } catch (err) {
         // Si el error NO es de expiración, el token es inválido (firma corrupta, malformado, etc.)

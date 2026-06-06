@@ -1137,14 +1137,12 @@ namespace back_cabs.CRM.controllers.Auth
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Name, user.Name),
-                    new Claim(ClaimTypes.Role, user.Role)
+                    new Claim("id", user.Id),
+                    new Claim("email", user.Email),
+                    new Claim("name", user.Name),
+                    new Claim("role", user.Role)
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(540),
-                Issuer = issuer,
-                Audience = audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 

@@ -1,13 +1,16 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaMssql } from '@prisma/adapter-mssql'
 import logger from '../utils/logger.js'
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const adapter = new PrismaMssql({
-  server: 'localhost',
+  server: process.env.DB_SERVER,
   port: 1433,
-  database: 'cabs_pruebas',
+  database: process.env.DB_DATABASE,
   user: 'sa',
-  password: '0186',
+  password: process.env.DB_PASSWORD,
   options: {
     encrypt: true,
     trustServerCertificate: true,

@@ -273,11 +273,6 @@ model fleet_vehiculos_uso {
   @@index([vehiculo_id], map: "IX_fleet_vehiculos_uso_vehiculo_id")
 }
 
-model legacy_clientes_ref {
-  legacy_client_id    Int       @id(map: "PK__legacy_c__E91B6C8511598D2E")
-  last_sync_timestamp DateTime?
-}
-
 model legacy_intakes_ref {
   legacy_intake_id Int @id(map: "PK__legacy_i__BB75EA220B3983B8")
 }
@@ -473,6 +468,13 @@ model usuario_horarios {
   auth_usuarios User      @relation(fields: [UsuarioId], references: [id], onDelete: Cascade, map: "FK_usuario_horarios_auth_usuarios")
 }
 
+model auth_usuarios_clientes {
+  Id_Cliente Int     @id(map: "PK__legacy_c__E91B6C8511598D2E")
+  password   String? @db.NVarChar(100)
+
+  @@map("auth_usuarios-clientes")
+}
+
 model Cart {
   id             Int        @id @default(autoincrement())
   userId         Int        @unique
@@ -536,5 +538,3 @@ model UserAddress {
   cp           String  @db.VarChar(10)
   country      String  @db.NVarChar(100)
 }
-
-

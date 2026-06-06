@@ -5,14 +5,14 @@ import { validateToken } from "../middlewares/JWTValidator.js";  // ← nuevo
 const cartRouter = Router();
 
 // ← Si USE_AUTH=true usa el middleware real, si no usa uno falso
-const authMiddleware = process.env.USE_AUTH === "true"
-  ? validateToken
-  : (req, res, next) => {
-      req.user = { id: 1 };
-      next();
-    };
+// const authMiddleware = process.env.USE_AUTH === "true"
+//   ? validateToken
+//   : (req, res, next) => {
+//       req.user = { id: 1 };
+//       next();
+//     };
 
-cartRouter.use(authMiddleware);   
+cartRouter.use(validateToken);   
 
 // ═══════════════════════════════════════════════════════════
 //  RUTAS - Endpoints del carrito con JSDoc Swagger

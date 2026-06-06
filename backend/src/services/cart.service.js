@@ -1,5 +1,5 @@
 import prisma from "../config/db.js";
-import ExelService from "./exel.service.js";
+import ExelService from "./exelService.js";
 import logger from "../utils/logger.js";
 import PedidoCreateDto from "../utils/DTO's/Request/PedidoCreateDto.js";
 import PedidoResponseDto from "../utils/DTO's/Response/PedidoResponseDto.js";

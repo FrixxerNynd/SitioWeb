@@ -1,15 +1,15 @@
 import cartService from "../services/cart.service.js";
 
-const getUserId = (req) => req.user?.id;
+const getUserId = (req) => parseInt(req.user?.id);
 
 // ═══════════════════════════════════════════════════════════
 //  CONTROLADOR - Manejo de requests y responses HTTP
 // ═══════════════════════════════════════════════════════════
 
 class CartController {
-
   // GET /api/cart
   async getCart(req, res, next) {
+    console.log("Usuario del token: ", req?.user)
     try {
       const result = await cartService.getCart(getUserId(req));
       res.status(200).json({ success: true, data: result });
