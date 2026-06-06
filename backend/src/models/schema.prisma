@@ -472,3 +472,69 @@ model usuario_horarios {
   ActualizadoEn DateTime?
   auth_usuarios User      @relation(fields: [UsuarioId], references: [id], onDelete: Cascade, map: "FK_usuario_horarios_auth_usuarios")
 }
+
+model Cart {
+  id             Int        @id @default(autoincrement())
+  userId         Int        @unique
+  paymentType    String     @default("Transferencia") @db.VarChar(50)
+  deliveryMethod String?    @db.VarChar(50)
+  shippingCost   Float      @default(0)
+  frozenAddress  String?    @db.NVarChar(Max)
+  subtotal       Float      @default(0)
+  total          Float      @default(0)
+  createdAt      DateTime   @default(now())
+  items          CartItem[]
+}
+
+model CartItem {
+  id         Int    @id @default(autoincrement())
+  cartId     Int
+  productId  Int
+  sku        String @db.VarChar(100)
+  name       String @db.NVarChar(200)
+  price      Float
+  quantity   Int
+  totalPrice Float
+  cart       Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  userId          Int
+  paymentType     String      @db.VarChar(50)
+  deliveryMethod  String      @db.VarChar(50)
+  shippingCost    Float       @default(0)
+  shippingAddress String?     @db.NVarChar(Max)
+  subtotal        Float
+  total           Float
+  status          String      @db.VarChar(50)
+  createdAt       DateTime    @default(now())
+  items           OrderItem[]
+}
+
+model OrderItem {
+  id         Int    @id @default(autoincrement())
+  orderId    Int
+  productId  Int
+  sku        String @db.VarChar(100)
+  name       String @db.NVarChar(200)
+  price      Float
+  quantity   Int
+  totalPrice Float
+  order      Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model UserAddress {
+  id           Int     @id @default(autoincrement())
+  userId       Int
+  street       String  @db.NVarChar(200)
+  extNum       String  @db.VarChar(20)
+  intNum       String? @db.VarChar(20)
+  neighborhood String  @db.NVarChar(100)
+  city         String  @db.NVarChar(100)
+  state        String  @db.NVarChar(100)
+  cp           String  @db.VarChar(10)
+  country      String  @db.NVarChar(100)
+}
+
+

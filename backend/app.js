@@ -7,132 +7,123 @@ import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './src/config/swagger.js';
 import logger from './src/utils/logger.js';
-import redisClient from './src/config/redis.js';
-import ExelService from './src/services/exel.service.js';
-
+import cartRouter from './src/routes/cart.routes.js';
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-//1.- Middlewares
+// ─────────────────────────────────────────────
+// 1. Middlewares globales
+// ─────────────────────────────────────────────
 app.use(helmet());
 app.use(cors({
     origin: process.env.CORS_ORIGIN || '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
-
 app.use(express.json());
 app.use(cookieParser());
 
-//2.- Morgan para logging de solicitudes HTTP
-const morganStream = {
-    write: (message) => logger.info(message.trim())
-};
-app.use(morgan('combined', { stream: morganStream}));
+// 2. Morgan → Winston
+const morganStream = { write: (message) => logger.info(message.trim()) };
+app.use(morgan('combined', { stream: morganStream }));
 
-//3.- Rutas de control y Health
+// ─────────────────────────────────────────────
+// 3. Rutas utilitarias
+// ─────────────────────────────────────────────
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Estado del servidor
+ *     tags: [Sistema]
+ *     responses:
+ *       200:
+ *         description: Servicio en línea
+ */
 app.get('/health', (req, res) => {
     res.status(200).json({
         status: 'UP',
         timestamp: new Date().toISOString(),
-        service: 'Catalog Service Backend',
-        redis: redisClient.isConnected ? 'connected ✅' : 'disconnected ⚠️'
+        service: 'CABS Cart Service Backend',
     });
 });
 
-// Documentación API
+/**
+ * @swagger
+ * /productos:
+ *   get:
+ *     summary: Listar todos los productos del catálogo Exel del Norte
+ *     tags: [Productos]
+ *     responses:
+ *       200:
+ *         description: Lista de productos obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       500:
+ *         description: Error al obtener productos
+ */
+app.get('/productos', async (req, res) => {
+    try {
+        const data = await ExelService.fetchExternalProducts();
+        res.json({
+            success: true,
+            message: 'Productos obtenidos exitosamente',
+            data: data || []
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// ─────────────────────────────────────────────
+// 4. Rutas del dominio
+// ─────────────────────────────────────────────
+app.use('/api/cart', cartRouter);
+
+// ─────────────────────────────────────────────
+// 5. Documentación Swagger
+// ─────────────────────────────────────────────
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-//4.- Manejo de errores global
+// ─────────────────────────────────────────────
+// 6. Manejador de errores global (siempre al final)
+// ─────────────────────────────────────────────
 app.use((err, req, res, next) => {
     logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
     res.status(err.status || 500).json({
         error: {
-            message: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message,
+            message: process.env.NODE_ENV === 'production'
+                ? 'Internal Server Error'
+                : err.message,
         }
     });
 });
 
-/// end poit para ver si redis si funciona 
-app.get('/test-redis', async (req, res) => {
-    // const { id = '100' } = req.query;
-    
-    try {
-        // Importar el servicio de Exel
-        
-        const startTime = Date.now();
-        const data = await ExelService.fetchExternalProductsWithCache();
-        const endTime = Date.now();
-        
-        const product = data?.datos?.find();
-        
-        res.json({
-            success: true,
-            message: 'Prueba de caché con Redis',
-            productId: id,
-            productFound: !!product,
-            productName: product?.nombre || 'No encontrado',
-            responseTimeMs: endTime - startTime,
-            fromCache: endTime - startTime < 50 ? '✅ (Redis - Caché funcionando)' : '❌ (API externa - primera vez)'
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
+// ─────────────────────────────────────────────
+// 7. Arranque del servidor
+// ─────────────────────────────────────────────
+app.listen(PORT, () => {
+    logger.info(`🚀 Servidor iniciado en puerto ${PORT} - Entorno: ${process.env.NODE_ENV || 'development'}`);
+    logger.info(`📖 Swagger disponible en http://localhost:${PORT}/api-docs`);
+    logger.info(`🔐 Autenticación ${process.env.JWT_SECRET ? process.env.JWT_SECRET.substring(0, 5) + "..." : "UNDEFINED"}`);
 });
-
-app.get('/productos', async (req, res) =>{
-    try {
-        const data = await ExelService.fetchExternalProductsWithCache();
-        res.json({
-            success: true,
-            message: 'Productos obtenidos con api',
-            data: data?.datos || []
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-
-async function startServer() {
-    // Intentar conectar a Redis pero NO dejar que detenga el servidor
-    try {
-        await redisClient.connect();
-        logger.info('✅ Redis conectado correctamente');
-    } catch (error) {
-        logger.warn('⚠️ Redis no disponible, el servidor funcionará sin caché');
-        // El servidor sigue corriendo aunque Redis falle
-    }
-    
-    // Iniciar el servidor SIEMPRE (con o sin Redis)
-    app.listen(PORT, () => {
-        logger.info(`Servidor iniciado en el puerto ${PORT} - Entorno: ${process.env.NODE_ENV || 'development'}`);
-        logger.info(`📖 Documentación API disponible en http://localhost:${PORT}/api-docs`);
-        logger.info(`📊 Estado de Redis: ${redisClient.isConnected ? 'Conectado ✅' : 'No disponible ⚠️'}`);
-    });
-}
-
-// Iniciar el servidor
-startServer();
 
 // Cierre graceful
-process.on('SIGINT', async () => {
-    logger.info('Cerrando servidor...');
-    await redisClient.disconnect();
-    process.exit(0);
-});
-
-process.on('SIGTERM', async () => {
-    logger.info('Cerrando servidor...');
-    await redisClient.disconnect();
-    process.exit(0);
-});
+process.on('SIGINT',  () => { logger.info('Cerrando servidor...'); process.exit(0); });
+process.on('SIGTERM', () => { logger.info('Cerrando servidor...'); process.exit(0); });
