@@ -13,7 +13,7 @@ export class UIProductoCard {
   @Input() precio: number = 0;
   @Input() precioOriginal: number = 0;
   @Input() descuento: number = 0;
-  @Input() imagen: string = '';
+  @Input() imagen?: string = '';
   @Input() oferta: boolean = false;
   @Input() stock: number = 0;
   @Input() marca: string = '';
