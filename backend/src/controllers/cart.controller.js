@@ -1,63 +1,115 @@
-import CartService from '../services/cart.services';
+import cartService from "../services/cart.service.js";
+
+const getUserId = (req) => parseInt(req.user?.id);
+
+// ═══════════════════════════════════════════════════════════
+//  CONTROLADOR - Manejo de requests y responses HTTP
+// ═══════════════════════════════════════════════════════════
 
 class CartController {
-
-    async fetchCart(req, res, next) {
-        try {
-            // Suponiendo que el middleware de autenticación inyecta req.user
-            const userId = req.user?.id || 1; 
-            const cart = await CartService.getCart(userId);
-            return res.status(200).json(cart);
-        } catch (error) {
-            next(error);
-        }
+  // GET /api/cart
+  async getCart(req, res, next) {
+    console.log("Usuario del token: ", req?.user)
+    try {
+      const result = await cartService.getCart(getUserId(req));
+      res.status(200).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    async updateCartItem(req, res, next) {
-        try {
-            const userId = req.user?.id || 1;
-            const { productId, quantity } = req.body;
-            const updatedCart = await CartService.updateItemQuantity(userId, productId, quantity);
-            return res.status(200).json(updatedCart);
-        } catch (error) {
-            next(error);
-        }
+  // GET /api/cart/item/:productId
+  async getCartItem(req, res, next) {
+    try {
+      const result = await cartService.getCartItem(
+        getUserId(req),
+        parseInt(req.params.productId)
+      );
+      res.status(200).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    async configurePayment(req, res, next) {
-        try {
-            const userId = req.user?.id || 1;
-            const { paymentType } = req.body;
-            const updatedCart = await CartService.setPaymentType(userId, paymentType);
-            return res.status(200).json(updatedCart);
-        } catch (error) {
-            next(error);
-        }
+  // POST /api/cart/item
+  async addItem(req, res, next) {
+    try {
+      const { productId, quantity } = req.body;
+      const result = await cartService.addItem(
+        getUserId(req),
+        parseInt(productId),
+        parseInt(quantity)
+      );
+      res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    async configureDelivery(req, res, next) {
-        try {
-            const userId = req.user?.id || 1;
-            const { method, addressId } = req.body;
-            const updatedCart = await CartService.setDeliveryMethod(userId, method, addressId);
-            return res.status(200).json(updatedCart);
-        } catch (error) {
-            next(error);
-        }
+  // PUT /api/cart/item/:productId
+  async updateItemQuantity(req, res, next) {
+    try {
+      const result = await cartService.updateItemQuantity(
+        getUserId(req),
+        parseInt(req.params.productId),
+        parseInt(req.body.quantity)
+      );
+      res.status(200).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    async checkout(req, res, next) {
-        try {
-            const userId = req.user?.id || 1;
-            const orderReceipt = await CartService.processCheckout(userId);
-            return res.status(201).json({
-                message: "¡Orden de compra generada con éxito en CABS Computación!",
-                order: orderReceipt
-            });
-        } catch (error) {
-            next(error);
-        }
+  // DELETE /api/cart/item/:productId
+  async removeItem(req, res, next) {
+    try {
+      const result = await cartService.removeItem(
+        getUserId(req),
+        parseInt(req.params.productId)
+      );
+      res.status(200).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
     }
+  }
+
+  // PATCH /api/cart/payment
+  async setPaymentType(req, res, next) {
+    try {
+      const result = await cartService.setPaymentType(
+        getUserId(req),
+        req.body.paymentType
+      );
+      res.status(200).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // PATCH /api/cart/delivery
+  async setDeliveryMethod(req, res, next) {
+    try {
+      const { method, addressId } = req.body;
+      const result = await cartService.setDeliveryMethod(
+        getUserId(req),
+        method,
+        addressId
+      );
+      res.status(200).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // POST /api/cart/checkout
+  async processCheckout(req, res, next) {
+    try {
+      const result = await cartService.processCheckout(getUserId(req));
+      res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new CartController();

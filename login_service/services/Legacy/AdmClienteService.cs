@@ -390,6 +390,12 @@ namespace back_cabs.CRM.services.Legacy
                 return null;
             }
 
+            var valido = _repositoryAuth.ValidateClientCredentialsAync(cliente.CIdClienteProveedor, contrasena);
+            if (valido == null)
+            {
+                _logger.LogWarning("⚠️ Credenciales inválidas para cliente ID: {IdCliente}, Email: {Email}", cliente.CIdClienteProveedor, email);
+                return null;
+            }
             _logger.LogInformation("✅ Credenciales válidas para cliente ID: {IdCliente}, Email: {Email}", cliente.CIdClienteProveedor, email);
             return cliente;
         }

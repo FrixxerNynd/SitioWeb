@@ -7,7 +7,7 @@ import ProductosResponseDto from "../utils/DTO's/Response/ProductosResponseDto.j
 
 dotenv.config();
 
-const apiKey = process.env.API_KEY;
+const apiKey = process.env.API_TOKEN;
 class ExelService {
     
     // Método original - se mantiene igual

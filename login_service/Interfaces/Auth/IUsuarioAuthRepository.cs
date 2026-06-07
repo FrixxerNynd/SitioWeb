@@ -53,6 +53,14 @@ namespace back_cabs.CRM.Interfaces.Auth
         Task<UsuarioAuth?> ValidateCredentialsAsync(string email, string password);
 
         /// <summary>
+        /// Valida las credenciales de un usuario cliente
+        /// </summary>
+        /// <param name="id">ID del usuario cliente</param>
+        /// <param name="password">Contraseña en texto plano</param>
+        /// <returns>Usuario cliente si las credenciales son válidas, null si no</returns>
+        Task<Auth_cliente?> ValidateClientCredentialsAync(int id, string password);
+
+        /// <summary>
         /// Obtiene todos los usuarios del sistema
         /// </summary>
         /// <param name="incluirInactivos">Si incluye usuarios inactivos</param>

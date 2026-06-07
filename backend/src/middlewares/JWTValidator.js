@@ -3,6 +3,9 @@
 
 import jwt from "jsonwebtoken";
 import axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const LOGIN_SERVICE_URL = process.env.LOGIN_SERVICE_URL || "http://localhost:5176";
@@ -81,6 +84,11 @@ function setAuthCookies(res, accessToken, refreshToken) {
  */
 export const validateToken = async (req, res, next) => {
     const token = req.cookies?.AuthToken;
+    
+    
+    console.log("TOKEN RECIBIDO:", token ? token.substring(0, 20) + "..." : "NINGUNO");
+    console.log("JWT_SECRET:", JWT_SECRET ? JWT_SECRET.substring(0, 5) + "..." : "UNDEFINED");
+
 
     if (!token) {
         return res.status(401).json({ message: "No autorizado" });
@@ -90,11 +98,16 @@ export const validateToken = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, JWT_SECRET, {
             algorithms: ["HS256"],
+            issuer: process.env.ISSUER,
+            audience: process.env.AUDIENCE,
         });
         req.user = decoded;
+        console.log("USUARIO DECODIFICADO: ", req.user)
         return next();
     } catch (err) {
         // Si el error NO es de expiración, el token es inválido (firma corrupta, malformado, etc.)
+        console.error("[JWTValidator] Error:", err.name, err.message);
+
         if (err.name !== "TokenExpiredError") {
             return res.status(403).json({ message: "Token inválido" });
         }
@@ -130,7 +143,7 @@ export const validateToken = async (req, res, next) => {
         setAuthCookies(res, newTokens.accessToken, newTokens.refreshToken);
 
         // Continuar con la request usando el nuevo payload
-        req.user = decoded;
+        req.user = normalizeClaims(decoded);
         return next();
     } catch (verifyErr) {
         console.error(
@@ -141,4 +154,23 @@ export const validateToken = async (req, res, next) => {
             .status(401)
             .json({ message: "Error al renovar sesión", expired: true });
     }
+
+    //Helper para los claims
+    function normalizeClaims(decoded){
+        const resultado = {...decoded};
+        for (const [uri, alias] of Object.entries(CLAIMS_MAP)) {
+            if (decoded[uri]) {
+                resultado[alias] = decoded[uri];
+                delete resultado[uri];
+            }
+        }
+        return resultado;
+    }
+
+    const CLAIM_MAP = {
+  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": "id",
+  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress": "email",
+  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": "name",
+  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role": "role",
+};
 };

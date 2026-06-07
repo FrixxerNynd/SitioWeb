@@ -12,7 +12,7 @@ import { PageListaProducto } from './pages/usuario/pages/catalogo-producto/lista
 import { ListaOrdenPague } from './pages/usuario/pages/orden-compra/lista-orden/lista-orden';
 import { MainLayout } from './layouts/main-layout/main-layout';
 import { AuthLayout } from './layouts/auth-layout/auth-layout';
-import { AuthGuard } from './guards/auth.guard'; 
+//import { AuthGuard } from './guards/auth.guard'; 
 
 export const routes: Routes = [
     {
@@ -45,6 +45,7 @@ export const routes: Routes = [
     {
         path: '',
         component: MainLayout,
+       // canActivate: [AuthGuard],
         children: [
             {
                 path: 'catalogo-producto',
@@ -63,5 +64,5 @@ export const routes: Routes = [
             }
         ]
     },
-    { path: '**', redirectTo: '/inicio-sesion' }
+   ///  { path: '**', redirectTo: '/inicio-sesion' }
 ];
