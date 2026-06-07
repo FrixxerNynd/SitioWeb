@@ -9,7 +9,6 @@ import * as bootstrap from 'bootstrap';
   standalone: true,
   imports: [CommonModule, FormsModule, Inputs],
   templateUrl: './lista-orden.html',
-  styleUrl: './lista-orden.css',
 })
 export class ListaOrdenPague implements OnInit {
   filtroId: string = '';
