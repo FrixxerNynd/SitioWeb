@@ -17,13 +17,13 @@ cartRouter.use(validateToken);
 // ═══════════════════════════════════════════════════════════
 //  RUTAS - Endpoints del carrito con JSDoc Swagger
 // ═══════════════════════════════════════════════════════════
-
 /**
  * @swagger
  * tags:
  *   name: Carrito
  *   description: Gestión del carrito de compras CABS
  */
+//funciono
 
 /**
  * @swagger

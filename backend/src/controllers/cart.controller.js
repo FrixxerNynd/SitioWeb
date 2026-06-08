@@ -1,7 +1,11 @@
 import cartService from "../services/cart.service.js";
 
-const getUserId = (req) => parseInt(req.user?.id);
 
+const getUserId = (req) => {
+  const id = parseInt(req.user?.id);
+  if (isNaN(id)) throw new Error("Token inválido: userId no encontrado");
+  return id;
+};
 // ═══════════════════════════════════════════════════════════
 //  CONTROLADOR - Manejo de requests y responses HTTP
 // ═══════════════════════════════════════════════════════════
@@ -11,8 +15,10 @@ class CartController {
   async getCart(req, res, next) {
     console.log("Usuario del token: ", req?.user)
     try {
-      const result = await cartService.getCart(getUserId(req));
+     
+      const result = await cartService.getCart(getUserId(req), req.user?.name);      
       res.status(200).json({ success: true, data: result });
+   
     } catch (error) {
       next(error);
     }

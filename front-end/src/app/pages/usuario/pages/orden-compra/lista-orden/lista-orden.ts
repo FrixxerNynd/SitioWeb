@@ -8,7 +8,6 @@ import { Inputs } from '../../../../../components/shared/inputs/inputs';
   standalone: true,
   imports: [CommonModule, FormsModule, Inputs],
   templateUrl: './lista-orden.html',
-  styleUrl: './lista-orden.css',
 })
 export class ListaOrdenPague implements OnInit {
   filtroId: string = '';
