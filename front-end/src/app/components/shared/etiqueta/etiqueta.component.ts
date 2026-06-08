@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { UitipografiaComponent } from '../../atoms/tipografia/tipografia.component';
-import { UiIconComponent } from '../../atoms/icono/icono.component';
+import { UitipografiaComponent } from '../tipografia/tipografia.component'; 
+import { UiIconComponent } from '../icono/icono.component'; 
 
 export type VarianteEtiqueta = 'positivo' | 'negativo' | 'neutro';
 
