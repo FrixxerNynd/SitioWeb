@@ -7,6 +7,7 @@
                     <img [src]="selectedImage" [alt]="product.name" class="img-fluid">
                 </div>
                 <div class="thumbnail-list mt-3">
+                    
                     <button *ngFor="let img of product.images; let i = index" 
                             class="thumbnail-btn" 
                             [class.active]="selectedImage === img"
@@ -98,24 +99,29 @@
 
                     <div class="tab-content p-2">
                         <!-- Características -->
-                        <div *ngIf="activeTab === 'features'">
-                            <ul class="list-unstyled">
-                                <li *ngFor="let feature of product.features" class="mb-2">
-                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                    {{ feature }}
-                                </li>
-                            </ul>
-                        </div>
+                        @if(activeTab === 'features'){
+                            <div>
+                                <ul class="list-unstyled">
+                                    <li *ngFor="let feature of product.features" class="mb-2">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        {{ feature }}
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+
 
                         <!-- Medidas y dimensiones -->
-                        <div *ngIf="activeTab === 'specs'">
-                            <table class="table table-borderless">
-                                <tr *ngFor="let spec of product.specifications | keyvalue">
-                                    <td class="fw-semibold" style="width: 40%;">{{ spec.key }}:</td>
-                                    <td>{{ spec.value }}</td>
-                                </tr>
-                            </table>
-                        </div>
+                        @if(activeTab === 'specs'){
+                            <div>
+                                <table class="table table-borderless">
+                                    <tr *ngFor="let spec of product.specifications | keyvalue">
+                                        <td class="fw-semibold" style="width: 40%;">{{ spec.key }}:</td>
+                                        <td>{{ spec.value }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>

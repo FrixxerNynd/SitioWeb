@@ -5,12 +5,11 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SecureAuthService } from '../../services/secure-auth.service';
 import { RecaptchaService } from '../../services/RecaptchaService';
-import { UiBoton } from '../../components/shared/boton/boton';
 
 @Component({
   selector: 'app-inicio-sesion',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, UiBoton],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './inicio-sesion.html',
 })
 export class PageInicioSesion implements OnInit, OnDestroy{

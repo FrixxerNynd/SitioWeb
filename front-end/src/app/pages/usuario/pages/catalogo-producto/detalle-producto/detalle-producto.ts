@@ -2,7 +2,6 @@ import { Component, signal} from '@angular/core';
 import { UiBoton } from '../../../../../components/shared/boton/boton';
 
 @Component({
-  imports: [UiBoton],
   templateUrl: './detalle-producto.html',
   styleUrl: './detalle-producto.css',
 })
