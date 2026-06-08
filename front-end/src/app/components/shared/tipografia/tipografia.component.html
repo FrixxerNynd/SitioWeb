@@ -1,0 +1,54 @@
+@switch (variante) {
+    @case ('h1') {
+        <h1 [ngClass]="classes">{{ texto }}</h1>
+    }
+    @case ('h2') {
+        <h2 [ngClass]="classes">{{ texto }}</h2>
+    }
+    @case ('h3') {
+        <h3 [ngClass]="classes">{{ texto }}</h3>
+    }
+    @case ('h4') {
+        <h4 [ngClass]="classes">{{ texto }}</h4>
+    }
+    @case ('h5') {
+        <h5 [ngClass]="classes">{{ texto }}</h5>
+    }
+    @case ('h6') {
+        <h6 [ngClass]="classes">{{ texto }}</h6>
+    }
+    
+    <!-- Párrafos -->
+    @case ('p') {
+        <p [ngClass]="classes">{{ texto }}</p>
+    }
+    @case ('p-lg') {
+        <p [ngClass]="classes">{{ texto }}</p>
+    }
+    @case ('p-md') {
+        <p [ngClass]="classes">{{ texto }}</p>
+    }
+    @case ('p-sm') {
+        <p [ngClass]="classes">{{ texto }}</p>
+    }
+
+    <!-- Captions -->
+    @case ('caption') {
+        <span [ngClass]="classes">{{ texto }}</span>
+    }
+    @case ('caption-lg') {
+        <span [ngClass]="classes">{{ texto }}</span>
+    }
+    @case ('caption-md') {
+        <span [ngClass]="classes">{{ texto }}</span>
+    }
+    @case ('caption-sm') {
+        <span [ngClass]="classes">{{ texto }}</span>
+    }
+
+    @default {
+        <span class="text-red-500">
+        Tipo de variante incorrecto: {{ variante }}
+        </span>
+    }
+}

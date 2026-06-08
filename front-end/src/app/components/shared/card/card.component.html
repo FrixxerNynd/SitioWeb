@@ -1,0 +1,42 @@
+<div class="flex flex-1 px-4 py-2.5 rounded-2xl border w-full h-full flex-col gap-4 bg-white transition-all duration-200 justify-between"
+    [ngClass]="{ 'border-blue-500': selected, 'border-zinc-200': !selected }" (click)="seleccionar.emit()">
+    
+    <!-- Encabezado de la tarjeta-->
+    <div class="flex justify-between items-center w-full">
+        <!-- Icono y texto -->
+        <div class="flex gap-1 items-center">
+            <app-ui-icono
+                name={{nameIcono}}
+                size="size-4">
+            </app-ui-icono>
+            <!-- Texto -->
+            <app-ui-tipografia
+                variante="h6"
+                texto={{title}}>                    
+            </app-ui-tipografia>
+        </div>
+        <!-- Etiqueta de estado -->
+        @if (viewLabel == true) {
+            <app-ui-etiqueta
+                [texto]="porcentaje"
+                [variante]="estadoEtiqueta"
+            />
+        }
+    </div>
+    
+    <div class="flex items-baseline w-full">
+        <app-ui-tipografia 
+            variante="h1"
+            [texto]="formatearValor()" 
+            color="text-neutral-950">
+        </app-ui-tipografia>                    
+    </div>
+    
+    @if (viewDescripcion == true) {
+        <app-ui-tipografia
+            variante="p-md"
+            texto={{descripcion}}
+            color="text-[#374151]">        
+        </app-ui-tipografia>
+    }
+</div>
