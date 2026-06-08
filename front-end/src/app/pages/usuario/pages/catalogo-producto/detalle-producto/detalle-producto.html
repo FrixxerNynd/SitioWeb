@@ -1,0 +1,124 @@
+<div class="container my-5">
+    <div class="product-card">
+        <div class="row g-0">
+            <!-- Contenedor izquierdo - Imágenes -->
+            <div class="col-lg-6 p-4">
+                <div class="product-image-main">
+                    <img [src]="selectedImage" [alt]="product.name" class="img-fluid">
+                </div>
+                <div class="thumbnail-list mt-3">
+                    <button *ngFor="let img of product.images; let i = index" 
+                            class="thumbnail-btn" 
+                            [class.active]="selectedImage === img"
+                            (click)="selectImage(img)">
+                        <img [src]="img" [alt]="'Imagen ' + (i+1)">
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenedor derecho - Información del producto -->
+            <div class="col-lg-6 p-4">
+                <div class="mb-2">
+                    <span class="badge bg-light text-dark">{{ product.category }}</span>
+                </div>
+
+                <!-- Título + etiqueta stock -->
+                <div class="title-etiqueta">
+                    <h3 class="fw-bold mb-0">{{ product.name }}</h3>
+                    <p class="text-muted">{{ product.description }}</p>
+                </div>
+                    <span class="badge-stock" [class.text-danger]="product.stock === 0">
+                        <i class="bi" [class.bi-check-circle-fill]="product.stock > 0" 
+                            [class.bi-exclamation-circle-fill]="product.stock === 0"></i>
+                        En stock:
+                            <span style="font-weight: 600;">{{ product.stock }}</span> 
+                    </span>                
+                <!-- Precios -->
+                <div class="mb-2">
+                    <span class="price-sale">
+                        4,000  MXN
+                    </span>                    
+                    <span class="price-original">
+                        3,000 MXN
+                    </span>
+                </div>
+
+                <span class="iva-text mb-2">IVA incluido</span>
+
+
+                <!-- Contenedor de botones -->
+                <div class="contedor-botonnes d-flex gap-3 mb-4">
+                    <button class="btn btn-outline-secondary" 
+                            (click)="decrementQuantity()"
+                            [disabled]="quantity === 1">
+                        <i class="bi bi-dash">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px; height:20px">>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                            </svg>                            
+                        </i>
+                    </button>
+                    <span class="fw-bold mx-2" style="line-height: 38px;">{{ quantity }}</span>
+                    <button class="btn btn-outline-secondary" 
+                            (click)="incrementQuantity()"
+                            [disabled]="quantity >= product.stock && product.stock > 0">
+                        <i class="bi bi-plus">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px; height:20px">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                            </svg>
+                        </i>
+                    </button>
+                    
+                    <button class="btn btn-primary flex-grow-1" 
+                            (click)="addToCart()"
+                            [disabled]="product.stock === 0">
+                        <i class="bi bi-cart-plus me-2"></i>Agregar carrito
+                    </button>
+                    
+                    <button class="btn btn-secondary flex-grow-1" 
+                            (click)="buyNow()"
+                            [disabled]="product.stock === 0">
+                        <i class="bi bi-lightning-charge me-2"></i>Ordenar ahora
+                    </button>
+                </div>
+
+                <!-- Características, medidas y dimensiones -->
+                <div class="mt-4">
+                    <div class="d-flex gap-2 mb-3 border-bottom">
+                        <button class="tab-button" 
+                                [class.active]="activeTab === 'features'"
+                                (click)="activeTab = 'features'">
+                            Características
+                        </button>
+                        <button class="tab-button" 
+                                [class.active]="activeTab === 'specs'"
+                                (click)="activeTab = 'specs'">
+                            Medidas y dimensiones
+                        </button>
+                    </div>
+
+                    <div class="tab-content p-2">
+                        <!-- Características -->
+                        <div *ngIf="activeTab === 'features'">
+                            <ul class="list-unstyled">
+                                <li *ngFor="let feature of product.features" class="mb-2">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    {{ feature }}
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Medidas y dimensiones -->
+                        <div *ngIf="activeTab === 'specs'">
+                            <table class="table table-borderless">
+                                <tr *ngFor="let spec of product.specifications | keyvalue">
+                                    <td class="fw-semibold" style="width: 40%;">{{ spec.key }}:</td>
+                                    <td>{{ spec.value }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
