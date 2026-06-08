@@ -24,9 +24,24 @@ class ExelService {
       
       const items =
         response.data?.datos ??
-        (Array.isArray(response.data) ? response.data : []);
-      return ProductosResponseDto.fromArray(items);
-    } catch (error) {
+        (Array.isArray(response.data) ? response.data : []); 
+        return items.map(item => new ProductosResponseDto({
+        id:             item.id,
+        nombre:         item.nombre,
+        precio:         parseFloat(item.precio ?? 0),
+        precioOriginal: parseFloat(item.precio_sin_oferta ?? 0),
+        stock:          parseInt(item.stock ?? 0),
+        descripcion:    item.descripcion_extendida,
+        sku:            item.sku,
+        codigoSAT:      item.codigo_sat,
+        codigoBarras:   item.codigo_barras,
+        marca:          item.marca_nombre,
+        subcategoria:   item.familia_id,
+      }));
+      } catch (error) {
+      console.log("STATUS:", error.response?.status);
+      console.log("RESPUESTA:", error.response?.data);
+      console.log("API KEY usada:", apiKey);
       logger.error(
         `Error al conectar con la API de Exel del Norte: ${error.message}`,
       );
@@ -69,7 +84,7 @@ class ExelService {
       const apiUrl = "https://api01.exeldelnorte.com.mx/imagenes";
       //Verificar si query trae informacion
       if (query.length > 0) {
-        const response = await axios.get(apriUrl, {
+        const response = await axios.get(apiUrl, {
           headers: {
             Authorization: apiKey,
           },

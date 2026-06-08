@@ -98,8 +98,7 @@ export const validateToken = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, JWT_SECRET, {
             algorithms: ["HS256"],
-            issuer: process.env.ISSUER,
-            audience: process.env.AUDIENCE,
+           
         });
         req.user = decoded;
         console.log("USUARIO DECODIFICADO: ", req.user)
@@ -143,7 +142,7 @@ export const validateToken = async (req, res, next) => {
         setAuthCookies(res, newTokens.accessToken, newTokens.refreshToken);
 
         // Continuar con la request usando el nuevo payload
-        req.user = normalizeClaims(decoded);
+        req.user = decoded;
         return next();
     } catch (verifyErr) {
         console.error(

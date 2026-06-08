@@ -9,7 +9,7 @@ const toResponseDto = (data) => new PedidoResponseDto({
   id:            data.id,
   estado:        data.status         ?? data.estado       ?? '',
   fechaPedido:   data.createdAt      ?? data.fechaPedido  ?? new Date(),
-  clienteNombre: data.userId?.toString() ?? '',
+  clienteNombre: data.name ?? '',
   transportista: data.deliveryMethod ?? '',
   numeroFactura: data.id?.toString() ?? '',
   productos:     (data.items ?? []).map(i => `${i.name} x${i.quantity}`),
@@ -38,38 +38,41 @@ const CABS_SUCURSAL_ADDRESS = {
 class CartService {
 
   // ─── READ - Obtener el carrito completo del usuario ───
-  async getCart(userId) {
+  async getCart(userId,userName) {
     let cart = await prisma.cart.findUnique({
-      where: { userId },
+      where: { 
+        userId: parseInt(userId.id), // Soporta ambos formatos: { id: 1 } o { nameid: "1" }
+       },
       include: { items: true },
     });
 
     // Inicializar carrito en DB si el usuario entra por primera vez
     if (!cart) {
       cart = await prisma.cart.create({
-        data: { userId, paymentType: "Transferencia", subtotal: 0, total: 0 },
+        data: { userId: parseInt(userId.id), paymentType: "Transferencia", subtotal: 0, total: 0 },
         include: { items: true },
       });
     }
 
     const updated = await this.recalculateCartTotals(cart.id);
-    return toResponseDto(updated);
+    return toResponseDto({ ...updated, name: userName || `Usuario ${userId.id}` });
+
   }
 
   // ─── READ - Obtener un ítem específico del carrito por productId ───
   async getCartItem(userId, productId) {
-    const cart = await prisma.cart.findUnique({
-      where: { userId },
-      include: { items: true },
-    });
+  const cart = await prisma.cart.findUnique({
+    where: { userId: parseInt(userId) }, // ← userId ya es número, no objeto
+    include: { items: true },
+  });
 
-    if (!cart) throw new Error("El carrito del usuario no existe.");
+  if (!cart) throw new Error("El carrito del usuario no existe.");
 
-    const item = cart.items.find((i) => i.productId === productId);
-    if (!item) throw new Error("El producto no se encuentra en el carrito.");
+  const item = cart.items.find((i) => i.productId === productId);
+  if (!item) throw new Error("El producto no se encuentra en el carrito.");
 
-    return item;
-  }
+  return item;
+}
 
   // ─── CREATE - Agregar un producto nuevo al carrito ───
   async addItem(userId, productId, quantity) {
@@ -97,7 +100,7 @@ class CartService {
 
     // Validar existencias reales en el catálogo externo
     const externalData = await ExelService.fetchExternalProducts({ id: productId });
-    const externalProduct = externalData?.find((p) => p.id === productId);
+    const externalProduct = externalData?.find((p) => parseInt(p.id) === parseInt(productId));
 
     if (!externalProduct)
       throw new Error("El producto seleccionado ya no existe en el catálogo.");
@@ -141,7 +144,7 @@ class CartService {
 
     // Validar existencias reales en el catálogo externo
     const externalData = await ExelService.fetchExternalProducts({ id: productId });
-    const externalProduct = externalData?.find((p) => p.id === productId);
+    const externalProduct = externalData?.find((p) => parseInt(p.id) === parseInt(productId));
 
     if (!externalProduct)
       throw new Error("El producto seleccionado ya no existe en el catálogo.");
