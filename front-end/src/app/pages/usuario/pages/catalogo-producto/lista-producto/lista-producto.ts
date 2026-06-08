@@ -1,4 +1,3 @@
-// front-end/src/app/pages/usuario/pages/catalogo-producto/lista-producto/lista-producto.ts
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
@@ -23,6 +22,9 @@ export class PageListaProducto implements OnInit {
     // ========== SEÑALES ==========
     allProducts = signal<IProduct[]>([]);
     displayedProducts = signal<IProduct[]>([]);
+
+    mostrarModalFiltros = signal(false);
+
     
     brands = signal<IBrand[]>([]);
     categories = signal<ICategory[]>([]);
@@ -524,4 +526,20 @@ export class PageListaProducto implements OnInit {
             this.isLoading.set(false);
         }
     }
+
+
+    abrirModalFiltros() {
+        this.mostrarModalFiltros.set(true);
+        document.body.style.overflow = 'hidden'; 
+    }    
+
+    cerrarModalFiltros() {
+        this.mostrarModalFiltros.set(false);
+        document.body.style.overflow = ''; 
+    }
+
+    aplicarFiltrosDesdeModal() {
+        this.aplicarFiltros();
+        this.cerrarModalFiltros();
+    }    
 }
