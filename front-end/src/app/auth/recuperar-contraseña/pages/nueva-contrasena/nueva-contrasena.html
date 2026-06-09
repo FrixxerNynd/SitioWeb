@@ -4,7 +4,38 @@
     }
     .cursor-pointer {
         cursor: pointer;
-    }    
+    }
+    
+    .error-text {
+        color: #dc2626;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .is-invalid {
+        border-color: #dc2626;
+    }
+    
+    .btn-loading {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    /* Animación para el tooltip */
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .tooltip-animation {
+        animation: slideDown 0.3s ease-out;
+    }
 </style>
 
 <div class="container-fluid vh-100 bg-light p-2 overflow-hidden">
@@ -12,14 +43,11 @@
         <!-- CONTENEDOR IZQUIERDO -->
         <div class="d-none d-lg-flex col-lg-6 rounded-4 gradient-bg flex-column p-4" 
              style="overflow: hidden; height: 100%;">
-            <!-- Logo -->
             <div class="mb-4">
                 <div style="width: 80px; height: 80px;">
                     <img src="/logo/logo-blanco.svg" alt="Logo CABS Computación">
                 </div>
             </div>
-
-            <!-- Encabezado principal -->
             <div class="mt-auto">
                 <h2 class="text-white fw-semibold">Accede de forma sencilla</h2>
                 <h2 class="text-white fw-semibold">al catálogo de productos de CABS Computación</h2>
@@ -30,13 +58,10 @@
         <div class="col-12 col-lg-6 d-flex align-items-start justify-content-center p-4 p-sm-5" 
              style="overflow-y: auto; height: 100%;">
             <div class="w-100" style="max-width: 40.625rem;">
-                <!-- Icono para retroceder -->
                 <div class="mb-3">
                     <a routerLink="/recuperar-contrasena/verificar-codigo" 
                        class="text-decoration-none cursor-pointer d-inline-flex align-items-center gap-2"
-                       style="color: #4a5568; transition: all 0.2s ease;"
-                       onmouseover="this.style.color='#1e3a8a'; this.style.transform='translateX(-4px)';"
-                       onmouseout="this.style.color='#4a5568'; this.style.transform='translateX(0)';">
+                       style="color: #4a5568; transition: all 0.2s ease;">
                         <svg xmlns="http://www.w3.org/2000/svg" 
                              fill="none" 
                              viewBox="0 0 24 24" 
@@ -52,37 +77,87 @@
                     </a>
                 </div>
 
-                <!-- Encabezado del formulario -->
                 <div class="text-start mb-4">
                     <h2 class="h1 fw-bold text-dark mb-2">Cambiar contraseña</h2>
                     <p class="fs-5 fw-medium text-secondary">Ingresa tu nueva contraseña.</p>
                 </div>
                 
-                <!-- Formulario Reactivo de Angular -->
-                <form>
-                    <!-- Campo: Nueva Contraseña -->
+                <!-- Tooltip de éxito  -->
+                @if (showTooltip) {
+                    <div class="mb-4 bg-green-50 text-green-800 font-medium p-3 border border-green-800 rounded-md flex gap-2 justify-between items-start tooltip-animation">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" style="width: 20px; height: 20px; flex-shrink: 0;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <span class="flex-grow-1">{{ tooltipMessage }}</span>
+                    </div>
+                }
+
+                <form [formGroup]="passwordForm" (ngSubmit)="onSubmit()">
                     <div class="mb-4">
                         <label for="nuevaPasswordInput" class="form-label fw-semibold mb-2">
                             Nueva contraseña <span class="text-danger">*</span>
                         </label>
                         <input type="password" 
                                class="form-control form-control-lg" 
+                               [class.is-invalid]="nuevaPassword?.invalid && nuevaPassword?.touched"
                                id="nuevaPasswordInput"
                                formControlName="nuevaPassword"
                                placeholder="Mínimo 6 caracteres">
+                        @if (nuevaPassword?.invalid && nuevaPassword?.touched) {
+                            <div class="error-text">
+                                @if (nuevaPassword?.errors?.['required']) {
+                                    <span>La contraseña es obligatoria</span>
+                                }
+                                @if (nuevaPassword?.errors?.['minlength']) {
+                                    <span>La contraseña debe tener al menos 6 caracteres</span>
+                                }
+                            </div>
+                        }
                     </div>
 
-                    <!-- Botón de envío -->
+                    <div class="mb-4">
+                        <label for="confirmarPasswordInput" class="form-label fw-semibold mb-2">
+                            Confirmar contraseña <span class="text-danger">*</span>
+                        </label>
+                        <input type="password" 
+                               class="form-control form-control-lg" 
+                               [class.is-invalid]="(confirmarPassword?.invalid && confirmarPassword?.touched) || passwordForm?.errors?.['passwordMismatch']"
+                               id="confirmarPasswordInput"
+                               formControlName="confirmarPassword"
+                               placeholder="Repite tu nueva contraseña">
+                        @if (confirmarPassword?.invalid && confirmarPassword?.touched) {
+                            <div class="error-text">
+                                @if (confirmarPassword?.errors?.['required']) {
+                                    <span>Confirmar la contraseña es obligatorio</span>
+                                }
+                            </div>
+                        }
+                        @if (passwordForm?.errors?.['passwordMismatch'] && confirmarPassword?.touched) {
+                            <div class="error-text">
+                                Las contraseñas no coinciden
+                            </div>
+                        }
+                    </div>
+
                     <button type="submit" 
-                            routerLink="/inicio-sesion"
+                            [disabled]="isLoading || passwordForm.invalid"
                             class="btn btn-lg w-100 fw-semibold py-2 mb-4"
+                            [class.btn-loading]="isLoading"
                             style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
                                 border: none;
                                 color: white;
                                 border-radius: 8px;
                                 transition: all 0.3s ease;
                                 box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                        Cambiar contraseña
+                        @if (!isLoading) {
+                            <span>Cambiar contraseña</span>
+                        }
+                        @if (isLoading) {
+                            <span>
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Procesando...
+                            </span>
+                        }
                     </button>
                 </form>
             </div>

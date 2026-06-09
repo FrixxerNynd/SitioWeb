@@ -2,24 +2,36 @@
     .gradient-bg {
         background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
     }
+    .error-text {
+        color: #dc2626;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }    
+
     .cursor-pointer {
         cursor: pointer;
-    }    
+    }
+
+    .is-invalid {
+        border-color: #dc2626;
+    }
+
+    .btn-loading {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
 </style>
 
 <div class="container-fluid vh-100 bg-light p-2 overflow-hidden">
     <div class="row g-0 h-100 overflow-hidden">
         <!-- CONTENEDOR IZQUIERDO -->
-        <div class="d-none d-lg-flex col-lg-6 rounded-4 gradient-bg flex-column p-4" 
-             style="overflow: hidden; height: 100%;">
-            <!-- Logo -->
+        <div class="d-none d-lg-flex col-lg-6 rounded-4 gradient-bg flex-column p-4"
+            style="overflow: hidden; height: 100%;">
             <div class="mb-4">
                 <div style="width: 80px; height: 80px;">
                     <img src="/logo/logo-blanco.svg" alt="Logo CABS Computación">
                 </div>
             </div>
-
-            <!-- Encabezado principal -->
             <div class="mt-auto">
                 <h2 class="text-white fw-semibold">Accede de forma sencilla</h2>
                 <h2 class="text-white fw-semibold">al catálogo de productos de CABS Computación</h2>
@@ -27,62 +39,83 @@
         </div>
 
         <!-- CONTENEDOR DERECHO - RECUPERAR CONTRASEÑA -->
-        <div class="col-12 col-lg-6 d-flex align-items-start justify-content-center p-4 p-sm-5" 
-             style="overflow-y: auto; height: 100%;">
+        <div class="col-12 col-lg-6 d-flex align-items-start justify-content-center p-4 p-sm-5"
+            style="overflow-y: auto; height: 100%;">
             <div class="w-100" style="max-width: 40.625rem;">
-                <!-- Icono para retroceder -->
                 <div class="mb-3">
-                    <a routerLink="/inicio-sesion" 
-                       class="text-decoration-none cursor-pointer d-inline-flex align-items-center gap-2"
-                       style="color: #4a5568; transition: all 0.2s ease;"
-                       onmouseover="this.style.color='#1e3a8a'; this.style.transform='translateX(-4px)';"
-                       onmouseout="this.style.color='#4a5568'; this.style.transform='translateX(0)';">
-                        <svg xmlns="http://www.w3.org/2000/svg" 
-                             fill="none" 
-                             viewBox="0 0 24 24" 
-                             stroke-width="2" 
-                             stroke="currentColor" 
-                             width="24" 
-                             height="24">
-                            <path stroke-linecap="round" 
-                                  stroke-linejoin="round" 
-                                  d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                    <a routerLink="/inicio-sesion"
+                        class="text-decoration-none cursor-pointer d-inline-flex align-items-center gap-2"
+                        style="color: #4a5568; transition: all 0.2s ease;"
+                        onmouseover="this.style.color='#1e3a8a'; this.style.transform='translateX(-4px)';"
+                        onmouseout="this.style.color='#4a5568'; this.style.transform='translateX(0)';">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" width="24" height="24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
                         </svg>
                         <span class="fw-medium">Regresar</span>
                     </a>
                 </div>
 
-                <!-- Encabezado del formulario -->
                 <div class="text-start mb-4">
                     <h2 class="h1 fw-bold text-dark mb-2">¿Olvidaste tu contraseña?</h2>
-                    <p class="fs-5 fw-medium text-secondary">Ingresa tu correo electrónico para que podamos <br>enviarte un código de verificación.</p>
+                    <p class="fs-5 fw-medium text-secondary">Ingresa tu correo electrónico o tu RFC para<br>recuperar tu
+                        cuenta.</p>
                 </div>
-                
-                <!-- Formulario Reactivo de Angular -->
-                <form>
-                    <!-- Campo: Correo Electrónico -->
+
+                <!-- Mensaje informativo azul (siempre visible) -->
+                <div class="mb-3 bg-blue-50 text-blue-600 font-medium p-3 border border-blue-600 rounded-md flex gap-2 justify-between items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                    </svg>
+                    <span>Si existe una cuenta con ese dato, recibirás un correo de recuperación.</span>
+                </div>
+
+                <form [formGroup]="recuperarForm" (ngSubmit)="onSubmit()">
                     <div class="mb-4">
-                        <label for="emailInput" class="form-label fw-semibold mb-2">
-                            Correo Electrónico <span class="text-danger">*</span>
+                        <label for="identificadorInput" class="form-label fw-semibold mb-2">
+                            Correo Electrónico o RFC <span class="text-danger">*</span>
                         </label>
-                        <input type="email" 
-                               class="form-control form-control-lg" 
-                               id="emailInput"
-                               formControlName="email"
-                               placeholder="nombre@ejemplo.com">
+                        <input type="text" 
+                               class="form-control form-control-lg"
+                               [class.is-invalid]="identificador?.invalid && identificador?.touched"
+                               id="identificadorInput" 
+                               formControlName="identificador"
+                               placeholder="ejemplo@correo.com  o  XAXX010101XXX" 
+                               autocomplete="off">
+
+                        <!-- Solo mostrar errores de VALIDACIÓN (formato incorrecto) -->
+                        @if (identificador?.invalid && identificador?.touched) {
+                            <div class="error-text">
+                                @if (identificador?.errors?.['required']) {
+                                    <span>Este campo es obligatorio</span>
+                                }
+                                @if (identificador?.errors?.['invalidEmailOrRFC']) {
+                                    <span>Ingresa un correo electrónico válido o un RFC válido (13 caracteres)</span>
+                                }
+                            </div>
+                        }
                     </div>
 
-                    <!-- Botón de envío -->
                     <button type="submit" 
-                            routerLink="/recuperar-contrasena/verificar-codigo"
-                            class="btn btn-lg w-100 fw-semibold py-2 mb-4"
+                            [disabled]="isLoading || recuperarForm.invalid"
+                            class="btn btn-lg w-100 fw-semibold py-2 mb-4" 
+                            [class.btn-loading]="isLoading" 
                             style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
                                 border: none;
                                 color: white;
                                 border-radius: 8px;
                                 transition: all 0.3s ease;
                                 box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                        Enviar código
+                        @if (!isLoading) {
+                            <span>Enviar código</span>
+                        }
+                        @if (isLoading) {
+                            <span>
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Enviando...
+                            </span>
+                        }
                     </button>
                 </form>
             </div>

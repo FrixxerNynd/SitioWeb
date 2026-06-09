@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Inputs } from '../../../../../components/shared/inputs/inputs';
+import { UIProductoCard } from '../../../../../components/shared/producto-card/producto-card';
 
 @Component({
   selector: 'app-lista-orden',
   standalone: true,
-  imports: [CommonModule, FormsModule, Inputs],
+  imports: [CommonModule, FormsModule, Inputs, UIProductoCard],
   templateUrl: './lista-orden.html',
 })
 export class ListaOrdenPague implements OnInit {

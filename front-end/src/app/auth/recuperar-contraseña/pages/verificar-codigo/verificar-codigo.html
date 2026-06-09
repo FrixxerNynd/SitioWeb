@@ -24,14 +24,30 @@
         outline: none;
     }
     
-    /* Ocultar spinner de inputs number */
+    .code-input.is-invalid {
+        border-color: #dc2626;
+    }
+    
+    .error-text {
+        color: #dc2626;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        text-align: center;
+    }
+    
+    .btn-loading {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    
+    /* Ocultar spinner de inputs */
     .code-input::-webkit-inner-spin-button,
     .code-input::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
     
-    .code-input[type=number] {
+    .code-input[type=text] {
         -moz-appearance: textfield;
     }
     
@@ -49,14 +65,11 @@
         <!-- CONTENEDOR IZQUIERDO -->
         <div class="d-none d-lg-flex col-lg-6 rounded-4 gradient-bg flex-column p-4" 
              style="overflow: hidden; height: 100%;">
-            <!-- Logo -->
             <div class="mb-4">
                 <div style="width: 80px; height: 80px;">
                     <img src="/logo/logo-blanco.svg" alt="Logo CABS Computación">
                 </div>
             </div>
-
-            <!-- Encabezado principal -->
             <div class="mt-auto">
                 <h2 class="text-white fw-semibold">Accede de forma sencilla</h2>
                 <h2 class="text-white fw-semibold">al catálogo de productos de CABS Computación</h2>
@@ -67,13 +80,10 @@
         <div class="col-12 col-lg-6 d-flex align-items-start justify-content-center p-4 p-sm-5" 
              style="overflow-y: auto; height: 100%;">
             <div class="w-100" style="max-width: 40.625rem;">
-                <!-- Icono para retroceder -->
                 <div class="mb-3">
                     <a routerLink="/recuperar-contrasena/solicitar-correo"
                        class="text-decoration-none cursor-pointer d-inline-flex align-items-center gap-2"
-                       style="color: #4a5568; transition: all 0.2s ease;"
-                       onmouseover="this.style.color='#1e3a8a'; this.style.transform='translateX(-4px)';"
-                       onmouseout="this.style.color='#4a5568'; this.style.transform='translateX(0)';">
+                       style="color: #4a5568; transition: all 0.2s ease;">
                         <svg xmlns="http://www.w3.org/2000/svg" 
                              fill="none" 
                              viewBox="0 0 24 24" 
@@ -89,92 +99,70 @@
                     </a>
                 </div>
 
-                <!-- Encabezado del formulario -->
                 <div class="text-start mb-4">
                     <h2 class="h1 fw-bold text-dark mb-2">Verifica tu código</h2>
                     <p class="fs-5 fw-medium text-secondary">Ingresa el código de 6 dígitos que enviamos a tu correo.</p>
                 </div>
-                
-                <!-- Formulario Reactivo de Angular -->
-                <form>
-                    <!-- Campo: Código de verificación (6 inputs) -->
+
+                <form [formGroup]="codigoForm" (ngSubmit)="onSubmit()">
                     <div class="mb-4">
                         <label class="form-label fw-semibold mb-3 text-start d-block">
                             Código de verificación <span class="text-danger">*</span>
                         </label>
                         <div class="d-flex justify-content-between gap-2 gap-sm-3">
-                            <input type="number" 
-                                   maxlength="1" 
-                                   class="form-control code-input text-center"
-                                   id="codigo1"
-                                   formControlName="codigo1"
-                                  
-                                   placeholder="-">
-                            <input type="number" 
-                                   maxlength="1" 
-                                   class="form-control code-input text-center"
-                                   id="codigo2"
-                                   formControlName="codigo2"
-                                   
-                                   
-                                   placeholder="-">
-                            <input type="number" 
-                                   maxlength="1" 
-                                   class="form-control code-input text-center"
-                                   id="codigo3"
-                                   formControlName="codigo3"
-                                   
-                                   placeholder="-">
-                            <input type="number" 
-                                   maxlength="1" 
-                                   class="form-control code-input text-center"
-                                   id="codigo4"
-                                   formControlName="codigo4"
-                                   
-                                   placeholder="-">
-                            <input type="number" 
-                                   maxlength="1" 
-                                   class="form-control code-input text-center"
-                                   id="codigo5"
-                                   formControlName="codigo5"
-                                  
-                                   placeholder="-">
-                            <input type="number" 
-                                   maxlength="1" 
-                                   class="form-control code-input text-center"
-                                   id="codigo6"
-                                   formControlName="codigo6"
-                                   placeholder="-">
+                            @for (i of [1,2,3,4,5,6]; track i) {
+                                <input type="text" 
+                                       maxlength="1" 
+                                       inputmode="numeric"
+                                       pattern="\d*"
+                                       [class.is-invalid]="codigoForm.get('codigo' + i)?.invalid && codigoForm.get('codigo' + i)?.touched"
+                                       class="form-control code-input text-center"
+                                       [id]="'codigo' + i"
+                                       [formControlName]="'codigo' + i"
+                                       (input)="onInput($event, i)"
+                                       (keydown)="onKeyDown($event, i)"
+                                       (paste)="onPaste($event)"
+                                       placeholder="-">
+                            }
                         </div>
+                        @if (codigoForm.invalid && (codigoForm.get('codigo1')?.touched || codigoForm.get('codigo2')?.touched)) {
+                            <div class="error-text">
+                                <span>Ingresa los 6 dígitos del código de verificación</span>
+                            </div>
+                        }
                     </div>
 
-                    <!-- Texto de reenvío -->
                     <div class="text-center mb-4">
                         <p class="text-secondary small mb-0">
                             ¿No recibiste el código?
                             <a href="#" 
+                               (click)="reenviarCodigo($event)"
                                class="text-primary text-decoration-none fw-semibold">
                                 Reenviar código
                             </a>
                         </p>
                     </div>
 
-                    <!-- Botón de envío -->
                     <button type="submit" 
-                            routerLink="/recuperar-contrasena/nueva-contrasena"
+                            [disabled]="isLoading || codigoForm.invalid"
                             class="btn btn-lg w-100 fw-semibold py-2 mb-4"
+                            [class.btn-loading]="isLoading"
                             style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
                                 border: none;
                                 color: white;
                                 border-radius: 8px;
                                 transition: all 0.3s ease;
                                 box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                        Verificar código
+                        @if (!isLoading) {
+                            <span>Verificar código</span>
+                        }
+                        @if (isLoading) {
+                            <span>
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Verificando...
+                            </span>
+                        }
                     </button>
-                    <div class="mb-3">
-                        <ui-boton routerLink="/recuperar-contrasena/nueva-contrasena" type="submit" tipo="primario" text="Verificar código" size="lg" widthType="full">
-                        </ui-boton>
-                    </div>                     
                 </form>
             </div>
         </div>
