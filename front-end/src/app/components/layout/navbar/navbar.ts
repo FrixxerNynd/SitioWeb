@@ -11,6 +11,7 @@ import { CookieService } from '../../../services/cookie.service';
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css']
 })
+
 export class UiNavbarComponent implements OnInit, OnDestroy {
   private authService = inject(SecureAuthService);
   private cookieService = inject(CookieService);
@@ -105,6 +106,4 @@ export class UiNavbarComponent implements OnInit, OnDestroy {
     
     return 'Usuario';
   }
-
-
 }
