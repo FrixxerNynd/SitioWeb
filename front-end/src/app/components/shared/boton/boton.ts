@@ -1,27 +1,31 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
+import { UiIconComponent } from '../icono/icono.component';
 
 @Component({
   selector: 'ui-boton',
-  imports: [CommonModule],
+  imports: [CommonModule, UiIconComponent],
   templateUrl: './boton.html',
   styleUrl: './boton.css',
 })
 export class UiBoton implements OnInit {
 
   @Input() type: 'submit' | 'reset' | 'button' = 'button';
-  @Input() tipo: 'primario' | 'secundario' | 'cerrar' | 'icono' = 'primario';
+  @Input() tipo: 'primario' | 'secundario' | 'cerrar' | 'icono' | 'contador' = 'primario';
   @Input() text: string = 'texto boton';
   @Input() viewIcon: boolean = false;
   @Input() size: 'xs' | 'md' | 'lg' = 'xs';
-  @Input() disabled: boolean = true; // Cambiado a true por defecto
-  
+  @Input() disabled: boolean = true; 
+  @Input() nomeIco: string = 'home';
   @Input() widthType: 'fixed' | 'full' | 'auto' = 'auto';
   @Input() customWidth: string = '';
   
   // Inputs para activar el botón automáticamente
-  @Input() enableWhen: any = null; // Puede ser cualquier valor
+  @Input() enableWhen: any = null; 
   @Input() enableWhenFormValid: boolean = false;
+
+  contador: number = 0;
+
   
   get fullWidth(): boolean {
     return this.widthType === 'full';
@@ -58,4 +62,16 @@ export class UiBoton implements OnInit {
       this.btnClick.emit(event);
     }
   }
+
+
+incrementar() {
+  this.contador++;
+}
+
+decrementar() {
+  if (this.contador > 0) {
+    this.contador--;
+  }
+}
+
 }

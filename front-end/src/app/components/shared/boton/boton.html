@@ -1,59 +1,66 @@
 @switch(tipo) {
     @case('primario') {
-        <button class="btn btn-primario btn-{{size}} cursor-pointer"
-                [class.btn-full]="widthType === 'full'"
-                [style.width]="buttonWidth"
-                [type]="type"
-                [disabled]="disabled"
-                (click)="onClick($event)">
-            @if(viewIcon) {
-                <span class="btn-icon">
-                    <ng-content select="[icon]"></ng-content>
-                </span>
-            }
-            <span class="btn-text">{{ text }}</span>
-            <ng-content></ng-content>
-        </button>
+    <button class="flex items-center justify-center font-medium transition  btn-gradient text-white
+                px-3 py-2 text-sm md:px-4 md:py-2 md:text-base lg:px-5 lg:py-3 lg:text-lg"
+        [class.w-full]="widthType === 'full'" [style.width]="buttonWidth" [type]="type" [disabled]="disabled"
+        (click)="onClick($event)">
+        <span>{{ text }}</span>
+        <ng-content></ng-content>
+    </button>
     }
-    
+
     @case('secundario') {
-        <button class="btn btn-secundario btn-{{size}} cursor-pointer"
-                [class.btn-full]="widthType === 'full'"
-                [style.width]="buttonWidth"
-                [type]="type"
-                [disabled]="disabled"
-                (click)="onClick($event)">
-            @if(viewIcon) {
-                <span class="btn-icon">
-                    <ng-content select="[icon]"></ng-content>
-                </span>
-            }
-            <span class="btn-text">{{ text }}</span>
-            <ng-content></ng-content>
-        </button>
+    <button class="inline-flex items-center justify-center gap-2 rounded-md font-medium transition  btn-secundario
+                bg-white text-[#1e3a8a]
+                px-3 py-2 text-sm md:px-4 md:py-2 md:text-base lg:px-5 lg:py-3 lg:text-lg"
+        [class.w-full]="widthType === 'full'" [style.width]="buttonWidth" [type]="type" [disabled]="disabled"
+        (click)="onClick($event)">
+        <span>{{ text }}</span>
+        <ng-content></ng-content>
+    </button>
     }
-    
+
     @case('cerrar') {
-        <button class="btn btn-cerrar btn-{{size}} cursor-pointer"
-                [class.btn-full]="widthType === 'full'"
-                [style.width]="widthType === 'full' ? '100%' : 'auto'"
-                type="button"
-                [disabled]="disabled"
-                (click)="onClick($event)"
-                aria-label="Cerrar">
-            <span class="close-icon">✕</span>
-            <ng-content></ng-content>
-        </button>
+    <button class="items-center justify-center font-medium transition btn-cerrar
+                text-[#71717b] bg-white
+                disabled:opacity-60 disabled:cursor-not-allowed
+                px-3 py-2 text-sm md:px-4 md:py-2 md:text-base lg:px-5 lg:py-3 lg:text-lg"
+        [class.w-full]="widthType === 'full'" [style.width]="widthType === 'full' ? '100%' : 'auto'" type="button"
+        [disabled]="disabled" (click)="onClick($event)" aria-label="Cerrar">
+        <span>{{ text }}</span>
+        <ng-content></ng-content>
+    </button>
     }
-    
+
     @case('icono') {
-        <button class="btn btn-icono btn-{{size}} cursor-pointer"
-                [style.width]="widthType === 'full' ? '100%' : 'auto'"
-                [type]="type"
-                [disabled]="disabled"
-                (click)="onClick($event)"
-                [attr.aria-label]="text">
-            <ng-content></ng-content>
-        </button>
+    <button class="inline-flex items-center justify-center rounded-full transition 
+                bg-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110 
+                disabled:opacity-60 disabled:cursor-not-allowed
+                p-2 md:p-3 lg:p-4" [style.width]="widthType === 'full' ? '100%' : 'auto'" [type]="type"
+        [disabled]="disabled" (click)="onClick($event)" [attr.aria-label]="text">
+        <app-ui-icono [name]="nomeIco"></app-ui-icono>
+        <ng-content></ng-content>
+    </button>
+    }
+
+    @case('contador') {
+        <div class="flex items-center justify-center border rounded-md bg-white overflow-hidden h-10 w-auto ">
+            <!-- Botón de restar -->
+            <button class="cursor-pointer hover:bg-gray-100 p-2 transition w-10 
+                    border-r border-gray-300" (click)="decrementar()" aria-label="Disminuir">
+                <app-ui-icono name="minus"></app-ui-icono>
+            </button>
+
+            <!-- Valor del contador -->
+            <div class=" flex items-center justify-center text-center truncate p-2 w-10 h-full ">
+                <p class="text-sm md:text-base lg:text-lg font-semibold"> {{ contador }} </p>
+            </div>
+
+            <!-- Botón de sumar -->
+            <button class="cursor-pointer hover:bg-gray-100 p-2 transition w-10 h-full
+                    border-l border-gray-300" (click)="incrementar()" aria-label="Incrementar">
+                <app-ui-icono name="plus"></app-ui-icono>
+            </button>
+        </div>
     }
 }
