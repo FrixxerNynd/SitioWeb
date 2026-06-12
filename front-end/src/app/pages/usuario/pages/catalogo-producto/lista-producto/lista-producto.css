@@ -528,3 +528,361 @@
 .gap-3 {
   gap: 1rem;
 }
+
+
+
+/* ============================================
+   SKELETON LOADER PARA TARJETAS DE PRODUCTO
+   ============================================ */
+
+/* Clase principal para el skeleton */
+.producto-card.skeleton {
+  pointer-events: none;
+  cursor: wait;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de carga shimmer (más moderno que pulse) */
+.skeleton-shimmer {
+  background: linear-gradient(
+    110deg,
+    #ececec 8%,
+    #f5f5f5 18%,
+    #ececec 33%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Aplicar shimmer a los elementos del skeleton */
+.producto-card.skeleton .skeleton-imagen,
+.producto-card.skeleton .skeleton-title,
+.producto-card.skeleton .skeleton-text-sm,
+.producto-card.skeleton .skeleton-price,
+.producto-card.skeleton .skeleton-button {
+  background: linear-gradient(
+    110deg,
+    #ececec 8%,
+    #f5f5f5 18%,
+    #ececec 33%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* Skeleton para la imagen */
+.skeleton-imagen {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+/* Asegurar que el contenedor de imagen en skeleton tenga fondo consistente */
+.producto-card.skeleton .imagen-container {
+  background: #f8f9fa;
+}
+
+/* Skeleton para el título */
+.skeleton-title {
+  height: 20px;
+  width: 85%;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+/* Skeleton para texto (marca/categoría/stock) */
+.skeleton-text-sm {
+  height: 13px;
+  width: 70%;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+/* Skeletons para precios */
+.skeleton-price {
+  width: 70px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.skeleton-price-original {
+  width: 80px;
+}
+
+/* Skeleton para botones */
+.skeleton-button {
+  flex: 1;
+  height: 42px;
+  border-radius: 6px;
+}
+
+/* Ajuste para el contenedor de precios en skeleton */
+.precios.skeleton {
+  background: transparent;
+  animation: none;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* Ajuste para acciones en skeleton */
+.acciones.skeleton {
+  background: transparent;
+  animation: none;
+  gap: 10px;
+}
+
+/* Opcional: overlay sutil sobre toda la tarjeta skeleton */
+.producto-card.skeleton::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+
+/* ============================================
+   SKELETON LOADER PARA FILTROS
+   ============================================ */
+
+/* Skeleton para filtros - mismo estilo shimmer */
+.skeleton-filtro-card {
+  margin-bottom: 1rem;
+  border-bottom: 0.0938rem solid #e0e0e0;
+  overflow: hidden;
+}
+
+.skeleton-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0px 8px 0px;
+  margin-bottom: 12px;
+}
+
+.skeleton-header-title {
+  height: 18px;
+  border-radius: 4px;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+.skeleton-header-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+.skeleton-body {
+  padding: 4px 0 12px 0;
+}
+
+.skeleton-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.skeleton-checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+  flex-shrink: 0;
+}
+
+.skeleton-label {
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* Variaciones de ancho para labels */
+.skeleton-label-sm {
+  width: 60%;
+}
+
+.skeleton-label-md {
+  width: 75%;
+}
+
+.skeleton-label-lg {
+  width: 85%;
+}
+
+/* Skeleton para el rango de precios */
+.skeleton-price-inputs {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0 25px;
+}
+
+.skeleton-price-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-price-field span {
+  height: 12px;
+  width: 40px;
+  border-radius: 4px;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+.skeleton-price-input {
+  height: 38px;
+  width: 100%;
+  border-radius: 5px;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+.skeleton-slider {
+  position: relative;
+  height: 5px;
+  margin: 20px 0;
+  background: #e5e7eb;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.skeleton-slider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+  border-radius: 5px;
+}
+
+.skeleton-slider-thumbs {
+  position: relative;
+  height: 5px;
+  margin-top: -5px;
+}
+
+.skeleton-slider-thumb {
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #d1d5db;
+  top: -6px;
+}
+
+.skeleton-slider-thumb-left {
+  left: 25%;
+}
+
+.skeleton-slider-thumb-right {
+  right: 25%;
+}
+
+/* Skeleton para botones de filtro */
+.skeleton-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.skeleton-button-filtro {
+  flex: 1;
+  height: 42px;
+  border-radius: 8px;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+.skeleton-filtro-wrapper {
+  pointer-events: none;
+  cursor: wait;
+}
+
+
+/* ============================================
+   SKELETON BARRA DE TEXTO SUPERIOR
+   ============================================ */
+
+/* Barra superior con texto */
+.skeleton-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.skeleton-header-text {
+  width: 250px;
+  height: 20px;
+  border-radius: 4px;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* Filtros activos simulados */
+.skeleton-filtros-activos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.skeleton-filtro-chip {
+  width: 100px;
+  height: 32px;
+  border-radius: 20px;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+.skeleton-filtro-chip-sm {
+  width: 140px;
+}
+
+/* Versión simplificada (solo una barra) */
+.skeleton-simple-bar {
+  width: 100%;
+  height: 24px;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
