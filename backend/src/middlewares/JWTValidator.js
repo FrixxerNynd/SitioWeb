@@ -85,10 +85,8 @@ function setAuthCookies(res, accessToken, refreshToken) {
 export const validateToken = async (req, res, next) => {
     const token = req.cookies?.AuthToken;
     
-    
     console.log("TOKEN RECIBIDO:", token ? token.substring(0, 20) + "..." : "NINGUNO");
     console.log("JWT_SECRET:", JWT_SECRET ? JWT_SECRET.substring(0, 5) + "..." : "UNDEFINED");
-
 
     if (!token) {
         return res.status(401).json({ message: "No autorizado" });
@@ -98,7 +96,6 @@ export const validateToken = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, JWT_SECRET, {
             algorithms: ["HS256"],
-           
         });
         req.user = decoded;
         console.log("USUARIO DECODIFICADO: ", req.user)

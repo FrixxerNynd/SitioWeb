@@ -38,18 +38,18 @@ const CABS_SUCURSAL_ADDRESS = {
 class CartService {
 
   // ─── READ - Obtener el carrito completo del usuario ───
-  async getCart(userId,userName) {
+  async getCart(userId, userName) {
     let cart = await prisma.cart.findUnique({
-      where: { 
-        userId: parseInt(userId.id), // Soporta ambos formatos: { id: 1 } o { nameid: "1" }
-       },
+      where: {
+        userId: parseInt(userId), // Soporta ambos formatos: { id: 1 } o { nameid: "1" }
+      },
       include: { items: true },
     });
 
     // Inicializar carrito en DB si el usuario entra por primera vez
     if (!cart) {
       cart = await prisma.cart.create({
-        data: { userId: parseInt(userId.id), paymentType: "Transferencia", subtotal: 0, total: 0 },
+        data: { userId: parseInt(userId), paymentType: "Transferencia", subtotal: 0, total: 0 },
         include: { items: true },
       });
     }

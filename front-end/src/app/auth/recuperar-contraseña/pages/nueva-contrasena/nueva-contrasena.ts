@@ -61,6 +61,9 @@ export class PageNuevaContrasena implements OnInit, OnDestroy {
     
     if (!this.email || !this.token) {
       console.error('❌ Faltan datos: email o token no encontrados');
+      console.log('Email:', this.email);
+      console.log('Token:', this.token);
+      
       this.showTooltipMessage('Error: Datos de recuperación no encontrados', 'error');
       setTimeout(() => {
         this.router.navigate(['/recuperar-contrasena/solicitar-correo']);
