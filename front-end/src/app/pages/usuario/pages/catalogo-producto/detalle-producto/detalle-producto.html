@@ -1,130 +1,249 @@
-<div class="container my-5">
-    <div class="product-card">
-        <div class="row g-0">
-            <!-- Contenedor izquierdo - Imágenes -->
-            <div class="col-lg-6 p-4">
-                <div class="product-image-main">
-                    <img [src]="selectedImage" [alt]="product.name" class="img-fluid">
+<div class="container mx-auto px-4 py-5 md:py-8">
+    <div class="bg-white rounded-lg overflow-hidden border">
+        <!-- SKELETON LOADER -->
+        @if (isLoading()) {
+        <div class="flex flex-col lg:flex-row">
+            <!-- Skeleton Imagen izquierda -->
+            <div class="lg:w-1/2 p-4 md:p-6">
+                <div class="text-center min-h-[320px] md:min-h-[340px] flex items-center justify-center mb-4">
+                    <div class="w-full h-[280px] md:h-[320px] skeleton rounded-lg"></div>
                 </div>
-                <div class="thumbnail-list mt-3">
-                    
-                    <button *ngFor="let img of product.images; let i = index" 
-                            class="thumbnail-btn" 
-                            [class.active]="selectedImage === img"
-                            (click)="selectImage(img)">
-                        <img [src]="img" [alt]="'Imagen ' + (i+1)">
+                <div class="flex flex-wrap gap-3 w-full">
+                    @for (item of [1,2,3,4]; track item) {
+                    <div class="w-[calc(25%-0.75rem)] sm:w-[calc(20%-0.75rem)] md:w-[calc(16.666%-0.75rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.75rem)] aspect-square rounded-2xl skeleton"></div>
+                    }
+                </div>
+            </div>
+
+            <!-- Skeleton Información derecha -->
+            <div class="lg:w-1/2 p-4 md:p-6 flex flex-col gap-4">
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center">
+                        <div class="skeleton skeleton-text w-32"></div>
+                        <div class="skeleton skeleton-badge"></div>
+                    </div>
+                    <div class="skeleton skeleton-text-lg"></div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <div class="skeleton skeleton-text w-full"></div>
+                    <div class="skeleton skeleton-text w-3/4"></div>
+                    <div class="skeleton skeleton-text-sm"></div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="skeleton skeleton-price"></div>
+                    <div class="skeleton skeleton-price"></div>
+                </div>
+
+                <div class="flex flex-col gap-3 w-full">
+                    <div class="grid grid-cols-3 w-full gap-10">
+                        <div class="skeleton skeleton-button w-full"></div>
+                    </div>
+                    <div class="w-full">
+                        <div class="grid grid-cols-2 gap-3 w-full">
+                            <div class="skeleton skeleton-button"></div>
+                            <div class="skeleton skeleton-button"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <!-- Encabezado -->
+                    <div class="flex gap-2 mb-3 justify-between">
+                        <div class="skeleton skeleton-tab"></div>
+                        <div class="skeleton skeleton-tab"></div>
+                    </div>
+                    <!-- Contenido -->
+                    <div>
+                        <div class="skeleton-table-row">
+                            <div class="skeleton skeleton-table-cell"></div>
+                            <div class="skeleton skeleton-table-cell"></div>
+                        </div>
+                        <div class="skeleton-table-row">
+                            <div class="skeleton skeleton-table-cell"></div>
+                            <div class="skeleton skeleton-table-cell"></div>
+                        </div>
+                        <div class="skeleton-table-row">
+                            <div class="skeleton skeleton-table-cell"></div>
+                            <div class="skeleton skeleton-table-cell"></div>
+                        </div>
+                        <div class="skeleton-table-row">
+                            <div class="skeleton skeleton-table-cell"></div>
+                            <div class="skeleton skeleton-table-cell"></div>
+                        </div>
+                        <div class="skeleton-table-row">
+                            <div class="skeleton skeleton-table-cell"></div>
+                            <div class="skeleton skeleton-table-cell"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        } @else {
+        <!-- CONTENIDO REAL -->
+        <div class="flex flex-col lg:flex-row">
+            <!-- Contenedor izquierdo - Imágenes -->
+            <div class="lg:w-1/2 p-4 md:p-6">
+                <!-- Imagen principal -->
+                <div class="text-center min-h-[320px] md:min-h-[340px] flex items-center justify-center mb-4">
+                    <img [src]="selectedImage" [alt]="product.name"
+                        class="max-w-full max-h-[280px] md:max-h-[320px] object-contain transition-transform duration-300 hover:scale-105">
+                </div>
+
+                <!-- Miniaturas con flex-wrap y ancho responsivo -->
+                <div class="flex flex-wrap gap-3 w-full">
+                    <button *ngFor="let img of product.images; let i = index"
+                        class="w-[calc(25%-0.75rem)] sm:w-[calc(20%-0.75rem)] md:w-[calc(16.666%-0.75rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.75rem)] aspect-square rounded-2xl border-2 p-2 transition-all duration-200 cursor-pointer bg-white hover:border-[#1e3a5f] hover:shadow-lg hover:-translate-y-0.5"
+                        [class.border-[#1e3a5f]]="selectedImage === img" [class.border-gray-200]="selectedImage !== img"
+                        (click)="selectImage(img)">
+                        <img [src]="img" [alt]="'Imagen ' + (i+1)" class="w-full h-full object-contain">
                     </button>
                 </div>
             </div>
 
             <!-- Contenedor derecho - Información del producto -->
-            <div class="col-lg-6 p-4">
-                <div class="mb-2">
-                    <span class="badge bg-light text-dark">{{ product.category }}</span>
+            <div class="lg:w-1/2 p-4 md:p-6 flex flex-col gap-4">
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 font-semibold rounded text-base">{{ product.category }}</span>
+                        <span
+                            class="flex border justify-center items-center gap-2 bg-green-50 text-green-700 font-semibold px-3 py-1 rounded-full text-xs"
+                            [class.bg-red-50]="product.stock === 0" [class.text-red-700]="product.stock === 0">
+                            <i class="bi" [class.bi-check-circle-fill]="product.stock > 0"
+                                [class.bi-exclamation-circle-fill]="product.stock === 0"></i>
+                            En stock:
+                            <span class="font-semibold">{{ product.stock }}</span>
+                        </span>
+                    </div>
+                    <h3 class="font-bold text-xl md:text-2xl text-gray-900 tracking-tighter">{{ product.name }}</h3>
                 </div>
 
-                <!-- Título + etiqueta stock -->
-                <div class="title-etiqueta">
-                    <h3 class="fw-bold mb-0">{{ product.name }}</h3>
-                    <p class="text-muted">{{ product.description }}</p>
+                <div class="flex flex-col gap-2">
+                    <p class="text-gray-600 text-sm font-medium">{{ product.description }}</p>
+                    <span class="text-sm text-gray-500 font-semibold"> + IVA incluido</span>
                 </div>
-                    <span class="badge-stock" [class.text-danger]="product.stock === 0">
-                        <i class="bi" [class.bi-check-circle-fill]="product.stock > 0" 
-                            [class.bi-exclamation-circle-fill]="product.stock === 0"></i>
-                        En stock:
-                            <span style="font-weight: 600;">{{ product.stock }}</span> 
-                    </span>                
+
                 <!-- Precios -->
-                <div class="mb-2">
-                    <span class="price-sale">
-                        4,000  MXN
-                    </span>                    
-                    <span class="price-original">
-                        3,000 MXN
+                <div class="flex gap-4">
+                    <span class="text-[#1e3a5f] font-semibold text-2xl md:text-3xl">
+                        ${{ product.price }} MXN
+                    </span>
+                    <span class="text-zinc-400 font-semibold line-through text-2xl md:text-3xl">
+                        ${{ product.originalPrice }} MXN
                     </span>
                 </div>
 
-                <span class="iva-text mb-2">IVA incluido</span>
-
-
                 <!-- Contenedor de botones -->
-                <div class="contedor-botonnes d-flex gap-3 mb-4">
-                    <button class="btn btn-outline-secondary" 
-                            (click)="decrementQuantity()"
-                            [disabled]="quantity === 1">
-                        <i class="bi bi-dash">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px; height:20px">>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-                            </svg>                            
-                        </i>
-                    </button>
-                    <span class="fw-bold mx-2" style="line-height: 38px;">{{ quantity }}</span>
-                    <button class="btn btn-outline-secondary" 
-                            (click)="incrementQuantity()"
-                            [disabled]="quantity >= product.stock && product.stock > 0">
-                        <i class="bi bi-plus">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px; height:20px">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                            </svg>
-                        </i>
-                    </button>
-                    
-                    <button class="btn btn-primary flex-grow-1" 
-                            (click)="addToCart()"
-                            [disabled]="product.stock === 0">
-                        <i class="bi bi-cart-plus me-2"></i>Agregar carrito
-                    </button>
-                    
-                    <button class="btn btn-secondary flex-grow-1" 
-                            (click)="buyNow()"
-                            [disabled]="product.stock === 0">
-                        <i class="bi bi-lightning-charge me-2"></i>Ordenar ahora
-                    </button>
+                <div class="flex flex-col gap-3 w-full">
+                    <div class="grid grid-cols-3 w-full gap-10">
+                        <ui-boton tipo="contador" text="Ordenar ahora" size="lg" [disabled]="false"></ui-boton>
+                    </div>
+                    <div class="w-full">
+                        <div class="grid grid-cols-2 gap-3 w-full">
+                            <ui-boton text="Agregar al carrito" size="lg" widthType="full" [disabled]="false"
+                                (btnClick)="addToCart()"></ui-boton>
+                            <ui-boton tipo="secundario" text="Ordenar ahora" size="lg" widthType="full"
+                                [disabled]="false" (btnClick)="buyNow()"></ui-boton>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Características, medidas y dimensiones -->
                 <div class="mt-4">
-                    <div class="d-flex gap-2 mb-3 border-bottom">
-                        <button class="tab-button" 
-                                [class.active]="activeTab === 'features'"
-                                (click)="activeTab = 'features'">
+                    <div class="flex gap-2 mb-3 justify-between">
+                        <button [ngClass]="{
+                            'text-[#1e3a5f] border-b-[#1e3a5f]': activeTab === 'caracteristicas',
+                            'text-gray-500 border-b-transparent': activeTab !== 'caracteristicas'
+                        }" class="w-full flex items-center justify-center rounded-md py-2 px-4 md:px-5 font-semibold border-b-2 transition-all duration-200 hover:text-[#1e3a5f]"
+                            (click)="activeTab = 'caracteristicas'">
                             Características
                         </button>
-                        <button class="tab-button" 
-                                [class.active]="activeTab === 'specs'"
-                                (click)="activeTab = 'specs'">
+                        <button [ngClass]="{
+                            'text-[#1e3a5f] border-b-[#1e3a5f]': activeTab === 'medidasDimensiones',
+                            'text-gray-500 border-b-transparent': activeTab !== 'medidasDimensiones'
+                        }" class="w-full flex items-center gap-2 rounded-md py-2 px-4 md:px-5 font-semibold border-b-2 transition-all duration-200 hover:text-[#1e3a5f]"
+                            (click)="activeTab = 'medidasDimensiones'">
                             Medidas y dimensiones
                         </button>
                     </div>
 
-                    <div class="tab-content p-2">
-                        <!-- Características -->
-                        @if(activeTab === 'features'){
-                            <div>
-                                <ul class="list-unstyled">
-                                    <li *ngFor="let feature of product.features" class="mb-2">
-                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                        {{ feature }}
-                                    </li>
-                                </ul>
+                    @if (activeTab == 'caracteristicas') {
+                    <div>
+                        <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                            <div class="p-2"><span>ATRIBUTO</span></div>
+                            <div class="p-2"><span>VALOR</span></div>
+                        </div>
+                        <div>
+                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
+                                <div class="p-2"><span>SKU</span></div>
+                                <div class="p-2"><span>{{ product.sku || 'N/A' }}</span></div>
                             </div>
-                        }
-
-
-                        <!-- Medidas y dimensiones -->
-                        @if(activeTab === 'specs'){
-                            <div>
-                                <table class="table table-borderless">
-                                    <tr *ngFor="let spec of product.specifications | keyvalue">
-                                        <td class="fw-semibold" style="width: 40%;">{{ spec.key }}:</td>
-                                        <td>{{ spec.value }}</td>
-                                    </tr>
-                                </table>
+                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                                <div class="p-2"><span>Código SAT</span></div>
+                                <div class="p-2"><span>{{ product.satCode || 'N/A' }}</span></div>
                             </div>
-                        }
+                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
+                                <div class="p-2"><span>Código de barras</span></div>
+                                <div class="p-2"><span>{{ product.barcode || 'N/A' }}</span></div>
+                            </div>
+                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                                <div class="p-2"><span>Referencia</span></div>
+                                <div class="p-2"><span>{{ product.reference || 'N/A' }}</span></div>
+                            </div>
+                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
+                                <div class="p-2"><span>Marca</span></div>
+                                <div class="p-2"><span>{{ product.brand || 'N/A' }}</span></div>
+                            </div>
+                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                                <div class="p-2"><span>Subcategoría</span></div>
+                                <div class="p-2"><span>{{ product.subcategory || 'N/A' }}</span></div>
+                            </div>
+                        </div>
                     </div>
+                    }
+
+                    @if (activeTab == 'medidasDimensiones') {
+                    <div>
+                        <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                            <div class="p-2"><span>ATRIBUTO</span></div>
+                            <div class="p-2"><span>VALOR</span></div>
+                        </div>
+                        <div>
+                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
+                                <div class="p-2"><span>Altura</span></div>
+                                <div class="p-2"><span>{{ product.height || 'N/A' }}</span></div>
+                            </div>
+                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                                <div class="p-2"><span>Ancho</span></div>
+                                <div class="p-2"><span>{{ product.width || 'N/A' }}</span></div>
+                            </div>
+                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
+                                <div class="p-2"><span>Largo / Profundidad</span></div>
+                                <div class="p-2"><span>{{ product.depth || 'N/A' }}</span></div>
+                            </div>
+                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                                <div class="p-2"><span>Peso</span></div>
+                                <div class="p-2"><span>{{ product.weight || 'N/A' }}</span></div>
+                            </div>
+                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
+                                <div class="p-2"><span>Unidad de peso</span></div>
+                                <div class="p-2"><span>{{ product.weightUnit || 'N/A' }}</span></div>
+                            </div>
+                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                                <div class="p-2"><span>Volumen</span></div>
+                                <div class="p-2"><span>{{ product.volume || 'N/A' }}</span></div>
+                            </div>
+                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
+                                <div class="p-2"><span>Unidad de volumen</span></div>
+                                <div class="p-2"><span>{{ product.volumeUnit || 'N/A' }}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    }
                 </div>
             </div>
         </div>
+        }
     </div>
 </div>

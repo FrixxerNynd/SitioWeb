@@ -1,14 +1,20 @@
-import { Component, signal} from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { UiBoton } from '../../../../../components/shared/boton/boton';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
+  imports: [UiBoton, CommonModule],
   templateUrl: './detalle-producto.html',
   styleUrl: './detalle-producto.css',
 })
-export class  PageDetalleProducto {
+export class PageDetalleProducto {
   selectedImage: string = '';
   quantity: number = 1;
-  activeTab: 'features' | 'specs' = 'features';
+  activeTab: 'caracteristicas' | 'medidasDimensiones' = 'caracteristicas';
+  
+  // Signal para controlar el estado de carga
+  isLoading = signal<boolean>(true);
 
   product = {
     name: 'Terminal Integrada en Caja A35 Soft Restaurant® Payments',
@@ -17,48 +23,38 @@ export class  PageDetalleProducto {
     price: 3480,
     originalPrice: 3990,
     stock: 15,
+    sku: 'TER-A35-001',
+    satCode: '43211501',
+    barcode: '750123456789',
+    reference: 'REF-A35-2024',
+    brand: 'Soft Restaurant',
+    subcategory: 'Terminales de Pago',
+    height: '18.5 cm',
+    width: '12.3 cm',
+    depth: '5.2 cm',
+    weight: '450 g',
+    weightUnit: 'gramos',
+    volume: '1.2 L',
+    volumeUnit: 'litros',
     images: [
       'https://placehold.co/600x400/1e3a5f/white?text=Terminal+A35',
       'https://placehold.co/600x400/2c7da0/white?text=Vista+Posterior',
       'https://placehold.co/600x400/61a5c2/white?text=Vista+Lateral',
       'https://placehold.co/600x400/89c2d9/white?text=Interfaz'
-    ],
-    features: [
-      'Pantalla táctil de 7 pulgadas HD',
-      'Procesador Quad-core 1.8 GHz',
-      'Conectividad WiFi y Bluetooth 5.0',
-      'Soporta pagos contactless',
-      'Batería de respaldo de 4 horas',
-      'Compatible con todos los bancos principales'
-    ],
-    specifications: {
-      'Dimensiones': '18.5 x 12.3 x 5.2 cm',
-      'Peso': '450 gramos',
-      'Material': 'Policarbonato reforzado',
-      'Puertos': 'USB-C, RJ45, USB 3.0',
-      'Temperatura operativa': '-10°C a 45°C',
-      'Garantía': '18 meses'
-    }
+    ]
   };
 
   constructor() {
     this.selectedImage = this.product.images[0];
+    
+    // Simular carga de datos (elimina esto cuando tengas datos reales)
+    setTimeout(() => {
+      this.isLoading.set(false);
+    }, 20000);
   }
 
   selectImage(image: string): void {
     this.selectedImage = image;
-  }
-
-  incrementQuantity(): void {
-    if (this.quantity < this.product.stock) {
-      this.quantity++;
-    }
-  }
-
-  decrementQuantity(): void {
-    if (this.quantity > 1) {
-      this.quantity--;
-    }
   }
 
   addToCart(): void {
@@ -76,7 +72,5 @@ export class  PageDetalleProducto {
       quantity: this.quantity
     });
     alert(`🛒 Procediendo con la compra de ${this.quantity} unidad(es)`);
-  }  
+  }
 }
-
-
