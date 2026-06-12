@@ -35,7 +35,7 @@
     @case('icono') {
     <button class="inline-flex items-center justify-center rounded-full transition 
                 bg-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110 
-                disabled:opacity-60 disabled:cursor-not-allowed
+                disabled:opacity-60 
                 p-2 md:p-3 lg:p-4" [style.width]="widthType === 'full' ? '100%' : 'auto'" [type]="type"
         [disabled]="disabled" (click)="onClick($event)" [attr.aria-label]="text">
         <app-ui-icono [name]="nomeIco"></app-ui-icono>
@@ -62,5 +62,20 @@
                 <app-ui-icono name="plus"></app-ui-icono>
             </button>
         </div>
+    }
+    @case('btn-tabla-pie'){
+        <button class="inline-flex items-center justify-center transition-all duration-200 bg-white border border-gray-300 
+                        text-gray-600 hover:text-white hover:bg-[#1e3a5f] hover:border-[#1e3a5f]
+                        active:bg-[#0f2a4a] active:scale-95
+                        disabled:opacity-60 
+                        p-1 md:p-2 lg:p-3 rounded-2" 
+                [style.width]="widthType === 'full' ? '100%' : 'auto'" 
+                [type]="type"
+                [disabled]="disabled" 
+                (click)="onClick($event)" 
+                [attr.aria-label]="text">
+                <app-ui-icono [name]="nomeIco" size="w-4 h-4"></app-ui-icono>
+                <ng-content></ng-content>
+        </button>
     }
 }

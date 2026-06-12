@@ -11,7 +11,7 @@ import { UiIconComponent } from '../icono/icono.component';
 export class UiBoton implements OnInit {
 
   @Input() type: 'submit' | 'reset' | 'button' = 'button';
-  @Input() tipo: 'primario' | 'secundario' | 'cerrar' | 'icono' | 'contador' = 'primario';
+  @Input() tipo: 'primario' | 'secundario' | 'cerrar' | 'icono' | 'contador' | 'btn-tabla-pie' = 'primario';
   @Input() text: string = 'texto boton';
   @Input() viewIcon: boolean = false;
   @Input() size: 'xs' | 'md' | 'lg' = 'xs';
