@@ -1,5 +1,5 @@
 import { createClient } from 'redis';
-import logger from '../utils/logger.js';
+import logger from '../utils/Helpers/logger.js';
 
 class RedisClient {
     constructor() {
@@ -43,14 +43,14 @@ class RedisClient {
 
     async getOrSet(cacheKey, fetchCallback, ttlSeconds = 300) {
         const client = this.getClient();
-        
+
         if (!client) {
             return await fetchCallback();
         }
 
         try {
             const cachedData = await client.get(cacheKey);
-            
+
             if (cachedData) {
                 logger.info(`📦 Cache HIT: ${cacheKey}`);
                 return JSON.parse(cachedData);
@@ -58,12 +58,12 @@ class RedisClient {
 
             logger.info(`🔍 Cache MISS: ${cacheKey}`);
             const freshData = await fetchCallback();
-            
+
             if (freshData) {
                 await client.setEx(cacheKey, ttlSeconds, JSON.stringify(freshData));
                 logger.info(`💾 Guardado en caché: ${cacheKey}`);
             }
-            
+
             return freshData;
         } catch (error) {
             logger.error(`Error en caché: ${error.message}`);

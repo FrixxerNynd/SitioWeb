@@ -10,8 +10,10 @@ class ProductosResponseDto {
    * @param {string} [data.sku]
    * @param {string} [data.codigoSAT]
    * @param {string} [data.codigoBarras]
-   * @param {string} [data.marca]
-   * @param {string} [data.subcategoria]
+   * @param {number} [data.marca]
+   * @param {number} [data.subcategoria]
+   * @param {number} [data.referencia]
+   * @param {number} [data.categoria]
    * @param {Date|string} [data.fechaCreacion]
    */
   constructor(data = {}) {
@@ -24,8 +26,10 @@ class ProductosResponseDto {
     this.sku = data.sku ?? '';
     this.codigoSAT = data.codigoSAT ?? '';
     this.codigoBarras = data.codigoBarras ?? '';
-    this.marca = data.marca ?? '';
-    this.subcategoria = data.subcategoria ?? '';
+    this.marca = data.marca ?? 0;
+    this.subcategoria = data.subcategoria ?? 0;
+    this.referencia = data.referencia ?? 0;
+    this.categoria = data.categoria ?? 0;
     this.fechaCreacion = data.fechaCreacion ? new Date(data.fechaCreacion) : new Date();
   }
 }

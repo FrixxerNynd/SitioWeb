@@ -1,34 +1,34 @@
 import prisma from "../config/db.js";
 import ExelService from "./exelService.js";
-import logger from "../utils/logger.js";
-import PedidoCreateDto from "../utils/DTO's/Request/PedidoCreateDto.js";
-import PedidoResponseDto from "../utils/DTO's/Response/PedidoResponseDto.js";
+import logger from "../utils/Helpers/logger.js";
+import PedidoCreateDto from "../utils/DTO's/Request/Pedidos/PedidoCreateDto.js";
+import PedidoResponseDto from "../utils/DTO's/Response/Pedidos/PedidoResponseDto.js";
 
 // ── Adaptador: traduce el objeto de Prisma al formato que espera PedidoResponseDto
 const toResponseDto = (data) => new PedidoResponseDto({
-  id:            data.id,
-  estado:        data.status         ?? data.estado       ?? '',
-  fechaPedido:   data.createdAt      ?? data.fechaPedido  ?? new Date(),
+  id: data.id,
+  estado: data.status ?? data.estado ?? '',
+  fechaPedido: data.createdAt ?? data.fechaPedido ?? new Date(),
   clienteNombre: data.name ?? '',
   transportista: data.deliveryMethod ?? '',
   numeroFactura: data.id?.toString() ?? '',
-  productos:     (data.items ?? []).map(i => `${i.name} x${i.quantity}`),
-  subtotal:      data.subtotal       ?? 0,
-  flete:         data.shippingCost   ?? 0,
-  iva:           0,
-  total:         data.total          ?? 0,
+  productos: (data.items ?? []).map(i => `${i.name} x${i.quantity}`),
+  subtotal: data.subtotal ?? 0,
+  flete: data.shippingCost ?? 0,
+  iva: 0,
+  total: data.total ?? 0,
 });
 
 // Dirección estática de la sucursal central obtenida de los requerimientos de diseño (Pág. 3)
 const CABS_SUCURSAL_ADDRESS = {
-  street:       "Beatriz Prada",
-  extNum:       "450",
-  intNum:       "N/A",
+  street: "Beatriz Prada",
+  extNum: "450",
+  intNum: "N/A",
   neighborhood: "Col. Jardines de Durango",
-  city:         "Victoria de Durango",
-  state:        "Durango",
-  cp:           "34020",
-  country:      "México",
+  city: "Victoria de Durango",
+  state: "Durango",
+  cp: "34020",
+  country: "México",
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -61,18 +61,18 @@ class CartService {
 
   // ─── READ - Obtener un ítem específico del carrito por productId ───
   async getCartItem(userId, productId) {
-  const cart = await prisma.cart.findUnique({
-    where: { userId: parseInt(userId) }, // ← userId ya es número, no objeto
-    include: { items: true },
-  });
+    const cart = await prisma.cart.findUnique({
+      where: { userId: parseInt(userId) }, // ← userId ya es número, no objeto
+      include: { items: true },
+    });
 
-  if (!cart) throw new Error("El carrito del usuario no existe.");
+    if (!cart) throw new Error("El carrito del usuario no existe.");
 
-  const item = cart.items.find((i) => i.productId === productId);
-  if (!item) throw new Error("El producto no se encuentra en el carrito.");
+    const item = cart.items.find((i) => i.productId === productId);
+    if (!item) throw new Error("El producto no se encuentra en el carrito.");
 
-  return item;
-}
+    return item;
+  }
 
   // ─── CREATE - Agregar un producto nuevo al carrito ───
   async addItem(userId, productId, quantity) {
@@ -114,11 +114,11 @@ class CartService {
 
     await prisma.cartItem.create({
       data: {
-        cartId:     cart.id,
+        cartId: cart.id,
         productId,
-        sku:        externalProduct.sku,
-        name:       externalProduct.nombre,
-        price:      parseFloat(externalProduct.precio),
+        sku: externalProduct.sku,
+        name: externalProduct.nombre,
+        price: parseFloat(externalProduct.precio),
         quantity,
         totalPrice: parseFloat(externalProduct.precio) * quantity,
       },
@@ -215,11 +215,11 @@ class CartService {
     if (!cart) throw new Error("El carrito del usuario no existe.");
 
     let shippingAddress = null;
-    let shippingCost    = 0.0;
+    let shippingCost = 0.0;
 
     if (method === "Sucursal") {
       shippingAddress = CABS_SUCURSAL_ADDRESS;
-      shippingCost    = 0.0; // Recoger en sucursal es gratis
+      shippingCost = 0.0; // Recoger en sucursal es gratis
 
     } else if (method === "Domicilio") {
       if (!addressId)
@@ -267,33 +267,33 @@ class CartService {
       throw new Error("No ha seleccionado el método de entrega.");
 
     const pedidoDto = new PedidoCreateDto({
-      usuarioId:   userId,
+      usuarioId: userId,
       productoIds: cart.items.map((i) => i.productId),
-      subtotal:    cart.subtotal,
-      flete:       cart.shippingCost,
-      iva:         0,
-      total:       cart.total,
+      subtotal: cart.subtotal,
+      flete: cart.shippingCost,
+      iva: 0,
+      total: cart.total,
     });
 
     return await prisma.$transaction(async (tx) => {
       // 1. Crear la Orden de Venta Final
       const order = await tx.order.create({
         data: {
-          userId:          pedidoDto.usuarioId,
-          paymentType:     cart.paymentType,
-          deliveryMethod:  cart.deliveryMethod,
-          shippingCost:    pedidoDto.flete,
-          subtotal:        pedidoDto.subtotal,
-          total:           pedidoDto.total,
+          userId: pedidoDto.usuarioId,
+          paymentType: cart.paymentType,
+          deliveryMethod: cart.deliveryMethod,
+          shippingCost: pedidoDto.flete,
+          subtotal: pedidoDto.subtotal,
+          total: pedidoDto.total,
           shippingAddress: cart.frozenAddress,
-          status:          "PAGADO_PENDIENTE_SURTIDO",
+          status: "PAGADO_PENDIENTE_SURTIDO",
           items: {
             create: cart.items.map((item) => ({
-              productId:  item.productId,
-              sku:        item.sku,
-              name:       item.name,
-              price:      item.price,
-              quantity:   item.quantity,
+              productId: item.productId,
+              sku: item.sku,
+              name: item.name,
+              price: item.price,
+              quantity: item.quantity,
               totalPrice: item.totalPrice,
             })),
           },
@@ -308,11 +308,11 @@ class CartService {
       await tx.cart.update({
         where: { id: cart.id },
         data: {
-          subtotal:       0,
-          total:          0,
+          subtotal: 0,
+          total: 0,
           deliveryMethod: null,
-          frozenAddress:  null,
-          shippingCost:   0,
+          frozenAddress: null,
+          shippingCost: 0,
         },
       });
 

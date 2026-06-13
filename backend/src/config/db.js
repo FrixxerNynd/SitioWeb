@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaMssql } from '@prisma/adapter-mssql'
-import logger from '../utils/logger.js'
+import logger from '../utils/Helpers/logger.js'
 import dotenv from 'dotenv';
 
 dotenv.config();
