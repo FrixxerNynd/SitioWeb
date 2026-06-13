@@ -9,6 +9,7 @@ import swaggerSpec from './src/config/swagger.js';
 import logger from './src/utils/Helpers/logger.js';
 import cartRouter from './src/routes/cart.routes.js';
 import exelRouter from './src/routes/exel.routes.js';
+import orderRouter from './src/routes/order.routes.js';
 import redisClient from './src/config/redis.js';
 dotenv.config();
 
@@ -59,6 +60,7 @@ app.get('/health', (req, res) => {
 // ─────────────────────────────────────────────
 app.use('/api/cart', cartRouter);
 app.use('/api/productos', exelRouter);
+app.use('/api/orders', orderRouter);
 
 // ─────────────────────────────────────────────
 // 5. Documentación Swagger

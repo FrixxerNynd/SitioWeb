@@ -11,6 +11,16 @@ namespace back_cabs.CRM.Interfaces.Legacy
     public interface IAdmClienteService
     {
         /// <summary>
+        /// Verificar existencia de un cliente por ID
+        /// </summary>
+        Task<bool> ExistsAsync(int idCliente);
+
+        /// <summary>
+        /// Verificar estatus activo del cliente
+        /// </summary>
+        Task<bool> IsActiveAsync(int? idCliente);
+
+        /// <summary>
         /// Búsqueda paginada de clientes con domicilio
         /// </summary>
         Task<(List<AdmClienteConDomicilioResponseDto> Clientes, int TotalRegistros, int TotalPaginas)> SearchPaginatedAsync(AdmClienteFilterDto filter);

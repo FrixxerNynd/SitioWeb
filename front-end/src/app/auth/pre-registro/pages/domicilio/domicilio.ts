@@ -1,10 +1,10 @@
-// front-end/src/app/auth/pre-registro/pages/domicilio/domicilio.ts
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { UiBoton } from '../../../../components/shared/boton/boton';
 import { MexicoApiService, IMexicoState, IMexicoCity, IMexicoSettlement } from '../../../../services/mexico-api.service';
+import { PreRegistroService } from '../../pre-registro.service';
 
 @Component({
   standalone: true,
@@ -15,6 +15,7 @@ export class PageDomicilio implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private mexicoApi = inject(MexicoApiService);
+  private preRegistroService = inject(PreRegistroService);
 
   states = signal<IMexicoState[]>([]);
   cities = signal<IMexicoCity[]>([]);
@@ -57,6 +58,31 @@ export class PageDomicilio implements OnInit {
         await this.loadDataByZipCode(zipCode);
       }
     });
+
+    // Restaurar estado si ya existe en localStorage
+    const estado = this.preRegistroService.obtenerEstado();
+    if (estado.direccion) {
+      const dir = estado.direccion;
+      
+      // Cargar ciudades del estado y colonias del CP manualmente
+      if (dir.estado) {
+        await this.loadCitiesByState(dir.estado);
+      }
+      if (dir.codigoPostal) {
+        await this.loadDataByZipCode(dir.codigoPostal);
+      }
+
+      this.domicilioForm.patchValue({
+        pais:           dir.pais || 'México',
+        estado:         dir.estado || '',
+        ciudad:         dir.ciudad || '',
+        codigoPostal:   dir.codigoPostal || '',
+        colonia:        dir.colonia || '',
+        calle:          dir.calle || '',
+        numExterior:    dir.numeroExterior || '',
+        numInterior:    dir.numeroInterior || '',
+      }, { emitEvent: false });
+    }
   }
 
   async loadStates() {
@@ -146,14 +172,23 @@ export class PageDomicilio implements OnInit {
       return;
     }
 
-    const addressData = {
-      ...this.domicilioForm.value,
-      fechaRegistro: new Date().toISOString()
-    };
-    
-    localStorage.setItem('preRegistroDomicilio', JSON.stringify(addressData));
-    console.log('✅ Domicilio guardado:', addressData);
-    
+    const v = this.domicilioForm.value;
+
+    // Guardar dirección en el estado del wizard
+    this.preRegistroService.guardarPaso({
+      direccion: {
+        calle:          v.calle,
+        numeroExterior: v.numExterior,
+        numeroInterior: v.numInterior ?? '',
+        colonia:        v.colonia,
+        codigoPostal:   v.codigoPostal,
+        ciudad:         v.ciudad,
+        estado:         v.estado,
+        pais:           v.pais,
+        telefono1:      '',
+      }
+    });
+
     this.router.navigate(['/pre-registro/cuenta']);
   }
 

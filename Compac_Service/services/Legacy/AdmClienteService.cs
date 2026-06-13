@@ -392,6 +392,12 @@ namespace back_cabs.CRM.services.Legacy
                 _logger.LogWarning("⚠️ Credenciales inválidas para email: {Email}", email);
                 return null;
             }
+            // Validar que el cliente esté activo (CEstatus = 1 activo, CEstatus = 0 inactivo/pendiente)
+            if (cliente.CEstatus != 1)
+            {
+                _logger.LogWarning("⚠️ Cliente {IdCliente} inactivo o pendiente de autorización", cliente.CIdClienteProveedor);
+                throw new UnauthorizedAccessException("Tu cuenta está inactiva. Contacta a tu administrador.");
+            }
 
             // ValidateClientCredentialsAsync retorna ServiceResult<Auth_cliente>, nunca null.
             // Se debe verificar ServiceResult.Success para saber si las credenciales son correctas.
@@ -681,6 +687,24 @@ namespace back_cabs.CRM.services.Legacy
             }
         }
 
-        
+        /// <summary>
+        /// Verificar existencia de un cliente por ID
+        /// </summary>
+        public async Task<bool> ExistsAsync(int idCliente)
+        {
+            return await _context.AdmClientes
+                .AsNoTracking()
+                .AnyAsync(c => c.CIdClienteProveedor == idCliente );
+        }
+
+        /// <summary>
+        /// Verificar estatus activo del cliente
+        /// </summary>
+        public async Task<bool> IsActiveAsync(int? idCliente)
+        {
+            return await _context.AdmClientes
+                .AsNoTracking()
+                .AnyAsync(c => c.CIdClienteProveedor == idCliente && c.CEstatus == 1);
+        }
     }
 }

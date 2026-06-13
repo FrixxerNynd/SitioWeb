@@ -52,6 +52,37 @@ class ExelService {
     }
   }
 
+  async getSaveExternalSizeProducts(queryParams) {
+    try {
+      const apiUrl = "https://api01.exeldelnorte.com.mx/productos_medidas";
+
+      const response = await axios.get(apiUrl, {
+        headers: {
+          Authorization: apiKey,
+          params: queryParams
+        },
+      });
+
+      const items = response.data?.datos ?? (Array.isArray(response.data) ? response.data : []);
+
+      const medidas = items.map(item => new responseDto.medidas({
+        referencia: item.referencia,
+        altura: parseFloat(item.altura ?? 0),
+        ancho: parseFloat(item.ancho ?? 0),
+        largo: parseFloat(item.largo ?? 0),
+        peso: parseFloat(item.peso ?? 0),
+        medida_peso: item.medida_peso,
+        volumen: parseFloat(item.volumen ?? 0),
+        medida_volumen: item.medida_volumen,
+      }));
+      const { saved, skipped } = await this.saveMedidasRedis(medidas);
+      logger.info(`Medidas guardadas: ${saved}, Medidas omitidas: ${skipped}`);
+
+    } catch (error) {
+      logger.error(`Error al obtener y guardar medidas: ${error.message}`);
+      throw new Error('No se pudo obtener las medidas de los productos.');
+    }
+  }
 
 
   /**
@@ -214,6 +245,30 @@ class ExelService {
     }
   }
 
+  async getExternalSubcategorias() {
+    try {
+      const apiUrl = "https://api01.exeldelnorte.com.mx/subcategorias";
+      const response = await axios.get(apiUrl, {
+        headers: {
+          Authorization: apiKey,
+        },
+      });
+
+      const subcategorias = response.data.datos.map(subcategoria => new responseDto.subcategoria({
+        id_subcategoria: subcategoria.id_subcategoria,
+        nombre_subcategoria: subcategoria.nombre_subcategoria,
+        id_categoria: subcategoria.id_categoria,
+      }));
+      await this.saveSubcategoriasRedis(subcategorias);
+      return subcategorias;
+    } catch (error) {
+      logger.error(
+        `Error al obtener las subcategorias de Exel del Norte: ${error.message}`,
+      );
+      throw new Error("No se pudo obtener el catálogo de subcategorias externo");
+    }
+  }
+
   async getImagenesBatch({ idsSetKey = 'catalogo:imagenes', page = 1, limit = 50 } = {}) {
     const client = await redisClient.getClient();
 
@@ -292,6 +347,14 @@ class ExelService {
     }
   }
 
+  async saveMedidasRedis(medidas) {
+    const client = await redisClient.getClient();
+    const helper = new RedisHelper(client);
+
+
+
+  }
+
   async saveCategoriesRedis(categorias) {
     const client = await redisClient.getClient();
     const helper = new RedisHelper(client);
@@ -313,6 +376,29 @@ class ExelService {
     catch (error) {
       logger.error("Error al guardar categorias en redis: " + error.message);
       throw new Error("Error al guardar categorias en redis: " + error.message)
+    }
+  }
+
+  async saveSubcategoriasRedis(subcategorias) {
+    const client = new redisClient.getClient();
+    const helper = new RedisHelper(client);
+    try {
+      const { saved, skipped } = await helper.saveBatch(subcategorias, {
+        keyPrefix: 'subcategoria',
+        idField: 'id_subcategoria',
+        allKeysSet: 'catalogo:subcategorias',
+        toHash: (s) => ({
+          id_subcategoria: String(s.id_subcategoria ?? ''),
+          nombre_subcategoria: String(s.nombre_subcategoria ?? ''),
+          id_categoria: String(s.id_categoria ?? ''),
+        }),
+        indices: [{ name: 'id_categoria', keyPrefix: 'indice:categoria' }],
+      });
+      logger.info(`Subcategorias: ${saved} guardadas, ${skipped} saltadas`);
+    }
+    catch (error) {
+      logger.error("Error al guardar subcategorias en redis: " + error.message);
+      throw new Error("Error al guardar subcategorias en redis: " + error.message)
     }
   }
 

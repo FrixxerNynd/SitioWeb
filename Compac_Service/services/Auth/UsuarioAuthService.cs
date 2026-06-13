@@ -100,21 +100,26 @@ namespace back_cabs.CRM.services.Auth
                     _logger.LogWarning("Intento de registro con email duplicado: {Email}", request.Email);
                     throw new InvalidOperationException("Ya existe un usuario registrado con este email");
                 }
+                //PASO 2.1: OBTENER Y VALIDAR CLIENTE A ENLAZAR (existencia + datos en una sola consulta)
+                var cliente = await _admClienteService.GetByIdAsync(request.IdCliente);
+                if (cliente == null)
+                {
+                    _logger.LogWarning("Intento de registro con cliente inexistente: {IdCliente}", request.IdCliente);
+                    throw new InvalidOperationException($"No se encontró el cliente con ID: {request.IdCliente}");
+                }
+                //PASO 2.2: VALIDAR ESTATUS ACTIVO DEL CLIENTE
+                var clienteActivo = await _admClienteService.IsActiveAsync(request.IdCliente);
+                if (!clienteActivo)
+                {
+                    _logger.LogWarning("Intento de registro con cliente inactivo: {IdCliente}", request.IdCliente);
+                    throw new UnauthorizedAccessException($"El cliente con ID: {request.IdCliente} está inactivo y no puede registrarse.");
+                }
 
                 // PASO 3: CREAR HASH SEGURO DE LA CONTRASEÑA
                 var contrasenaHash = back_cabs.CRM.Middleware.ApiUtilities.GenerateSha256Hash(request.Contrasena);
                 _logger.LogDebug("Hash de contraseña generado para usuario: {Email}", request.Email);
 
                 // PASO 4: CREAR ENTIDAD DE USUARIO
-
-                //Paso 4.1: Obtener el cliente asociado para el usuario
-                var cliente = await _admClienteService.GetByIdAsync(request.IdCliente);
-                if (cliente == null)
-                {
-                    _logger.LogWarning("No se encontró el cliente con ID: {IdCliente} para el registro de usuario: {Email}",
-                        request.IdCliente, request.Email);
-                    throw new InvalidOperationException($"No se encontró el cliente con ID: {request.IdCliente}");
-                }
                 
                 var nuevoUsuario = new UsuarioAuth
                 {
@@ -251,6 +256,17 @@ namespace back_cabs.CRM.services.Auth
             try
             {
                 _logger.LogInformation($"Validando credenciales para usuario: {email}");
+                // Verificar estatus del cliente solo si el usuario existe en el sistema interno
+                var user = await _usuarioRepository.GetByEmailAsync(email);
+                if (user != null)
+                {
+                    var clienteActivo = await _admClienteService.IsActiveAsync(user.IdAgenteLegacy);
+                    if (!clienteActivo)
+                    {
+                        _logger.LogWarning("Login bloqueado: cliente vinculado inactivo para {Email}", email);
+                        throw new UnauthorizedAccessException("Tu cuenta está inactiva. Contacta a tu administrador.");
+                    }
+                }
 
                 // Use repository which already encapsulates credential validation
                 var usuario = await _usuarioRepository.ValidateCredentialsAsync(email, contrasena);

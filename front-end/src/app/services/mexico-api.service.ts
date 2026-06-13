@@ -66,9 +66,9 @@ export class MexicoApiService {
 
   async getCities(): Promise<IMexicoCity[]> {
     try {
-      console.log('🌐 GET Ciudades:', `${this.baseUrl}/ciudad?per_page=500`);
+      console.log('🌐 GET Ciudades:', `${this.baseUrl}/ciudad?per_page=700`);
       const response = await firstValueFrom(
-        this.http.get<IApiMexicoResponse<IMexicoCity>>(`${this.baseUrl}/ciudad?per_page=500`)
+        this.http.get<IApiMexicoResponse<IMexicoCity>>(`${this.baseUrl}/ciudad?per_page=700`)
       );
       console.log('✅ Ciudades obtenidas:', response?.data?.length);
       return response?.data || [];

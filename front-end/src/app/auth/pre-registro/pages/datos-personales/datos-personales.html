@@ -59,7 +59,8 @@
                 </div>
                 
                 <!-- Formulario Reactivo de Angular -->
-                <form>
+                <form [formGroup]="datosForm" (ngSubmit)="siguiente()">
+
                     <!-- Campo: Nombre -->
                     <div class="mb-4">
                         <label for="nombreInput" class="form-label fw-semibold mb-2">
@@ -70,10 +71,11 @@
                                id="nombreInput"
                                formControlName="nombre"
                                placeholder="Tu nombre">
-                        <div *ngIf="loginForm.get('nombre')?.touched && loginForm.get('nombre')?.invalid"
-                            class="invalid-feedback d-block">
-                            El nombre es requerido
-                        </div>
+                        @if(datosForm.get('nombre')?.touched && datosForm.get('nombre')?.invalid){
+                            <div class="invalid-feedback d-block">
+                                El nombre es requerido
+                            </div>
+                        }
                     </div>
 
                     <!-- FILA: Apellido Paterno y Apellido Materno -->
@@ -87,10 +89,11 @@
                                    id="apellidoPaternoInput"
                                    formControlName="apellidoPaterno"
                                    placeholder="Tu apellido paterno">
-                            <div *ngIf="loginForm.get('apellidoPaterno')?.touched && loginForm.get('apellidoPaterno')?.invalid"
-                                class="invalid-feedback d-block">
-                                El apellido paterno es requerido
-                            </div>
+                            @if(datosForm.get('apellidoPaterno')?.touched && datosForm.get('apellidoPaterno')?.invalid){
+                                <div class="invalid-feedback d-block">
+                                    El apellido paterno es requerido
+                                </div>
+                            }
                         </div>
                         <div class="col-md-6">
                             <label for="apellidoMaternoInput" class="form-label fw-semibold mb-2">
@@ -101,10 +104,11 @@
                                    id="apellidoMaternoInput"
                                    formControlName="apellidoMaterno"
                                    placeholder="Tu apellido materno">
-                            <div *ngIf="loginForm.get('apellidoMaterno')?.touched && loginForm.get('apellidoMaterno')?.invalid"
-                                class="invalid-feedback d-block">
-                                El apellido materno es requerido
-                            </div>
+                            @if(datosForm.get('apellidoMaterno')?.touched && datosForm.get('apellidoMaterno')?.invalid){
+                                <div class="invalid-feedback d-block">
+                                    El apellido materno es requerido
+                                </div>
+                            }
                         </div>
                     </div>
 
@@ -118,11 +122,12 @@
                                    class="form-control form-control-lg" 
                                    id="telefonoFijoInput"
                                    formControlName="telefonoFijo"
-                                   placeholder="01 55 1234 5678">
-                            <div *ngIf="loginForm.get('telefonoFijo')?.touched && loginForm.get('telefonoFijo')?.invalid"
-                                class="invalid-feedback d-block">
-                                El teléfono fijo es requerido
-                            </div>
+                                   placeholder="5512345678">
+                            @if(datosForm.get('telefonoFijo')?.touched && datosForm.get('telefonoFijo')?.invalid){
+                                <div class="invalid-feedback d-block">
+                                    Teléfono requerido (10 dígitos)
+                                </div>
+                            }
                         </div>
                         <div class="col-md-6">
                             <label for="whatsappInput" class="form-label fw-semibold mb-2">
@@ -132,17 +137,36 @@
                                    class="form-control form-control-lg" 
                                    id="whatsappInput"
                                    formControlName="whatsapp"
-                                   placeholder="55 1234 5678">
-                            <div *ngIf="loginForm.get('whatsapp')?.touched && loginForm.get('whatsapp')?.invalid"
-                                class="invalid-feedback d-block">
-                                El teléfono WhatsApp es requerido
-                            </div>
+                                   placeholder="5512345678">
+                            @if(datosForm.get('whatsapp')?.touched && datosForm.get('whatsapp')?.invalid){
+                                <div class="invalid-feedback d-block">
+                                    WhatsApp requerido (10 dígitos)
+                                </div>
+                            }
                         </div>
                     </div>
 
+                    <!-- Campo: CURP -->
+                    <div class="mb-4">
+                        <label for="curpInput" class="form-label fw-semibold mb-2">
+                            CURP <span class="text-danger">*</span>
+                        </label>
+                        <input type="text"
+                               class="form-control form-control-lg"
+                               id="curpInput"
+                               formControlName="curp"
+                               placeholder="XXXX000000HXXXXXX0"
+                               maxlength="18"
+                               style="text-transform: uppercase;">
+                        @if(datosForm.get('curp')?.touched && datosForm.get('curp')?.invalid){
+                            <div class="invalid-feedback d-block">
+                                CURP requerida o formato inválido (18 caracteres)
+                            </div>
+                        }
+                    </div>
+
                     <!-- Botón de envío -->
-                    <button type="submit" 
-                            routerLink="/pre-registro/domicilio"
+                    <button type="submit"
                             class="btn btn-lg w-100 fw-semibold py-2 mb-4"
                             style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
                                 border: none;

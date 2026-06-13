@@ -173,7 +173,8 @@
                 </div>
 
                 <!-- Formulario Reactivo de Angular -->
-                <form>
+                <form [formGroup]="cuentaForm" (ngSubmit)="onSubmit()">
+
                     <!-- Campo: Correo Electrónico -->
                     <div class="mb-4">
                         <label for="emailInput" class="form-label fw-semibold mb-2">
@@ -226,10 +227,29 @@
                          Por favor completa el reCAPTCHA
                       </div>
                     }
+                    <!-- Banner de error -->
+                    @if(errorMensaje()){
+                        <div class="alert alert-danger py-2 mb-3" role="alert">
+                            {{ errorMensaje() }}
+                        </div>
+                    }
+
                     <!-- Botón de envío -->
                     <div class="mb-3">
-                        <ui-boton tipo="primario" text="Crear cuenta" size="lg" widthType="full" ></ui-boton>
-                    </div> 
+                        <button type="submit"
+                                class="btn btn-lg w-100 fw-semibold py-2"
+                                [disabled]="cargando()"
+                                style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
+                                       border: none; color: white; border-radius: 8px;
+                                       transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            @if(cargando()){
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                Enviando...
+                            } @else {
+                                Crear cuenta
+                            }
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

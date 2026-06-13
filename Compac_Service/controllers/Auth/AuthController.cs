@@ -213,6 +213,12 @@ namespace back_cabs.CRM.controllers.Auth
                     "Email duplicado",
                     ex.Message));
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning("Registro bloqueado por cliente inactivo: {Email}", request?.Email);
+
+                return StatusCode(403, new { message = ex.Message });
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error inesperado durante registro de usuario: {Email}", request?.Email);
@@ -434,6 +440,11 @@ namespace back_cabs.CRM.controllers.Auth
                     refreshToken = tokens.RefreshToken, // ✅ NUEVO: Token de refresco en la respuesta
                     expiresIn = DateTime.UtcNow.AddMinutes(540)  // 30 minutos en segundos
                 });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning("Login bloqueado por cuenta inactiva: {Email}", request.Email);
+                return StatusCode(403, new { message = $"Cliente inactivo, Error: {ex.Message}" });
             }
             catch (Exception ex)
             {
