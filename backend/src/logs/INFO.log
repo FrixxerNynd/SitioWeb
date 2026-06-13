@@ -1,0 +1,7 @@
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-12 22:41:33"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-12 22:41:33"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-12 22:41:33"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-12 22:41:33"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-12 22:41:33"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-12 22:42:18"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-12 22:42:18"}

@@ -3,7 +3,7 @@ import logger from '../utils/Helpers/logger.js';
 import redisClient from '../config/redis.js';
 import RedisHelper from '../utils/Helpers/redisHelper.js';
 import dotenv from "dotenv";
-import responseDto from "../utils/DTO's/Response/DTO-Index.js"
+import { responseDto } from "../utils/DTO's/Response/DTO-Index.js"
 
 dotenv.config();
 
@@ -174,7 +174,7 @@ class ExelService {
     return categorias
   }
 
-  async getImagenes(query) {
+  async getExternalImagenes(query) {
     try {
       const apiUrl = "https://api01.exeldelnorte.com.mx/imagenes";
       //Verificar si query trae informacion
@@ -194,7 +194,15 @@ class ExelService {
         },
       });
 
-      return response.data;
+      //Mapear la respuesta a ImagenResponseDto
+      const imagenes = response.data.datos.map(imagen => new responseDto.imagenes({
+        referencia: imagen.referencia,
+        imagenes: imagen.imagenes,
+      }));
+
+      await this.saveImagesRedis(imagenes);
+      return imagenes;
+
     } catch (error) {
       logger.error(
         `Error al obtener las imagenes de Exel del Norte: ${error.message}`,
@@ -203,7 +211,40 @@ class ExelService {
     }
   }
 
-  //#region Metodos Redis
+  async getImagenesBatch({ idsSetKey = 'catalogo:imagenes', page = 1, limit = 50 } = {}) {
+    const client = await redisClient.getClient();
+
+    if (!client) {
+      logger.warn('Redis no disponible, no se pudieron leer imágenes');
+      return { total: 0, page, limit, totalPages: 0, datos: [] };
+    }
+
+    const allIds = await client.sMembers(idsSetKey);
+    const total = allIds.length;
+
+    const start = (page - 1) * limit;
+    const idsPagina = allIds.slice(start, start + limit);
+
+    const datos = await Promise.all(
+      idsPagina.map(async (referencia) => {
+        const raw = await client.get(`imagenes:${referencia}`);
+        return new responseDto.imagenes({
+          referencia,
+          imagenes: raw ? JSON.parse(raw) : [],
+        });
+      })
+    );
+
+    return {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      datos
+    };
+  }
+
+  //#region Metodos Guardado en Redis
   async saveProductsRedis(productos) {
     const client = await redisClient.getClient();
 
@@ -247,6 +288,7 @@ class ExelService {
       logger.error("Error al guardar productos en redis: " + error.message);
     }
   }
+
   async saveCategoriesRedis(categorias) {
     const client = await redisClient.getClient();
     const helper = new RedisHelper(client);
@@ -269,6 +311,42 @@ class ExelService {
       throw new Error("Error al guardar categorias en redis: " + error.message)
     }
   }
+
+  async saveImagesRedis(imagenes) {
+    const client = await redisClient.getClient();
+
+    if (!client) {
+      logger.warn("Redis no disponible, imagenes no guardadas en redis");
+      return { saved: 0, skipped: imagenes.length };
+    }
+
+    try {
+      const multi = client.multi();
+      let saved = 0;
+      let skipped = 0;
+
+      for (const img of imagenes) {
+        if (!img.referencia || !img.imagenes || img.imagenes.length === 0) {
+          skipped++;
+          continue;
+        }
+
+        multi.set(`imagenes:${img.referencia}`, JSON.stringify(img.imagenes));
+        multi.sAdd('catalogo:imagenes', img.referencia);
+
+        saved++;
+      }
+
+      await multi.exec();
+      logger.info(`Se guardaron ${saved} productos con imágenes en Redis (${skipped} saltados)`);
+      return { saved, skipped };
+    } catch (error) {
+      logger.error("Error al guardar imagenes en redis: " + error.message);
+      return { saved: 0, skipped: imagenes.length };
+    }
+  }
+
+
   //#endregion
 }
 

@@ -72,11 +72,12 @@ class ExelController {
     /**
      * GET /api/productos/imagenes
      * Devuelve imágenes de productos.
-     * Acepta query params opcionales: ?referencia=XXX
+     * Acepta query params opcionales: ?page=1&limit=50
      */
     async getImagenes(req, res, next) {
         try {
-            const data = await exelService.getImagenes(req.query);
+            const { page = 1, limit = 50 } = req.query;
+            const data = await exelService.getImagenesBatch({ page, limit });
             res.status(200).json({ success: true, data });
         } catch (error) {
             next(error);

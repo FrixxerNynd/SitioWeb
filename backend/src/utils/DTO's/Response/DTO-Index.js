@@ -3,12 +3,14 @@ import PedidoResponseDto from "./Pedidos/PedidoResponseDto.js";
 import ProductosResponseDto from "./Productos/ProductosResponseDto.js";
 import PedidoCreateDto from "../Request/Pedidos/PedidoCreateDto.js";
 import ProductosCreateDto from "../Request/Productos/ProductosCreateDto.js";
+import ImagenesResponseDto from "./Imagenes/ImagenesResponseDto.js";
 
 
 export const responseDto = {
     categoria: CategoriaResponseDto,
     pedido: PedidoResponseDto,
-    productos: ProductosResponseDto
+    productos: ProductosResponseDto,
+    imagenes: ImagenesResponseDto
 }
 
 export const requestDto = {
