@@ -1,232 +1,192 @@
-<div class="container-fluid bg-lith">
-  <div class="container">
-    <div class="container-fluid">
-      <!-- titulo -->
-      <div class="card rounded-3 border-2 border-zinc-200 p-4 bg-white overflow-hidden my-4">
-        <div class="flex flex-col gap-2">
-          <h2 class="fw-bold text-dark m-0">Mis órdenes</h2>
-          <p class="text-muted small m-0 mt-1">Revisa fácilmente tus órdenes aquí.</p>
-        </div>
-        <!-- buscar y borrar -->
-        <div class="row g-3 align-items-end mb-4">
-          <div class="col-12 col-md-3">
-            <ui-inputs
-              type="text"
-              label="Buscador de orden"
-              placeholder="buscador de orden"
-              icon="fi fi-rr-search"
-              [(ngModel)]="filtroId"
-            >
-            </ui-inputs>
+<div class="bg-gray-50 min-h-screen">
+  <div class="container-fluid">
+    <div class="container">
+      <!-- Encabezado -->
+      <div class="bg-white rounded-lg border my-4 overflow-hidden">
+        <div class="flex flex-col gap-2 p-4">
+          <!-- Titulo y parrafo -->
+          <div class="flex flex-col gap-1">
+            <span class="text-3xl font-semibold text-gray-900">Mis órdenes</span>
+            <p class="text-gray-600 text-base">Revisa fácilmente tus órdenes aquí.</p>
           </div>
 
-          <div class="col-12 col-sm-6 col-md-3">
-            <ui-inputs
-              type="select"
-              label="Estado"
-              placeholder="Seleccionar estatus"
-              [options]="opcionesEstatus"
-              [(ngModel)]="filtroEstatus"
-            >
-            </ui-inputs>
-          </div>
+          <!-- filtros, buscar y borrar -->
+          <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-3">
+              <ui-inputs type="text" label="Buscador de orden" placeholder="buscador de orden" icon="fi fi-rr-search"
+                [(ngModel)]="filtroId">
+              </ui-inputs>
+            </div>
 
-          <div class="col-12 col-sm-6 col-md-2">
-            <label class="form-label small fw-semibold text-secondary">Fecha inicio</label>
-            <input
-              type="date"
-              class="form-control"
-              [(ngModel)]="filtroFechaInicio"
-              style="height: 40px; border-radius: 5px; border-color: #d0d5dd; font-size: 15px"
-            />
-          </div>
+            <div class="col-12 col-md-3">
+              <ui-inputs type="select" label="Estado" placeholder="Seleccionar estatus" [options]="opcionesEstatus"
+                [(ngModel)]="filtroEstatus">
+              </ui-inputs>
+            </div>
 
-          <div class="col-12 col-sm-6 col-md-2">
-            <label class="form-label small fw-semibold text-secondary">Fecha fin</label>
-            <input
-              type="date"
-              class="form-control"
-              [(ngModel)]="filtroFechaFin"
-              style="height: 40px; border-radius: 5px; border-color: #d0d5dd; font-size: 15px"
-            />
-          </div>
+            <div class="col-12 col-md-2">
+              <label class="form-label text-xs font-semibold text-gray-500 mb-1">Fecha inicio</label>
+              <input type="date"
+                class="form-control h-10 rounded-md border-gray-300 text-sm focus:ring-2 focus:ring-[#1e3a5f]"
+                [(ngModel)]="filtroFechaInicio" />
+            </div>
 
-          <!-- Botones corregidos -->
-          <div class="col-12 col-md-2">
-            <div class="d-flex flex-column flex-sm-row gap-2">
-              <button
-                class="btn btn-outline-secondary text-dark border-light-subtle bg-white w-100 w-sm-auto"
-                type="button"
-                (click)="limpiarFiltros()"
-                style="height: 40px; border-radius: 5px"
-              >
-                Limpiar
-              </button>
-              <button
-                class="btn btn-outline-secondary text-dark border-light-subtle bg-white w-100 w-sm-auto"
-                type="button"
-                (click)="buscarOrdenes()"
-                style="height: 40px; border-radius: 5px"
-              >
-                Buscar
-              </button>
+            <div class="col-12 col-md-2">
+              <label class="form-label text-xs font-semibold text-gray-500 mb-1">Fecha fin</label>
+              <input type="date"
+                class="form-control h-10 rounded-md border-gray-300 text-sm focus:ring-2 focus:ring-[#1e3a5f]"
+                [(ngModel)]="filtroFechaFin" />
+            </div>
+
+            <!-- Botones -->
+            <div class="col-12 col-md-2">
+              <div class="d-flex gap-2">
+                <ui-boton text="Limpiar" type="reset" tipo="cerrar" (btnClick)="limpiarFiltros()"
+                  [disabled]="false"></ui-boton>
+                <ui-boton text="Buscar" type="reset" tipo="cerrar" (btnClick)="buscarOrdenes()"
+                  [disabled]="false"></ui-boton>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- TARJETAS TOTAL GASTADO -->
-      <div class="row g-3 mb-4">
-        <div class="col-12 col-sm-6 col-xl-3">
-          <div class="card rounded-3 border-2 border-zinc-200 bg-white p-3 h-100">
-            <div class="text-secondary small fw-medium mb-1 d-flex align-items-center gap-1">
-              <i class="fi fi-sr-usd-circle"></i>Total gastado
-            </div>
-            <h2 class="fw-bold text-dark my-1">{{ totalGastado | currency }}</h2>
-            <span class="text-muted small d-none d-sm-block">Suma total de todas tus compras</span>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 mb-6">
+        <!-- Tarjeta 1 - Total gastado -->
+        <div
+          class="flex flex-col justify-between bg-white border border-zinc-200 rounded-xl p-3 hover:shadow-md transition-shadow">
+          <div class="text-gray-500 text-sm font-medium mb-1 flex items-center gap-2">
+            <app-ui-icono name="currency-dollar" size="w-4 h-4"></app-ui-icono>
+            <span>Total gastado</span>
           </div>
+          <span class="font-semibold text-gray-900 text-4xl my-1">{{ totalGastado | currency }}</span>
+          <span class="text-zinc-600 text-sm hidden sm:block">Suma total de todas tus compras</span>
         </div>
 
-        <div class="col-12 col-sm-6 col-xl-3">
-          <div class="card rounded-3 border-2 border-zinc-200 bg-white p-3 h-100">
-            <div class="text-secondary small fw-medium mb-1 d-flex align-items-center gap-1">
-              <i class="fi fi-sr-credit-card"></i> Crédito disponible
-            </div>
-            <h2 class="fw-bold text-dark my-1">{{ creditoDisponible | currency }}</h2>
-            <span class="text-muted small d-none d-sm-block">Crédito que te queda por usar</span>
+        <!-- Tarjeta 2 - Crédito disponible -->
+        <div
+          class="flex flex-col justify-between bg-white border border-zinc-200 rounded-xl p-3 hover:shadow-md transition-shadow">
+          <div class="text-gray-500 text-sm font-medium mb-1 flex items-center gap-2">
+            <app-ui-icono name="credit-card" size="w-4 h-4"></app-ui-icono>
+            <span>Crédito disponible</span>
           </div>
+          <span class="font-semibold text-gray-900 text-4xl my-1">{{ creditoDisponible | currency }}</span>
+          <span class="text-zinc-600 text-sm hidden sm:block">Crédito que te queda por usar</span>
         </div>
 
-        <div class="col-12 col-sm-6 col-xl-3">
-          <div class="card rounded-3 border-2 border-zinc-200 bg-white p-3 h-100">
-            <div class="text-secondary small fw-medium mb-1 flex align-items-center gap-1">
-              <i class="fi fi-sr-duplicate"></i> Total de órdenes
-            </div>
-            <h2 class="fw-bold text-dark my-1">{{ totalOrdenes }}</h2>
-            <span class="text-muted small d-none d-sm-block"
-              >Cantidad total de compras realizadas</span
-            >
+        <!-- Tarjeta 3 - Total de órdenes -->
+        <div
+          class="flex flex-col justify-between bg-white border border-zinc-200 rounded-xl p-3 hover:shadow-md transition-shadow">
+          <div class="text-gray-500 text-sm font-medium mb-1 flex items-center gap-2">
+            <app-ui-icono name="document-duplicate" size="w-4 h-4"></app-ui-icono>
+            <span>Total de órdenes</span>
           </div>
+          <span class="font-semibold text-gray-900 text-4xl my-1">{{ totalOrdenes }}</span>
+          <span class="text-zinc-600 text-sm hidden sm:block">Cantidad total de compras realizadas</span>
         </div>
 
-        <div class="col-12 col-sm-6 col-xl-3">
-          <div class="card rounded-3 border-2 border-zinc-200 bg-white p-3 h-100">
-            <div class="text-secondary small fw-medium mb-1 d-flex align-items-center gap-1">
-              <i class="fi fi-sr-clock-three"></i> Órdenes procesando
-            </div>
-            <h2 class="fw-bold text-dark my-1">{{ ordenesProcesando }}</h2>
-            <span class="text-muted small d-none d-sm-block">Compras que aún están en curso</span>
+        <!-- Tarjeta 4 - Órdenes procesando -->
+        <div
+          class="flex flex-col justify-between bg-white border border-zinc-200 rounded-xl p-3 hover:shadow-md transition-shadow">
+          <div class="text-gray-500 text-sm font-medium mb-1 flex items-center gap-2">
+            <app-ui-icono name="clock" size="w-4 h-4"></app-ui-icono>
+            <span>Órdenes procesando</span>
           </div>
+          <span class="font-semibold text-gray-900 text-4xl my-1">{{ ordenesProcesando }}</span>
+          <span class="text-zinc-600 text-sm hidden sm:block">Compras que aún están en curso</span>
         </div>
       </div>
 
-      <!-- TABLAS  -->
-      <div class="card rounded-3 border-2 border-zinc-200 bg-white overflow-hidden my-4">
-        <div *ngIf="ordenesFiltradas.length > 0">
-          <div class="table-responsive">
-            <table class="table table-hover align-middle border-2 border-zinc-200 mb-0">
-              <thead class="table-light text-secondary small text-uppercase border-bottom">
-                <tr>
-                  <th class="px-6 py-4 text-center text-secondary fw-semibold">Orden</th>
-                  <th class="px-6 py-4 text-center text-secondary fw-semibold">Fecha</th>
-                  <th class="px-6 py-4 text-center text-secondary fw-semibold">Tipo de pago</th>
-                  <th class="px-6 py-4 text-center text-secondary fw-semibold">Total</th>
-                  <th class="px-6 py-4 text-center text-secondary fw-semibold">Estado</th>
-                  <th class="px-6 py-4 text-center text-secondary fw-semibold">Acciones</th>
-                </tr>
-              </thead>
-              <!-- contenido de la tabla -->
-              <tbody>
-                <tr *ngFor="let orden of ordenesPaginadas" class="border-bottom border-zinc-200">
-                  <td class="px-6 py-4 text-center text-secondary">{{ orden.id }}</td>
-                  <td class="px-6 py-4 text-center text-secondary">{{ orden.fecha }}</td>
-                  <td class="px-6 py-4 text-center text-secondary">{{ orden.tipoPago }}</td>
-                  <td class="px-6 py-4 text-center text-secondary">{{ orden.total | currency }}</td>
-                  <td class="py-3 text-center px-6">
-                    <span
-                      class="badge py-1 rounded-1 fw-semibold"
-                      [ngClass]="{
-                        'bg-success-subtle text-success': orden.estado === 'Entregada',
-                        'bg-danger-subtle text-danger': orden.estado === 'Cancelada',
-                        'bg-info-subtle text-info': orden.estado === 'Procesando',
-                      }"
-                    >
-                      {{ orden.estado }}
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 text-center text-secondary">
-                    <button class="btn text-dark p-0 border-0">
-                      <i class="fi fi-rr-eye"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <!-- footer -->
-          <div
-            class="table-footer flex-shrink-0 px-4 py-3 border-top bg-light d-flex align-items-center justify-content-between flex-wrap gap-2"
-          >
-            <span class="text-secondary small">{{ totalItemsRegistros }}</span>
+      <!-- TABLA -->
+      <div class="border border-zinc-200 rounded-lg overflow-hidden my-4">
+        @if (ordenesFiltradas.length > 1) {
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead class="bg-gray-50 text-left text-gray-500 font-semibold text-xs uppercase"
+              style="border-bottom: 1px solid #e4e4e7;">
+              <tr>
+                <th class="p-4">Orden</th>
+                <th class="p-4">Fecha</th>
+                <th class="p-4">Tipo de pago</th>
+                <th class="p-4">Total</th>
+                <th class="p-4">Estado</th>
+                <th class="p-4 text-end w-4">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let orden of ordenesPaginadas" class="bg-white text-gray-600 font-medium text-sm text-left"
+                style="border-bottom: 1px solid #e4e4e7;">
+                <td class="p-4">{{ orden.id }}</td>
+                <td class="p-4">{{ orden.fecha }}</td>
+                <td class="p-4">{{ orden.tipoPago }}</td>
+                <td class="p-4">{{ orden.total | currency }}</td>
+                <td class="p-4">
+                  <span class="inline-block px-3 py-1 rounded text-xs font-semibold" [ngClass]="{
+                  'bg-green-100 text-green-700': orden.estado === 'Entregada',
+                  'bg-red-100 text-red-700': orden.estado === 'Cancelada',
+                  'bg-blue-100 text-blue-700': orden.estado === 'Procesando'
+                }">
+                    {{ orden.estado }}
+                  </span>
+                </td>
+                <td class="p-4 text-end w-16">
+                  
+                  <button class="text-gray-600 hover:text-[#1e3a5f] transition-colors p-1" (click)="verDetalleOrden(orden)">
+                    <app-ui-icono name="eye" size="h-5 w-5"></app-ui-icono>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-            <div class="d-flex align-items-center gap-3 flex-wrap">
-              <div class="d-flex align-items-center gap-2">
-                <span class="text-secondary small">Filas por página:</span>
-                <select
-                  class="form-select form-select-sm"
-                  style="width: auto"
-                  (change)="cambiarFilasPorPagina($event)"
-                >
-                  <option *ngFor="let op of opcionesFilasPorPagina" [value]="op">{{ op }}</option>
-                </select>
-              </div>
+        <!-- Footer de la tabla -->
+        <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-gray-50 border-t border-gray-200">
+          <span class="text-gray-500 text-sm">{{ totalItemsRegistros }}</span>
 
-              <div class="d-flex align-items-center gap-2">
-                <button
-                  class="btn btn-sm btn-outline-secondary px-2 py-1"
-                  (click)="paginaAnterior()"
-                  [disabled]="paginaActual === 1"
-                >
-                  <i class="fi fi-rr-angle-left"></i>
-                </button>
-                <span class="text-secondary small">{{ paginaActual }}/{{ totalPaginas }}</span>
-                <button
-                  class="btn btn-sm btn-outline-secondary px-2 py-1"
-                  (click)="paginaSiguiente()"
-                  [disabled]="paginaActual === totalPaginas"
-                >
-                  <i class="fi fi-rr-angle-right"></i>
-                </button>
-              </div>
+          <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-2">
+              <span class="text-gray-500 text-sm">Filas por página:</span>
+              <select
+                class="h-8 px-2 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]"
+                (change)="cambiarFilasPorPagina($event)">
+                <option *ngFor="let op of opcionesFilasPorPagina" [value]="op">{{ op }}</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <ui-boton tipo="btn-tabla-pie" nomeIco="chevron-left" [disabled]="paginaActual === 1"
+                (btnClick)="paginaAnterior()"></ui-boton>
+              <span class="text-gray-600 text-sm">{{ paginaActual }}/{{ totalPaginas }}</span>
+              <ui-boton tipo="btn-tabla-pie" nomeIco="chevron-right" class="" [disabled]="paginaActual === totalPaginas"
+                (btnClick)="paginaSiguiente()"></ui-boton>
             </div>
           </div>
         </div>
-
-        <!-- Ordenes vacias -->
-        <div
-          *ngIf="ordenesFiltradas.length === 0"
-          class="d-flex flex-column align-items-center justify-content-center py-5 bg-white"
-        >
-          <div class="my-4 text-center">
-            <div
-              class="mb-3 d-inline-flex p-3 bg-warning-subtle rounded-circle text-warning align-items-center justify-content-center"
-              style="width: 64px; height: 64px"
-            >
-              <i class="fi fi-rr-search fs-3"></i>
+        } @else {
+          <!-- Órdenes vacías -->
+          <div class="flex flex-col items-center justify-center py-12 w-full bg-white">
+            <div class="text-center">
+              <div class="mb-4 inline-flex items-center justify-center w-16 h-16 bg-amber-50 rounded-full text-amber-500">
+                <app-ui-icono name="search" size="w-8 h-8"></app-ui-icono>
+              </div>
+              <h4 class="font-bold text-gray-900 text-xl mb-2">No se encontraron órdenes</h4>
+              <p class="text-gray-500 text-sm">
+                Prueba ajustar tus filtros de búsqueda.
+                <a href="javascript:void(0)" class="text-blue-600 underline hover:text-blue-800" (click)="limpiarFiltros()">Limpiar filtro</a>
+              </p>
             </div>
-            <h4 class="fw-bold text-dark mb-2">No se encontraron órdenes</h4>
-            <p class="text-secondary small mb-0">
-              Prueba ajustar tus filtros de búsqueda.
-              <a
-                href="javascript:void(0)"
-                class="text-primary text-decoration-underline fw-normal"
-                (click)="limpiarFiltros()"
-                >Limpiar filtro</a
-              >
-            </p>
           </div>
-        </div>
+        }
       </div>
     </div>
   </div>
 </div>
+
+<!-- Modal de detalles -->
+<app-detalles-orden 
+  [orden]="ordenSeleccionada" 
+  [(visible)]="modalVisible" 
+  (cerrar)="cerrarModal()">
+</app-detalles-orden>
