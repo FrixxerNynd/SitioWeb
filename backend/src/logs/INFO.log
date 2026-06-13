@@ -5,3 +5,205 @@
 {"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-12 22:41:33"}
 {"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-12 22:42:18"}
 {"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-12 22:42:18"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 06:42:13"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 06:42:13"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 06:42:13"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 06:42:13"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 06:42:13"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:43:11 +0000] \"GET /api-docs/ HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:43:11"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:43:12 +0000] \"GET /api-docs/ HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:43:12"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:43:12 +0000] \"GET /api-docs/swagger-ui.css HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:43:12"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:43:12 +0000] \"GET /api-docs/swagger-ui-standalone-preset.js HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:43:12"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:43:12 +0000] \"GET /api-docs/swagger-ui-init.js HTTP/1.1\" 200 21784 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:43:12"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:43:12 +0000] \"GET /api-docs/swagger-ui-bundle.js HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:43:12"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:43:12 +0000] \"GET /api-docs/swagger-ui-init.js HTTP/1.1\" 200 21784 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:43:12"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:43:12 +0000] \"GET /api-docs/swagger-ui-standalone-preset.js HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:43:12"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:43:12 +0000] \"GET /api-docs/swagger-ui-bundle.js HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:43:12"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:43:13 +0000] \"GET /api-docs/favicon-32x32.png HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:43:13"}
+{"level":"error","message":"Error al guardar categorias en redis: logger is not defined","timestamp":"2026-06-13 06:45:28"}
+{"level":"error","message":"Error al obtener las categorias de Exel del Norte: Error al guardar categorias en redis: logger is not defined","timestamp":"2026-06-13 06:45:28"}
+{"level":"error","message":"500 - No se pudo obtener el catálogo de categorias externo - /api/productos/sync-categorias - POST - ::1","timestamp":"2026-06-13 06:45:28"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:45:28 +0000] \"POST /api/productos/sync-categorias HTTP/1.1\" 500 77 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:45:28"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 06:46:40"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 06:47:21"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 06:47:21"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 06:47:21"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 06:47:21"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 06:47:21"}
+{"level":"info","message":"Se guardaron 19 items de categoria, skipped: 0","timestamp":"2026-06-13 06:47:30"}
+{"level":"info","message":"Categorías: 19 guardadas, 0 saltadas","timestamp":"2026-06-13 06:47:30"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:47:30 +0000] \"POST /api/productos/sync-categorias HTTP/1.1\" 200 100 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:47:30"}
+{"level":"error","message":"500 - exelService.getCategories is not a function - /api/productos/categorias - GET - ::1","timestamp":"2026-06-13 06:47:38"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:47:38 +0000] \"GET /api/productos/categorias HTTP/1.1\" 500 67 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:47:38"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 06:48:15"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 06:48:15"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 06:48:19"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 06:48:19"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 06:48:19"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 06:48:19"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 06:48:19"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:48:21 +0000] \"GET /api/productos/categorias HTTP/1.1\" 200 960 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:48:21"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 06:50:02"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 06:50:02"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 06:50:05"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 06:50:05"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 06:50:05"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 06:50:05"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 06:50:05"}
+{"level":"info","message":"Se guardaron 0 items de categoria, skipped: 19","timestamp":"2026-06-13 06:50:19"}
+{"level":"info","message":"Categorías: 0 guardadas, 19 saltadas","timestamp":"2026-06-13 06:50:19"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:50:19 +0000] \"POST /api/productos/sync-categorias HTTP/1.1\" 200 100 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:50:19"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:50:24 +0000] \"GET /api/productos/categorias HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:50:24"}
+{"level":"error","message":"❌ Error en Redis: Socket closed unexpectedly","timestamp":"2026-06-13 06:52:41"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 06:52:41"}
+{"level":"error","message":"❌ Error en Redis: Socket closed unexpectedly","timestamp":"2026-06-13 06:52:41"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 06:52:52"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 06:52:56"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 06:52:56"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 06:52:56"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 06:52:56"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 06:52:56"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:53:08 +0000] \"GET /api/productos/categorias HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:53:08"}
+{"level":"info","message":"Se guardaron 0 items de categoria, skipped: 19","timestamp":"2026-06-13 06:56:10"}
+{"level":"info","message":"Categorías: 0 guardadas, 19 saltadas","timestamp":"2026-06-13 06:56:10"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:56:10 +0000] \"POST /api/productos/sync-categorias HTTP/1.1\" 200 100 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:56:10"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:56:21 +0000] \"GET /api/productos/categorias HTTP/1.1\" 200 26 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:56:21"}
+{"level":"error","message":"❌ Error en Redis: Socket closed unexpectedly","timestamp":"2026-06-13 06:57:29"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 06:57:29"}
+{"level":"error","message":"❌ Error en Redis: Socket closed unexpectedly","timestamp":"2026-06-13 06:57:29"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 06:57:40"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 06:57:48"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 06:57:48"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 06:57:48"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 06:57:48"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 06:57:48"}
+{"level":"info","message":"Se guardaron 0 items de categoria, skipped: 19","timestamp":"2026-06-13 06:58:12"}
+{"level":"info","message":"Categorías: 0 guardadas, 19 saltadas","timestamp":"2026-06-13 06:58:12"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:58:12 +0000] \"POST /api/productos/sync-categorias HTTP/1.1\" 200 100 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:58:12"}
+{"level":"error","message":"500 - Cannot read properties of null (reading 'length') - /api/productos/redis-stats - GET - ::1","timestamp":"2026-06-13 06:58:27"}
+{"level":"info","message":"::1 - - [13/Jun/2026:12:58:27 +0000] \"GET /api/productos/redis-stats HTTP/1.1\" 500 73 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 06:58:27"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:01:11"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:01:11"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 07:01:17"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 07:01:17"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 07:01:17"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 07:01:17"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 07:01:17"}
+{"level":"info","message":"Se guardaron 0 items de categoria, skipped: 19","timestamp":"2026-06-13 07:01:32"}
+{"level":"info","message":"Categorías: 0 guardadas, 19 saltadas","timestamp":"2026-06-13 07:01:32"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:01:32 +0000] \"POST /api/productos/sync-categorias HTTP/1.1\" 200 100 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:01:32"}
+{"level":"error","message":"500 - Cannot read properties of null (reading 'length') - /api/productos/redis-stats - GET - ::1","timestamp":"2026-06-13 07:01:36"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:01:36 +0000] \"GET /api/productos/redis-stats HTTP/1.1\" 500 73 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:01:36"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:01:44 +0000] \"GET /api/productos/categorias HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:01:44"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:02:21"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:02:21"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 07:02:24"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 07:02:24"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 07:02:24"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 07:02:24"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 07:02:24"}
+{"level":"info","message":"Se guardaron 0 items de categoria, skipped: 19","timestamp":"2026-06-13 07:02:30"}
+{"level":"info","message":"Categorías: 0 guardadas, 19 saltadas","timestamp":"2026-06-13 07:02:30"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:02:30 +0000] \"POST /api/productos/sync-categorias HTTP/1.1\" 200 100 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:02:30"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:08:37"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:08:37"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 07:08:44"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 07:08:44"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 07:08:44"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 07:08:44"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 07:08:44"}
+{"level":"info","message":"Se guardaron 19 items de categoria, skipped: 0","timestamp":"2026-06-13 07:08:55"}
+{"level":"info","message":"Categorías: 19 guardadas, 0 saltadas","timestamp":"2026-06-13 07:08:55"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:08:55 +0000] \"POST /api/productos/sync-categorias HTTP/1.1\" 200 100 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:08:55"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:09:02 +0000] \"GET /api/productos/categorias HTTP/1.1\" 200 960 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:09:02"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:10:10"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:10:10"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 07:10:16"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 07:10:16"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 07:10:16"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 07:10:16"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 07:10:16"}
+{"level":"info","message":"Se guardaron 19 items de categoria, skipped: 0","timestamp":"2026-06-13 07:10:22"}
+{"level":"info","message":"Categorías: 19 guardadas, 0 saltadas","timestamp":"2026-06-13 07:10:22"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:10:22 +0000] \"POST /api/productos/sync-categorias HTTP/1.1\" 200 100 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:10:22"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:10:26 +0000] \"GET /api/productos/categorias HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:10:26"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:10:49"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:10:49"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 07:10:54"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 07:10:54"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 07:10:54"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 07:10:54"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 07:10:54"}
+{"level":"info","message":"Se guardaron 19 items de categoria, skipped: 0","timestamp":"2026-06-13 07:11:24"}
+{"level":"info","message":"Categorías: 19 guardadas, 0 saltadas","timestamp":"2026-06-13 07:11:24"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:11:25 +0000] \"POST /api/productos/sync-categorias HTTP/1.1\" 200 100 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:11:25"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:11:28 +0000] \"GET /api/productos/categorias HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:11:28"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:12:53"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:12:53"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 07:12:58"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 07:12:58"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 07:12:58"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 07:12:58"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 07:12:58"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:13:05 +0000] \"GET /api/productos/categorias HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:13:05"}
+{"level":"info","message":"Se guardaron 19 items de categoria, skipped: 0","timestamp":"2026-06-13 07:13:15"}
+{"level":"info","message":"Categorías: 19 guardadas, 0 saltadas","timestamp":"2026-06-13 07:13:15"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:13:15 +0000] \"POST /api/productos/sync-categorias HTTP/1.1\" 200 100 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:13:15"}
+{"level":"info","message":"Se guardaron 19 items de categoria, skipped: 0","timestamp":"2026-06-13 07:13:21"}
+{"level":"info","message":"Categorías: 19 guardadas, 0 saltadas","timestamp":"2026-06-13 07:13:21"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:13:21 +0000] \"POST /api/productos/sync-categorias HTTP/1.1\" 200 100 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:13:21"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:13:25 +0000] \"GET /api/productos/categorias HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:13:25"}
+{"level":"error","message":"500 - Cannot read properties of null (reading 'length') - /api/productos/redis-stats - GET - ::1","timestamp":"2026-06-13 07:14:49"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:14:49 +0000] \"GET /api/productos/redis-stats HTTP/1.1\" 500 73 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:14:49"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:24:59"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:24:59"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 07:25:04"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 07:25:04"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 07:25:04"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 07:25:04"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 07:25:04"}
+{"level":"info","message":"Se guardaron 19 items de categoria, skipped: 0","timestamp":"2026-06-13 07:25:13"}
+{"level":"info","message":"Categorías: 19 guardadas, 0 saltadas","timestamp":"2026-06-13 07:25:13"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:25:13 +0000] \"POST /api/productos/sync-categorias HTTP/1.1\" 200 100 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:25:13"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:25:25"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:25:25"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 07:27:44"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 07:27:44"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 07:27:44"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 07:27:44"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 07:27:44"}
+{"level":"info","message":"Se guardaron 19 items de categoria, skipped: 0","timestamp":"2026-06-13 07:27:49"}
+{"level":"info","message":"Categorías: 19 guardadas, 0 saltadas","timestamp":"2026-06-13 07:27:49"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:27:49 +0000] \"POST /api/productos/sync-categorias HTTP/1.1\" 200 100 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:27:49"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:27:53 +0000] \"GET /api/productos/categorias HTTP/1.1\" 200 990 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:27:53"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:30:17"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:30:17"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 07:30:23"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 07:30:23"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 07:30:23"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 07:30:23"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 07:30:23"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:30:27 +0000] \"GET /api-docs/ HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:30:27"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:30:27 +0000] \"GET /api-docs/swagger-ui-init.js HTTP/1.1\" 200 22897 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:30:27"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:30:27 +0000] \"GET /api-docs/swagger-ui-init.js HTTP/1.1\" 200 22897 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:30:27"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:30:27 +0000] \"GET /api-docs/swagger-ui-bundle.js HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:30:27"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:30:28 +0000] \"GET /api-docs/swagger-ui-standalone-preset.js HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:30:28"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:30:28 +0000] \"GET /api-docs/swagger-ui-standalone-preset.js HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:30:28"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:30:28 +0000] \"GET /api-docs/swagger-ui-bundle.js HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:30:28"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:30:28 +0000] \"GET /api-docs/swagger-ui.css HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:30:28"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:30:28 +0000] \"GET /api-docs/favicon-32x32.png HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:30:28"}
+{"level":"error","message":"Error al obtener las imagenes de Exel del Norte: Cannot read properties of undefined (reading 'map')","timestamp":"2026-06-13 07:30:38"}
+{"level":"error","message":"500 - No se pudo obtener el catálogo de imagenes externo - /api/productos/sync-imagenes - POST - ::1","timestamp":"2026-06-13 07:30:38"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:30:38 +0000] \"POST /api/productos/sync-imagenes HTTP/1.1\" 500 75 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:30:38"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:31:33"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:31:33"}
+{"level":"info","message":"✅ Conectado a Redis correctamente","timestamp":"2026-06-13 07:33:58"}
+{"level":"info","message":"🚀 Servidor iniciado en puerto 3000 - Entorno: development","timestamp":"2026-06-13 07:33:58"}
+{"level":"info","message":"📖 Swagger disponible en http://localhost:3000/api-docs","timestamp":"2026-06-13 07:33:58"}
+{"level":"info","message":"🔐 Autenticación Clave...","timestamp":"2026-06-13 07:33:58"}
+{"level":"info","message":"✅ Prisma conectado a SQL Server","timestamp":"2026-06-13 07:33:58"}
+{"level":"info","message":"Se guardaron 8505 productos con imágenes en Redis (0 saltados)","timestamp":"2026-06-13 07:34:06"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:34:06 +0000] \"POST /api/productos/sync-imagenes HTTP/1.1\" 200 114 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:34:06"}
+{"level":"info","message":"::1 - - [13/Jun/2026:13:34:26 +0000] \"GET /api/productos/imagenes HTTP/1.1\" 200 9166 \"-\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36\"","timestamp":"2026-06-13 07:34:26"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:36:05"}
+{"level":"info","message":"Cerrando servidor...","timestamp":"2026-06-13 07:36:05"}

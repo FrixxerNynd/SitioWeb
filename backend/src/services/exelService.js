@@ -148,7 +148,7 @@ class ExelService {
 
       //Mapear la respuesta a CategoriaResponseDto
       const categorias = response.data.datos.map(categoria => new responseDto.categoria({
-        id: categoria.id_categoria,
+        id: parseInt(categoria.id_categoria),
         nombre_categoria: categoria.nombre_categoria,
       }));
 
@@ -194,10 +194,13 @@ class ExelService {
         },
       });
 
+      // La API devuelve la clave raíz en mayúsculas "DATA"
+      const items = response.data?.DATA ?? response.data?.datos ?? [];
+
       //Mapear la respuesta a ImagenResponseDto
-      const imagenes = response.data.datos.map(imagen => new responseDto.imagenes({
+      const imagenes = items.map(imagen => new responseDto.imagenes({
         referencia: imagen.referencia,
-        imagenes: imagen.imagenes,
+        imagenes: imagen.imagenes ?? [],
       }));
 
       await this.saveImagesRedis(imagenes);
@@ -293,12 +296,13 @@ class ExelService {
     const client = await redisClient.getClient();
     const helper = new RedisHelper(client);
     try {
+
       const { saved, skipped } = await helper.saveBatch(categorias, {
         keyPrefix: 'categoria',
         idField: 'id',
         allKeysSet: 'catalogo:categorias',
         toHash: (c) => ({
-          id: String(c.id_categoria ?? ''),
+          id: String(c.id ?? ''),
           nombre_categoria: String(c.nombre_categoria ?? ''),
         }),
         indices: [],

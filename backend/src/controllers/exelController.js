@@ -62,7 +62,7 @@ class ExelController {
      */
     async getCategorias(req, res, next) {
         try {
-            const data = await exelService.getCategories();
+            const data = await exelService.getCategoriesRedis();
             res.status(200).json({ success: true, data });
         } catch (error) {
             next(error);
@@ -114,6 +114,23 @@ class ExelController {
                 success: true,
                 message: `Categorías sincronizadas: ${categorias.length} categorías guardadas en Redis`,
                 total: categorias.length,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+    /**
+     * POST /api/productos/sync-imagenes
+     * Fuerza una sincronización del catálogo de imágenes desde la API a Redis.
+     * Útil para refrescar manualmente el caché de imágenes.
+     */
+    async syncImagenes(req, res, next) {
+        try {
+            const imagenes = await exelService.getExternalImagenes([]);
+            res.status(200).json({
+                success: true,
+                message: `Imágenes sincronizadas: ${imagenes.length} productos con imágenes guardados en Redis`,
+                total: imagenes.length,
             });
         } catch (error) {
             next(error);

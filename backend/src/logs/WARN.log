@@ -1,0 +1,13 @@
+{"level":"error","message":"Error al guardar categorias en redis: logger is not defined","timestamp":"2026-06-13 06:45:28"}
+{"level":"error","message":"Error al obtener las categorias de Exel del Norte: Error al guardar categorias en redis: logger is not defined","timestamp":"2026-06-13 06:45:28"}
+{"level":"error","message":"500 - No se pudo obtener el catálogo de categorias externo - /api/productos/sync-categorias - POST - ::1","timestamp":"2026-06-13 06:45:28"}
+{"level":"error","message":"500 - exelService.getCategories is not a function - /api/productos/categorias - GET - ::1","timestamp":"2026-06-13 06:47:38"}
+{"level":"error","message":"❌ Error en Redis: Socket closed unexpectedly","timestamp":"2026-06-13 06:52:41"}
+{"level":"error","message":"❌ Error en Redis: Socket closed unexpectedly","timestamp":"2026-06-13 06:52:41"}
+{"level":"error","message":"❌ Error en Redis: Socket closed unexpectedly","timestamp":"2026-06-13 06:57:29"}
+{"level":"error","message":"❌ Error en Redis: Socket closed unexpectedly","timestamp":"2026-06-13 06:57:29"}
+{"level":"error","message":"500 - Cannot read properties of null (reading 'length') - /api/productos/redis-stats - GET - ::1","timestamp":"2026-06-13 06:58:27"}
+{"level":"error","message":"500 - Cannot read properties of null (reading 'length') - /api/productos/redis-stats - GET - ::1","timestamp":"2026-06-13 07:01:36"}
+{"level":"error","message":"500 - Cannot read properties of null (reading 'length') - /api/productos/redis-stats - GET - ::1","timestamp":"2026-06-13 07:14:49"}
+{"level":"error","message":"Error al obtener las imagenes de Exel del Norte: Cannot read properties of undefined (reading 'map')","timestamp":"2026-06-13 07:30:38"}
+{"level":"error","message":"500 - No se pudo obtener el catálogo de imagenes externo - /api/productos/sync-imagenes - POST - ::1","timestamp":"2026-06-13 07:30:38"}

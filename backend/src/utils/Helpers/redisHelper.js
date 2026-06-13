@@ -1,3 +1,5 @@
+import logger from "./logger.js";
+
 class RedisHelper {
     constructor(client) {
         this.client = client;

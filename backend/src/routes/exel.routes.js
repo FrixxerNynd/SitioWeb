@@ -165,6 +165,33 @@ exelRouter.post('/sync', exelController.syncCatalogo.bind(exelController));
  *         description: Error interno del servidor
  */
 exelRouter.post('/sync-categorias', exelController.syncCategorias.bind(exelController));
+
+/**
+ * @swagger
+ * /api/productos/sync-imagenes:
+ *   post:
+ *     summary: Sincronizar imágenes del catálogo en Redis
+ *     description: Fuerza una descarga de todas las imágenes de productos desde la API externa y las guarda en Redis.
+ *     tags: [Productos]
+ *     responses:
+ *       200:
+ *         description: Imágenes sincronizadas exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 total:
+ *                   type: integer
+ *       500:
+ *         description: Error interno del servidor
+ */
+exelRouter.post('/sync-imagenes', exelController.syncImagenes.bind(exelController));
+
 /**
  * @swagger
  * /api/productos/redis-stats:
