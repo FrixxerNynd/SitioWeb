@@ -13,26 +13,34 @@
           <!-- filtros, buscar y borrar -->
           <div class="row g-3 align-items-end">
             <div class="col-12 col-md-3">
-              <ui-inputs type="text" label="Buscador de orden" placeholder="buscador de orden" icon="fi fi-rr-search"
-                [(ngModel)]="filtroId">
-              </ui-inputs>
+              <label class="form-label text-sm font-semibold text-gray-600 mb-1">Buscador de orden</label>
+              <div class="input-group">
+                <input type="text"
+                  class="form-control h-10 rounded-end-md border-gray-300 text-sm focus:ring-2 focus:ring-[#1e3a5f]"
+                  placeholder="Buscador de orden" [(ngModel)]="filtroId" />
+              </div>
             </div>
 
             <div class="col-12 col-md-3">
-              <ui-inputs type="select" label="Estado" placeholder="Seleccionar estatus" [options]="opcionesEstatus"
+              <label class="form-label text-sm font-semibold text-gray-600 mb-1">Estado</label>
+              <select class="form-select h-10 rounded-md border-gray-300 text-sm focus:ring-2 focus:ring-[#1e3a5f]"
                 [(ngModel)]="filtroEstatus">
-              </ui-inputs>
+                <option value="">Todos</option>
+                <option value="Procesando">Pendientes / Procesando</option>
+                <option value="Entregada">Entregadas</option>
+                <option value="Cancelada">Canceladas</option>
+              </select>
             </div>
 
             <div class="col-12 col-md-2">
-              <label class="form-label text-xs font-semibold text-gray-500 mb-1">Fecha inicio</label>
+              <label class="form-label text-sm font-semibold text-gray-600 mb-1">Fecha inicio</label>
               <input type="date"
                 class="form-control h-10 rounded-md border-gray-300 text-sm focus:ring-2 focus:ring-[#1e3a5f]"
                 [(ngModel)]="filtroFechaInicio" />
             </div>
 
             <div class="col-12 col-md-2">
-              <label class="form-label text-xs font-semibold text-gray-500 mb-1">Fecha fin</label>
+              <label class="form-label text-sm font-semibold text-gray-600 mb-1">Fecha fin</label>
               <input type="date"
                 class="form-control h-10 rounded-md border-gray-300 text-sm focus:ring-2 focus:ring-[#1e3a5f]"
                 [(ngModel)]="filtroFechaFin" />
@@ -51,7 +59,19 @@
         </div>
       </div>
 
-      <!-- TARJETAS TOTAL GASTADO -->
+      <!-- TARJETAS TOTAL GASTADO - SKELETON O CONTENIDO -->
+      @if (loadingData) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 mb-6">
+        <div *ngFor="let _ of [1,2,3,4]" class="bg-white border border-zinc-200 rounded-xl p-3">
+          <div class="flex items-center gap-2 mb-1">
+            <div class="skeleton-shimmer w-4 h-4 rounded"></div>
+            <div class="skeleton-shimmer h-4 rounded w-24"></div>
+          </div>
+          <div class="skeleton-shimmer h-10 rounded w-28 my-1"></div>
+          <div class="skeleton-shimmer h-3 rounded w-32 hidden sm:block"></div>
+        </div>
+      </div>
+      } @else {
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 mb-6">
         <!-- Tarjeta 1 - Total gastado -->
         <div
@@ -97,10 +117,58 @@
           <span class="text-zinc-600 text-sm hidden sm:block">Compras que aún están en curso</span>
         </div>
       </div>
+      }
 
-      <!-- TABLA -->
+      <!-- TABLA - SKELETON O CONTENIDO -->
       <div class="border border-zinc-200 rounded-lg overflow-hidden my-4">
-        @if (ordenesFiltradas.length > 1) {
+        @if (loadingData) {
+        <!-- Skeleton de tabla usando tu CSS -->
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead class="bg-gray-50 text-left text-gray-500 font-semibold text-xs uppercase"
+              style="border-bottom: 1px solid #e4e4e7;">
+              <tr>
+                <th class="p-4">Orden</th>
+                <th class="p-4">Fecha</th>
+                <th class="p-4">Tipo de pago</th>
+                <th class="p-4">Total</th>
+                <th class="p-4">Estado</th>
+                <th class="p-4 text-end w-4">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let _ of [1,2,3,4,5]" class="bg-white" style="border-bottom: 1px solid #e4e4e7;">
+                <td class="p-4">
+                  <div class="skeleton-shimmer h-4 rounded w-20"></div>
+                </td>
+                <td class="p-4">
+                  <div class="skeleton-shimmer h-4 rounded w-24"></div>
+                </td>
+                <td class="p-4">
+                  <div class="skeleton-shimmer h-4 rounded w-28"></div>
+                </td>
+                <td class="p-4">
+                  <div class="skeleton-shimmer h-4 rounded w-16"></div>
+                </td>
+                <td class="p-4">
+                  <div class="skeleton-shimmer h-6 rounded w-20"></div>
+                </td>
+                <td class="p-4 text-end">
+                  <div class="skeleton-shimmer h-5 w-5 rounded ml-auto"></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-gray-50 border-t border-gray-200">
+          <div class="skeleton-shimmer h-4 rounded w-32"></div>
+          <div class="flex items-center gap-3">
+            <div class="skeleton-shimmer h-8 rounded w-24"></div>
+            <div class="skeleton-shimmer h-8 rounded w-20"></div>
+          </div>
+        </div>
+        } @else {
+        @if (ordenesFiltradas.length > 0) {
         <div class="overflow-x-auto">
           <table class="w-full border-collapse">
             <thead class="bg-gray-50 text-left text-gray-500 font-semibold text-xs uppercase"
@@ -123,16 +191,16 @@
                 <td class="p-4">{{ orden.total | currency }}</td>
                 <td class="p-4">
                   <span class="inline-block px-3 py-1 rounded text-xs font-semibold" [ngClass]="{
-                  'bg-green-100 text-green-700': orden.estado === 'Entregada',
-                  'bg-red-100 text-red-700': orden.estado === 'Cancelada',
-                  'bg-blue-100 text-blue-700': orden.estado === 'Procesando'
-                }">
+                        'bg-green-100 text-green-700': orden.estado === 'Entregada',
+                        'bg-red-100 text-red-700': orden.estado === 'Cancelada',
+                        'bg-blue-100 text-blue-700': orden.estado === 'Procesando'
+                      }">
                     {{ orden.estado }}
                   </span>
                 </td>
                 <td class="p-4 text-end w-16">
-                  
-                  <button class="text-gray-600 hover:text-[#1e3a5f] transition-colors p-1" (click)="verDetalleOrden(orden)">
+                  <button class="text-gray-600 hover:text-[#1e3a5f] transition-colors p-1"
+                    (click)="verDetalleOrden(orden)">
                     <app-ui-icono name="eye" size="h-5 w-5"></app-ui-icono>
                   </button>
                 </td>
@@ -165,19 +233,22 @@
           </div>
         </div>
         } @else {
-          <!-- Órdenes vacías -->
-          <div class="flex flex-col items-center justify-center py-12 w-full bg-white">
-            <div class="text-center">
-              <div class="mb-4 inline-flex items-center justify-center w-16 h-16 bg-amber-50 rounded-full text-amber-500">
-                <app-ui-icono name="search" size="w-8 h-8"></app-ui-icono>
-              </div>
-              <h4 class="font-bold text-gray-900 text-xl mb-2">No se encontraron órdenes</h4>
-              <p class="text-gray-500 text-sm">
-                Prueba ajustar tus filtros de búsqueda.
-                <a href="javascript:void(0)" class="text-blue-600 underline hover:text-blue-800" (click)="limpiarFiltros()">Limpiar filtro</a>
-              </p>
+        <!-- Órdenes vacías -->
+        <div class="flex flex-col items-center justify-center w-full bg-white"
+          style="padding-bottom: 62px; padding-top: 62px;">
+          <div class="text-center">
+            <div class="mb-4 inline-flex items-center justify-center w-16 h-16 bg-amber-50 rounded-full">
+              <app-ui-icono name="magnifying-glass" size="w-8 h-8" color="text-amber-500"></app-ui-icono>
             </div>
+            <h4 class="font-bold text-gray-900 text-xl mb-2">No se encontraron órdenes</h4>
+            <p class="text-gray-500 text-sm">
+              Prueba ajustar tus filtros de búsqueda.
+              <a href="javascript:void(0)" class="text-blue-600 underline hover:text-blue-800"
+                (click)="limpiarFiltros()">Limpiar filtro</a>
+            </p>
           </div>
+        </div>
+        }
         }
       </div>
     </div>
