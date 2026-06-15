@@ -54,5 +54,15 @@ namespace back_cabs.CRM.Interfaces.Legacy
         /// Actualiza la contraseña (cifrada) de un cliente legacy por email
         /// </summary>
         Task<bool> ActualizarContrasenaAsync(string email, string nuevaPassword);
+
+        /// <summary>
+        /// Obtiene lista paginada de clientes inactivos (CEstatus = 0), ordenados por fecha de alta más reciente
+        /// </summary>
+        Task<(List<AdmClienteConDomicilioResponseDto> Clientes, int TotalRegistros, int TotalPaginas)> GetClientesInactivosAsync(int numeroPagina = 1, int tamanoPagina = 50);
+
+        /// <summary>
+        /// Obtiene el detalle completo (datos + domicilio) de un cliente inactivo para su revisión previa a la activación
+        /// </summary>
+        Task<AdmClienteConDomicilioResponseDto?> GetDetalleClienteInactivoAsync(int idCliente);
     }
 }

@@ -291,5 +291,40 @@ namespace back_cabs.CRM.repositories.Legacy
                 throw;
             }
         }
+
+        /// <summary>
+        /// Obtener clientes inactivos (CEstatus = 0) paginados, ordenados por fecha de alta descendente
+        /// </summary>
+        public async Task<(List<AdmCliente> Clientes, int TotalRegistros)> GetClientesInactivosAsync(int numeroPagina, int tamanoPagina)
+        {
+            try
+            {
+                var query = _context.AdmClientes
+                    .AsNoTracking()
+                    .Where(c => c.CEstatus == 0);
+
+                var total = await query.CountAsync();
+
+                var skip = (numeroPagina - 1) * tamanoPagina;
+                var take = Math.Min(tamanoPagina, 100);
+
+                var clientes = await query
+                    .OrderByDescending(c => c.CFechaAlta)
+                    .Skip(skip)
+                    .Take(take)
+                    .ToListAsync();
+
+                _logger.LogInformation(
+                    "✅ Clientes inactivos obtenidos. Total: {Total}, Página: {Pagina}, Retornados: {Count}",
+                    total, numeroPagina, clientes.Count);
+
+                return (clientes, total);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error al obtener clientes inactivos");
+                throw;
+            }
+        }
     }
 }

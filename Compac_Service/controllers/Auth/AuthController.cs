@@ -302,6 +302,113 @@ namespace back_cabs.CRM.controllers.Auth
 
 
         /// <summary>
+        /// Obtiene la lista paginada de clientes inactivos (pendientes de activación), ordenados por fecha de registro más reciente
+        /// </summary>
+        /// <param name="pagina">Número de página (inicia en 1, default 1)</param>
+        /// <param name="tamano">Registros por página (máximo 100, default 50)</param>
+        /// <returns>Lista paginada de clientes inactivos con datos de domicilio</returns>
+        /// <response code="200">Lista obtenida exitosamente</response>
+        /// <response code="401">No autorizado</response>
+        /// <response code="500">Error interno del servidor</response>
+        [HttpGet("clientes-inactivos")]
+        [Authorize]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetClientesInactivos(
+            [FromQuery] int pagina = 1,
+            [FromQuery] int tamano = 50)
+        {
+            try
+            {
+                _logger.LogInformation("🔍 Solicitando clientes inactivos. Página: {Pagina}, Tamaño: {Tam}", pagina, tamano);
+
+                var tamanoPaginado = Math.Clamp(tamano, 1, 100);
+                var numeroPagina = Math.Max(1, pagina);
+
+                var (clientes, total, totalPaginas) = await _admClienteService.GetClientesInactivosAsync(numeroPagina, tamanoPaginado);
+
+                return Ok(new
+                {
+                    success = true,
+                    data = clientes,
+                    count = clientes.Count,
+                    totalRegistros = total,
+                    totalPaginas,
+                    paginaActual = numeroPagina,
+                    tamanoPagina = tamanoPaginado
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error al obtener clientes inactivos");
+                return StatusCode(500, UtilidadesManejoErrores.CreateErrorResponse(
+                    TipoError.ErrorServidorInterno,
+                    "Error interno del servidor",
+                    "No se pudo obtener la lista de clientes inactivos"));
+            }
+        }
+
+        /// <summary>
+        /// Obtiene el detalle completo de un cliente inactivo por ID, para su revisión previa a la activación
+        /// </summary>
+        /// <param name="id">ID del cliente en COMPAC (CIdClienteProveedor)</param>
+        /// <returns>Datos completos del cliente con domicilio</returns>
+        /// <response code="200">Cliente encontrado exitosamente</response>
+        /// <response code="404">Cliente no encontrado</response>
+        /// <response code="409">El cliente ya está activo</response>
+        /// <response code="401">No autorizado</response>
+        /// <response code="500">Error interno del servidor</response>
+        [HttpGet("clientes-inactivos/{id:int}")]
+        [Authorize]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Conflict)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetDetalleClienteInactivo(int id)
+        {
+            try
+            {
+                _logger.LogInformation("🔍 Solicitando detalle de cliente inactivo ID: {Id}", id);
+
+                var cliente = await _admClienteService.GetDetalleClienteInactivoAsync(id);
+
+                if (cliente == null)
+                {
+                    return NotFound(UtilidadesManejoErrores.CreateErrorResponse(
+                        TipoError.ErrorNoEncontrado,
+                        "Cliente no encontrado",
+                        $"No se encontró ningún cliente con ID {id}"));
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    data = cliente
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning("⚠️ Cliente {Id} ya activo: {Mensaje}", id, ex.Message);
+                return Conflict(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error al obtener detalle del cliente inactivo {Id}", id);
+                return StatusCode(500, UtilidadesManejoErrores.CreateErrorResponse(
+                    TipoError.ErrorServidorInterno,
+                    "Error interno del servidor",
+                    $"No se pudo obtener el detalle del cliente {id}"));
+            }
+        }
+
+
+        /// <summary>
         /// ✅ MEJORA 5: Obtiene un token CSRF para proteger requests subsecuentes
         /// </summary>
         /// <remarks>

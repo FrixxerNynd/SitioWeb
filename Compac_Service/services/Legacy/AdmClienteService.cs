@@ -706,5 +706,91 @@ namespace back_cabs.CRM.services.Legacy
                 .AsNoTracking()
                 .AnyAsync(c => c.CIdClienteProveedor == idCliente && c.CEstatus == 1);
         }
+
+        /// <summary>
+        /// Lista paginada de clientes inactivos (CEstatus = 0), ordenados por fecha de alta más reciente
+        /// OPTIMIZADO: Usa Redis con TTL corto (2 min) para reflejar cambios rápidos de activación
+        /// </summary>
+        public async Task<(List<AdmClienteConDomicilioResponseDto> Clientes, int TotalRegistros, int TotalPaginas)> GetClientesInactivosAsync(int numeroPagina = 1, int tamanoPagina = 50)
+        {
+            try
+            {
+                var cacheKey = $"AdmClientes:Inactivos:Pagina:{numeroPagina}:Tam:{tamanoPagina}";
+
+                var cachedResult = await _cacheService.GetAsync<(List<AdmClienteConDomicilioResponseDto>, int, int)>(cacheKey);
+                if (cachedResult != default)
+                {
+                    _logger.LogInformation("✅ Cache HIT - Clientes inactivos desde Redis. Key: {Key}, Count: {Count}",
+                        cacheKey, cachedResult.Item1.Count);
+                    return cachedResult;
+                }
+
+                _logger.LogInformation("🔍 Cache MISS - Consultando clientes inactivos en BD. Página: {Pagina}, Tamaño: {Tam}",
+                    numeroPagina, tamanoPagina);
+
+                var (clientes, total) = await _repository.GetClientesInactivosAsync(numeroPagina, tamanoPagina);
+
+                var clientesConDomicilio = await CargarDomiciliosAsync(clientes, null, true);
+
+                var totalPaginas = total == 0 ? 0 : (int)Math.Ceiling(total / (double)tamanoPagina);
+
+                var resultado = (clientesConDomicilio, total, totalPaginas);
+
+                // TTL corto (2 min) porque el listado cambia con cada autorización
+                await _cacheService.SetAsync(cacheKey, resultado, TimeSpan.FromMinutes(2));
+                _logger.LogInformation("💾 Clientes inactivos guardados en Redis. Count: {Count}, Key: {Key}",
+                    clientesConDomicilio.Count, cacheKey);
+
+                return resultado;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error al obtener clientes inactivos");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Detalle completo de un cliente inactivo para revisión previa a activación.
+        /// Retorna null si el cliente no existe. Lanza InvalidOperationException si ya está activo.
+        /// </summary>
+        public async Task<AdmClienteConDomicilioResponseDto?> GetDetalleClienteInactivoAsync(int idCliente)
+        {
+            try
+            {
+                _logger.LogInformation("🔍 Obteniendo detalle de cliente inactivo ID: {IdCliente}", idCliente);
+
+                var cliente = await _context.AdmClientes
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.CIdClienteProveedor == idCliente);
+
+                if (cliente == null)
+                {
+                    _logger.LogWarning("⚠️ Cliente {IdCliente} no encontrado", idCliente);
+                    return null;
+                }
+
+                if (cliente.CEstatus == 1)
+                {
+                    _logger.LogWarning("⚠️ Cliente {IdCliente} ya se encuentra activo (CEstatus=1)", idCliente);
+                    throw new InvalidOperationException($"El cliente con ID {idCliente} ya está activo y no requiere activación.");
+                }
+
+                var domicilios = await CargarDomiciliosAsync(new List<AdmCliente> { cliente }, null, true);
+
+                _logger.LogInformation("✅ Detalle de cliente inactivo {IdCliente} obtenido", idCliente);
+
+                return domicilios.FirstOrDefault();
+            }
+            catch (InvalidOperationException)
+            {
+                throw; // Relanzan para que el controller devuelva 409 Conflict
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error al obtener detalle del cliente inactivo {IdCliente}", idCliente);
+                throw;
+            }
+        }
     }
 }

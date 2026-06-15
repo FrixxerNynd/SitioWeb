@@ -37,5 +37,10 @@ namespace back_cabs.CRM.Interfaces.Legacy
         /// Obtener cliente por email principal
         /// </summary>
         Task<AdmCliente?> GetByEmailAsync(string email);
+
+        /// <summary>
+        /// Obtener clientes inactivos (CEstatus = 0) paginados, ordenados por fecha de alta descendente
+        /// </summary>
+        Task<(List<AdmCliente> Clientes, int TotalRegistros)> GetClientesInactivosAsync(int numeroPagina, int tamanoPagina);
     }
 }
