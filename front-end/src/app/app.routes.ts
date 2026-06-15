@@ -12,6 +12,8 @@ import { PageDetalleProducto } from './pages/usuario/pages/catalogo-producto/det
 import { ListaOrdenPague } from './pages/usuario/pages/orden-compra/lista-orden/lista-orden';
 import { MainLayout } from './layouts/main-layout/main-layout';
 import { AuthLayout } from './layouts/auth-layout/auth-layout';
+import { PagueListaPreRegistro } from './pages/administrador/pages/lista-pre-registro/lista-pre-registro'; 
+import { PagueDetallesPreRegistro } from './pages/administrador/pages/lista-pre-registro/detalles-pre-registro/detalles-pre-registro';
 //import { AuthGuard } from './guards/auth.guard'; 
 
 export const routes: Routes = [
@@ -60,6 +62,15 @@ export const routes: Routes = [
                 path: 'ordenes',
                 children: [
                     { path: 'lista-ordenes', component: ListaOrdenPague },
+                ]
+            },
+            {
+                path:'administrador',
+                children:[
+                    { path: 'lista-pre-registro', component: PagueListaPreRegistro },
+                    { path: 'lista-pre-registro/detalle/:id', component: PagueDetallesPreRegistro },
+                    { path: '', redirectTo: 'lista-pre-registro', pathMatch: 'full' }
+
                 ]
             }
         ]

@@ -1,15 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Inputs } from '../../../../../components/shared/inputs/inputs';
 import { UiBoton } from '../../../../../components/shared/boton/boton';
 import { UiIconComponent } from '../../../../../components/shared/icono/icono.component';
-import { DetallesOrdenComponent } from './detalles-orden/detalles-orden'; 
+import { ModalDetallesOrdenComponent } from './detalles-orden/detalles-orden'; 
 
 @Component({
-  selector: 'app-lista-orden',
   standalone: true,
-  imports: [CommonModule, FormsModule, Inputs, UiBoton, UiIconComponent, DetallesOrdenComponent],
+  imports: [CommonModule, FormsModule, UiBoton, UiIconComponent, ModalDetallesOrdenComponent],
   styleUrl: './lista-orden.css',
   templateUrl: './lista-orden.html',
 })

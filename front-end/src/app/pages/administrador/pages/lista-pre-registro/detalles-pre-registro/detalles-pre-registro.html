@@ -1,0 +1,368 @@
+<div class="bg-gray-50 min-h-screen">
+    <div class="container-fluid">
+        <div class="container py-4">
+            <!-- Encabezado con botón de regreso -->
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-start gap-3">
+                    <button class="p-2 hover:bg-white " style="border-radius: 50%;" (click)="regresar()">
+                        <app-ui-icono name="arrow-long-left" size="h-8 w-8"></app-ui-icono>
+                    </button>
+                    <div>
+                        <span class="text-2xl font-bold text-gray-900">Detalles del pre-registro</span>
+                        <p class="text-gray-800 font-normal text-base">Información completa del solicitante</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SKELETON DE CARGA -->
+            @if (loadingData) {
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Skeleton columna izquierda -->
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div class="p-4 border-b border-gray-100 bg-gray-50/50">
+                        <div class="flex items-center gap-2">
+                            <div class="skeleton-shimmer w-5 h-5 rounded"></div>
+                            <div class="skeleton-shimmer h-6 w-40 rounded"></div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2 p-4 divide-y divide-gray-100">
+                        <!-- Identificación skeleton -->
+                        <div class="pb-3">
+                            <div class="skeleton-shimmer h-4 w-24 rounded mb-2"></div>
+                            <div class="flex flex-col gap-2">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-16 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-32 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-32 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-48 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-28 rounded"></div>
+                                    <div class="skeleton-shimmer h-8 w-24 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-24 rounded"></div>
+                                    <div class="skeleton-shimmer h-8 w-24 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-28 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-32 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contacto skeleton -->
+                        <div class="pb-3">
+                            <div class="skeleton-shimmer h-4 w-20 rounded mb-2"></div>
+                            <div class="flex flex-col gap-2">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-32 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-48 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-24 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-32 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-32 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-32 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dirección skeleton -->
+                        <div class="pb-3">
+                            <div class="skeleton-shimmer h-4 w-20 rounded mb-2"></div>
+                            <div class="flex flex-col gap-2">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-16 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-48 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-28 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-16 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-28 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-16 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-32 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-48 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-20 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-32 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-28 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-20 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-16 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-32 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información de crédito skeleton -->
+                        <div class="pb-3">
+                            <div class="skeleton-shimmer h-4 w-32 rounded mb-2"></div>
+                            <div class="flex flex-col gap-2">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-28 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-32 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-40 rounded"></div>
+                                    <div class="skeleton-shimmer h-8 w-24 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-24 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-20 rounded"></div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="skeleton-shimmer h-5 w-40 rounded"></div>
+                                    <div class="skeleton-shimmer h-5 w-20 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones skeleton -->
+                        <div class="flex justify-between pt-3">
+                            <div class="skeleton-shimmer h-10 w-28 rounded-lg"></div>
+                            <div class="flex gap-2">
+                                <div class="skeleton-shimmer h-10 w-36 rounded-lg"></div>
+                                <div class="skeleton-shimmer h-10 w-44 rounded-lg"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skeleton columna derecha -->
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div class="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50/50">
+                        <div class="flex items-center gap-2">
+                            <div class="skeleton-shimmer w-5 h-5 rounded"></div>
+                            <div class="skeleton-shimmer h-6 w-40 rounded"></div>
+                        </div>
+                        <div class="skeleton-shimmer w-5 h-5 rounded"></div>
+                    </div>
+                    <div class="size-full p-6">
+                        <div class="skeleton-shimmer h-64 w-full rounded-lg"></div>
+                    </div>
+                </div>
+            </div>
+            }
+
+            <!-- ERROR DE CARGA -->
+            @if (errorCarga) {
+            <div class="flex flex-col items-center justify-center h-full bg-white rounded-xl border border-gray-200"
+                style="padding-bottom: 32px; padding-top: 32px;">
+                <div class="mb-2 inline-flex items-center justify-center w-16 h-16 bg-red-50 rounded-full">
+                    <app-ui-icono name="exclamation-triangle" size="w-8 h-8" color="text-red-500"></app-ui-icono>
+                </div>
+                <span class="text-xl font-semibold text-gray-900 mb-2">Error al cargar los datos</span>
+                <p class="text-gray-800 text-sm mb-2">No se pudo encontrar el pre-registro solicitado</p>
+                <ui-boton text="Volver al listado" tipo="cerrar" (btnClick)="regresar()"></ui-boton>
+            </div>
+            }
+
+            <!-- CONTENIDO PRINCIPAL - DOS COLUMNAS -->
+            @if (!loadingData && !errorCarga && cliente) {
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- COLUMNA IZQUIERDA: DATOS DEL CLIENTE -->
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div class="p-4 border-b border-gray-100 bg-gray-50/50">
+                        <div class="flex items-center gap-2">
+                            <app-ui-icono name="user" size="w-5 h-5" color="text-[#1e3a5f]"></app-ui-icono>
+                            <span class="text-lg font-semibold text-gray-900">Datos del solicitante</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2 p-4 divide-y divide-gray-100">
+                        <!-- Identificación -->
+                        <div class="pb-3">
+                            <span class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Identificación</span>
+                            <div class="flex flex-col gap-2">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">RFC</span>
+                                    <span class="text-base font-mono font-medium text-gray-900">{{ cliente.rfc }}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Nombre completo</span>
+                                    <span class="text-base font-medium text-gray-900">{{ cliente.nombre }} {{ cliente.apellidoPaterno }} {{ cliente.apellidoMaterno }}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Estado del pre-registro</span>
+                                    <span>
+                                        <span class="inline-block px-3 py-1 rounded text-sm font-semibold tracking-wider" [ngClass]="{
+                                            'bg-yellow-100 text-yellow-700': cliente.estado === 'Pendiente',
+                                            'bg-green-100 text-green-700': cliente.estado === 'Aprobado',
+                                            'bg-red-100 text-red-700': cliente.estado === 'Denegado'
+                                        }">
+                                            {{ cliente.estado || 'Pendiente' }}
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Estado CONTPAQI®</span>
+                                    <span>
+                                        <span class="inline-block px-3 py-1 rounded text-sm font-semibold tracking-wider" [ngClass]="{
+                                            'bg-green-100 text-green-700': cliente.estadoContpaqi === 'Enlazado',
+                                            'bg-gray-100 text-gray-600': cliente.estadoContpaqi === 'SinEnlazar'
+                                        }">
+                                            {{ cliente.estadoContpaqi === 'Enlazado' ? 'Enlazado' : 'Sin Enlazar' }}
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Fecha de registro</span>
+                                    <span class="text-base font-medium text-gray-900">{{ cliente.fechaRegistroFormateada }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contacto -->
+                        <div class="pb-3">
+                            <span class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Contacto</span>
+                            <div class="flex flex-col gap-2">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Correo electrónico</span>
+                                    <span class="text-base font-medium text-gray-900">{{ cliente.cuenta.correo }}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Teléfono fijo</span>
+                                    <span class="text-base font-medium text-gray-900">{{ cliente.telefonoFijo || 'No especificado' }}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Teléfono WhatsApp</span>
+                                    <span class="text-base font-medium text-gray-900">{{ cliente.telefonoWhatsApp || 'No especificado' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dirección -->
+                        <div class="pb-3">
+                            <span class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Dirección</span>
+                            <div class="flex flex-col gap-2">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Calle</span>
+                                    <span class="text-base font-medium text-gray-900">{{ cliente.direccion.calle }}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Número exterior</span>
+                                    <span class="text-base font-medium text-gray-900">{{ cliente.direccion.numeroExterior }}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Número interior</span>
+                                    <span class="text-base font-medium text-gray-900">{{ cliente.direccion.numeroInterior || 'N/A' }}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Colonia/Municipio</span>
+                                    <span class="text-base font-medium text-gray-900">{{ cliente.direccion.municipio }}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Estado</span>
+                                    <span class="text-base font-medium text-gray-900">{{ cliente.direccion.estado }}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Código postal</span>
+                                    <span class="text-base font-medium text-gray-900">{{ cliente.direccion.codigoPostal }}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">País</span>
+                                    <span class="text-base font-medium text-gray-900">{{ cliente.direccion.pais }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información de crédito -->
+                        <div class="pb-3">
+                            <span class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Información de crédito</span>
+                            @if (cliente.credito?.estadoCredito == true) {
+                            <div class="flex flex-col gap-2">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Límite de crédito</span>
+                                    <span class="text-base font-medium text-gray-900">{{ formatCurrency(cliente.credito.limiteCredito) }}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Permiso exceder el limite crédito</span>
+                                    <span>
+                                        <span class="inline-block px-3 py-1 rounded text-sm font-semibold" [ngClass]="{
+                                            'bg-green-100 text-green-700': cliente.credito.permisoExceder === true,
+                                            'bg-red-100 text-red-700': cliente.credito.permisoExceder === false
+                                        }">
+                                            {{ cliente.credito.permisoExceder ? 'Permitido' : 'Denegado' }}
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Días de crédito</span>
+                                    <span class="text-base font-medium text-gray-900">{{ cliente.credito.diasCredito }} días</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <span class="text-base text-gray-800">Limites documentos vencido</span>
+                                    <span class="text-base font-medium text-gray-900">{{ cliente.credito.limiteDocumentosVencido }} doc.</span>
+                                </div>
+                            </div>
+                            } @else {
+                            <div class="flex flex-col gap-2 justify-center items-center p-3 rounded-lg border mt-2 bg-zinc-50">
+                                <div class="flex flex-col justify-center items-center rounded-full bg-blue-50 w-10 h-10">
+                                    <app-ui-icono name="document-duplicate" size="w-6 h-6" color="text-blue-800"></app-ui-icono>
+                                </div>
+                                <div class="flex flex-col gap-1 text-center">
+                                    <span class="font-medium text-zinc-800 text-base">Sin información de crédito disponible</span>
+                                    <span class="font-medium text-zinc-600 text-sm tracking-wide">El usuario aún no está registrado en Contpaqi Comercial. Completa su registro para visualizar sus datos crediticios.</span>
+                                </div>
+                            </div>
+                            }
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="flex justify-between pt-3">
+                            <ui-boton tipo="cerrar" text="Regresar" (btnClick)="regresar()" [disabled]="false"></ui-boton>
+                            <div class="flex gap-2">
+                                <ui-boton tipo="cerrar" text="Cancelar solicitud" (btnClick)="regresar()" [disabled]="false"></ui-boton>
+                                <ui-boton tipo="primario" text="Confirmar pre-registro" (btnClick)="regresar()" [disabled]="false"></ui-boton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA DERECHA: CONSTANCIA FISCAL -->
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div class="p-4 border-b border-gray-100 bg-gray-50/50">
+                        <div class="flex items-center justify-between">
+                            <div class="flex justify-center items-center gap-2">
+                                <app-ui-icono name="document-text" size="w-5 h-5" color="text-[#1e3a5f]"></app-ui-icono>
+                                <span class="text-lg font-semibold text-gray-900">Constancia fiscal</span>
+                            </div>
+                            @if(cliente.constanciaFiscal?.disponible){
+                            <app-ui-icono name="arrow-down-tray" size="w-5 h-5" color="text-[#1e3a5f]"></app-ui-icono>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="size-full">
+                        @if (cliente.constanciaFiscal?.disponible) {
+                        <div class="flex justify-center items-center overflow-hidden bg-gray-50 text-center size-full" style="min-height: 400px;">
+                            <span class="text-2xl text-zinc-800 font-semibold">Imagen de constancia fiscal</span>
+                        </div>
+                        } @else {
+                        <div class="flex flex-col items-center justify-center text-center size-full" style="min-height: 400px;">
+                            <div class="w-15 h-15 bg-gray-100 rounded-full flex items-center justify-center mb-2">
+                                <app-ui-icono name="x-mark" size="w-8 h-8" color="text-gray-800"></app-ui-icono>
+                            </div>
+                            <span class="text-lg font-medium text-gray-700 mb-2">Constancia no disponible</span>
+                            <p class="text-gray-400 text-sm max-w-xs">El solicitante aún no ha subido su constancia de situación fiscal</p>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</div>

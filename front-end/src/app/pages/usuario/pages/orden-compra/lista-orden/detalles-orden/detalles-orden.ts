@@ -4,13 +4,13 @@ import { UiBoton } from '../../../../../../components/shared/boton/boton';
 import { UiIconComponent } from "../../../../../../components/shared/icono/icono.component";
 
 @Component({
-  selector: 'app-detalles-orden',
+  selector: 'modal-detalles-orden',
   standalone: true,
   imports: [CommonModule, UiBoton, UiIconComponent],
   templateUrl: './detalles-orden.html',
   styleUrls: ['./detalles-orden.css']
 })
-export class DetallesOrdenComponent implements OnChanges {
+export class ModalDetallesOrdenComponent implements OnChanges {
   @Input() orden: any = null;
   @Input() visible: boolean = false;
   @Output() visibleChange = new EventEmitter<boolean>();
