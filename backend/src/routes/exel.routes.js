@@ -42,16 +42,16 @@ const exelRouter = Router();
  *           type: string
  *         description: ID de la marca para filtrar
  *       - in: query
- *         name: limite
+ *         name: pageSize
  *         schema:
  *           type: integer
  *           default: 50
- *         description: Número máximo de resultados (paginación)
+ *         description: Número de resultados por página
  *       - in: query
- *         name: offset
+ *         name: page
  *         schema:
  *           type: integer
- *           default: 0
+ *           default: 1
  *         description: Índice de inicio (paginación)
  *     responses:
  *       200:
@@ -79,7 +79,6 @@ const exelRouter = Router();
  *         description: Error interno del servidor
  */
 exelRouter.get('/', exelController.getProductos.bind(exelController));
-
 /**
  * @swagger
  * /api/productos/categorias:
@@ -315,6 +314,28 @@ exelRouter.get('/ofertas', exelController.getProductosEnOferta.bind(exelControll
  *         description: Error interno del servidor
  */
 exelRouter.get('/precios', exelController.getPrecios.bind(exelController));
+
+/**
+ * @swagger
+ * /api/productos/{referencia}:
+ *   get:
+ *     summary: Obtener un producto por referencia
+ *     tags: [Productos]
+ *     parameters:
+ *       - in: path
+ *         name: referencia
+ *         schema:
+ *           type: string
+ *         description: Referencia del producto a obtener
+ *     responses:
+ *       200:
+ *         description: Producto obtenido exitosamente
+ *       404:
+ *         description: Producto no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ * */
+exelRouter.get('/:referencia', exelController.getProductByReference.bind(exelController));
 
 //#endregion
 

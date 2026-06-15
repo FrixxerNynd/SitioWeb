@@ -469,13 +469,51 @@
             <ui-producto-card [imagen]="product.imagen_principal ?? ''" [nombre]="product.nombre"
               [oferta]="product.oferta" [stock]="+product.stock" [marca]="product.marca_nombre"
               [categoria]="product.categoria_nombre" [precio]="roundPrice(product.precio)"
-              [precioOriginal]="roundPrice(product.precio_sin_oferta)" [id]="product.id"
+              [precioOriginal]="roundPrice(product.precio_sin_oferta)" [referencia]="product.referencia"
               (agregar)="agregarAlCarrito(product)" />
             }
           </div>
 
           @if (totalPagesCalculated() > 1) {
-          <!-- ... tu paginación existente ... -->
+          @if (totalPagesCalculated() > 1) {
+<div class="paginacion-container">
+    <div class="paginacion-info">
+        Mostrando {{ getRangoInicio() }} - {{ getRangoFin() }} de {{ filteredProducts().length }} productos
+    </div>
+
+    <div class="paginacion-controles">
+        <!-- Anterior -->
+        <button 
+            class="btn-pagina" 
+            (click)="prevPage()" 
+            [disabled]="currentPage() === 1">
+            ‹
+        </button>
+
+        <!-- Números de página -->
+        @for (page of getPageNumbers(); track page) {
+            @if (page === -1) {
+                <span class="pagina-ellipsis">...</span>
+            } @else {
+                <button 
+                    class="btn-pagina"
+                    [class.active]="page === currentPage()"
+                    (click)="goToPage(page)">
+                    {{ page }}
+                </button>
+            }
+        }
+
+        <!-- Siguiente -->
+        <button 
+            class="btn-pagina" 
+            (click)="nextPage()" 
+            [disabled]="currentPage() === totalPagesCalculated()">
+            ›
+        </button>
+    </div>
+</div>
+}
           }
 
           @if (filteredProducts().length === 0 && !isLoading()) {

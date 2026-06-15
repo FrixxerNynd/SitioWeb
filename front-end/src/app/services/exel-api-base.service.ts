@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CookieService } from './cookie.service';
-import { IProduct, IBrand, ICategory, IApiResponse } from '../interfaces/interface-excel-norte/excel-norte-interface';
+import { IProductosPageResponse, IProduct, IBrand, ICategory, IApiResponse } from '../interfaces/interface-excel-norte/excel-norte-interface';
 
 @Injectable({
     providedIn: 'root'
@@ -13,7 +13,7 @@ import { IProduct, IBrand, ICategory, IApiResponse } from '../interfaces/interfa
 export class ExcelNorteCatalogoService {
     private http = inject(HttpClient);
     private cookieService = inject(CookieService);
-    private baseUrl = environment.apiCabsUrl;
+    private baseUrl = environment.backendUrl;
     private apiKey = environment.Authorization;
 
     private imagenesCache = new Map<string, string>();
@@ -116,147 +116,216 @@ export class ExcelNorteCatalogoService {
     }
 
     // Obtener imagen de un producto (con caché)
-    async getImagenProducto(claveProducto: string): Promise<string | null> {
-        if (this.imagenesCache.has(claveProducto)) {
-            console.log(`📦 Imagen en caché para: ${claveProducto}`);
-            return this.imagenesCache.get(claveProducto) || null;
+    async getImagenProducto(referencia: string): Promise<string | null> {
+        if (this.imagenesCache.has(referencia)) {
+            console.log(`📦 Imagen en caché para: ${referencia}`);
+            return this.imagenesCache.get(referencia) || null;
         }
         
         try {
-            const respuesta = await this.get<any>('imagenes', { clave_producto: claveProducto });
+            const respuesta = await this.get<any>('productos/imagenes', { referencia: referencia });
 
             if (respuesta?.RESULT && respuesta.DATA && respuesta.DATA.length > 0) {
                 const urlImagen = respuesta.DATA[0].url_imagen;
-                this.imagenesCache.set(claveProducto, urlImagen);
-                console.log(`✅ Imagen obtenida para: ${claveProducto}`);
+                this.imagenesCache.set(referencia, urlImagen);
+                console.log(`✅ Imagen obtenida para: ${referencia}`);
                 return urlImagen;
             }
-            console.log(`⚠️ Sin imagen para: ${claveProducto}`);
+            console.log(`⚠️ Sin imagen para: ${referencia}`);
             return null;
         } catch (error) {
-            console.error(`Error al obtener imagen de ${claveProducto}:`, error);
+            console.error(`Error al obtener imagen de ${referencia}:`, error);
             return null;
         }
     }
 
-    // Obtener todas las imágenes de un producto
-    async getImagenesProducto(claveProducto: string): Promise<string[]> {
-        try {
-            const respuesta = await this.get<any>('imagenes', { clave_producto: claveProducto });
+    /// Obtener imágenes de un solo producto
+async getImagenesProducto(referencia: string): Promise<string[]> {
+    try {
+        const respuesta = await this.get<any>('productos/imagenes', { referencias: referencia });
 
-            if (respuesta?.RESULT && respuesta.DATA && respuesta.DATA.length > 0) {
-                const urls = respuesta.DATA.map((img: any) => img.url_imagen);
-                console.log(`✅ ${urls.length} imágenes obtenidas para ${claveProducto}`);
-                return urls;
+        const datos = respuesta?.data?.datos;
+        if (datos && datos.length > 0 && datos[0].imagenes?.length > 0) {
+            console.log(`✅ ${datos[0].imagenes.length} imágenes obtenidas para ${referencia}`);
+            return datos[0].imagenes;
+        }
+        return [];
+    } catch (error) {
+        console.error(`Error al obtener imágenes de ${referencia}:`, error);
+        return [];
+    }
+}
+
+// Obtener todas las imágenes de múltiples productos — un solo request
+async getImagenesMultiplesProductos(referencias: string[]): Promise<Map<string, string[]>> {
+    const imagenesMap = new Map<string, string[]>();
+    if (referencias.length === 0) return imagenesMap;
+
+    try {
+        const respuesta = await this.get<any>('productos/imagenes', {
+            referencias: referencias.join(',')
+        });
+
+        const datos = respuesta?.data?.datos;
+        if (datos && datos.length > 0) {
+            for (const item of datos) {
+                imagenesMap.set(item.referencia, item.imagenes ?? []);
             }
-            return [];
-        } catch (error) {
-            console.error(`Error al obtener imágenes de ${claveProducto}:`, error);
-            return [];
         }
+    } catch (error) {
+        console.error('Error al obtener imágenes múltiples:', error);
     }
 
-    // Obtener todas las imágenes de múltiples productos (optimizado)
-    async getImagenesMultiplesProductos(clavesProducto: string[]): Promise<Map<string, string[]>> {
-        const imagenesMap = new Map<string, string[]>();
-        
-        const batchSize = 10;
-        for (let i = 0; i < clavesProducto.length; i += batchSize) {
-            const batch = clavesProducto.slice(i, i + batchSize);
-            const promises = batch.map(clave => this.getImagenesProducto(clave));
-            const resultados = await Promise.all(promises);
-            
-            batch.forEach((clave, index) => {
-                imagenesMap.set(clave, resultados[index]);
-            });
+    return imagenesMap;
+}
+
+// Obtener imagen principal de múltiples productos — un solo request
+async getImagenesPrincipalesMultiples(referencias: string[]): Promise<Map<string, string | null>> {
+    const imagenesMap = new Map<string, string | null>();
+    if (referencias.length === 0) return imagenesMap;
+
+    try {
+        const respuesta = await this.get<any>('productos/imagenes', {
+            referencias: referencias.join(',')
+        });
+
+        const datos = respuesta?.data?.datos;
+        if (datos && datos.length > 0) {
+            for (const item of datos) {
+                imagenesMap.set(item.referencia, item.imagenes?.[0] ?? null);
+            }
         }
-        
-        return imagenesMap;
+    } catch (error) {
+        console.error('Error al obtener imágenes principales:', error);
     }
 
-    // Obtener todas las imágenes principales de productos (optimizado)
-    async getImagenesPrincipalesMultiples(clavesProducto: string[]): Promise<Map<string, string | null>> {
-        const imagenesMap = new Map<string, string | null>();
-        
-        const batchSize = 10;
-        for (let i = 0; i < clavesProducto.length; i += batchSize) {
-            const batch = clavesProducto.slice(i, i + batchSize);
-            const promises = batch.map(clave => this.getImagenProducto(clave));
-            const resultados = await Promise.all(promises);
-            
-            batch.forEach((clave, index) => {
-                imagenesMap.set(clave, resultados[index]);
-            });
-        }
-        
-        return imagenesMap;
-    }
+    return imagenesMap;
+}
 
     // Obtener todos los productos (con imágenes optimizado)
-    async getAllProducts(includeImages: boolean = true): Promise<IProduct[]> {
-        try {
-            const respuesta = await this.get<IApiResponse<any[]>>('productos');
+    async getAllProducts(
+    includeImages: boolean = true,
+    page: number = 1,
+    pageSize: number = 50
+): Promise<IProductosPageResponse> {
+    try {
+        const respuesta = await this.get<{
+            success: boolean;
+            source: string;
+            total: number;
+            data: any[];
+            pageSize: number;
+            Pagina: number;
+            Paginas: number;
+        }>('productos', {
+            pageSize: String(pageSize),
+            page: String(page)
+        });
 
-            if (respuesta.resultado === true && respuesta.datos) {
-                console.log(`📦 ${respuesta.datos.length} productos obtenidos`);
+        if (respuesta.success === true && respuesta.data) {
+            console.log(`📦 Página ${respuesta.Pagina}/${respuesta.Paginas} — ${respuesta.data.length}/${respuesta.total} productos obtenidos`);
 
-                const productos: IProduct[] = [];
+            const productos: IProduct[] = respuesta.data.map((product: any) => ({
+                id: String(product.id),
+                referencia: product.referencia,
+                sku: product.sku,
+                nombre: product.nombre,
+                stock: String(product.stock),
+                precio: String(product.precio),
+                precio_oferta: product.precio_oferta ? String(product.precio_oferta) : null,
+                precio_sin_oferta: String(product.precio_sin_oferta || product.precio),
+                oferta: Boolean(product.oferta),
+                moneda: product.moneda,
+                marca_id: String(product.marca_id),
+                marca_nombre: product.marca_nombre,
+                subcategoria_id: String(product.subcategoria_id || ''),
+                subcategoria_nombre: product.subcategoria_nombre || '',
+                categoria_id: String(product.categoria_id || ''),
+                categoria_nombre: product.categoria_nombre || '',
+                imagenes: [],
+                imagen_principal: null
+            }));
 
-                // Crear los productos base sin imágenes (todos como strings)
-                for (const product of respuesta.datos) {                    
-                    productos.push({
-                        id: String(product.id),
-                        referencia: product.referencia,
-                        sku: product.sku,
-                        nombre: product.nombre,
-                        stock: String(product.stock),
-                        precio: String(product.precio),
-                        precio_oferta: product.precio_oferta ? String(product.precio_oferta) : null,
-                        precio_sin_oferta: String(product.precio_sin_oferta || product.precio),
-                        oferta: Boolean(product.oferta),
-                        moneda: product.moneda,
-                        marca_id: String(product.marca_id),
-                        marca_nombre: product.marca_nombre,
-                        subcategoria_id: String(product.subcategoria_id || ""),
-                        subcategoria_nombre: product.subcategoria_nombre || "",
-                        categoria_id: String(product.categoria_id || ""),
-                        categoria_nombre: product.categoria_nombre || "",
-                        imagenes: [],
-                        imagen_principal: null
-                    });
-                }
+            if (includeImages && productos.length > 0) {
+                const referencias = productos.map(p => p.referencia || p.sku).filter(ref => ref);
+                const [imagenesPrincipales, todasImagenes] = await Promise.all([
+                    this.getImagenesPrincipalesMultiples(referencias),
+                    this.getImagenesMultiplesProductos(referencias)
+                ]);
 
-                if (includeImages && productos.length > 0) {
-                    console.log('Cargando imágenes para todos los productos...');
-                    
-                    const referencias = productos.map(p => p.referencia || p.sku).filter(ref => ref);
-                    
-                    const imagenesPrincipales = await this.getImagenesPrincipalesMultiples(referencias);
-                    const todasImagenes = await this.getImagenesMultiplesProductos(referencias);
-                    
-                    for (const producto of productos) {
-                        const clave = producto.referencia || producto.sku;
-                        if (clave) {
-                            producto.imagen_principal = imagenesPrincipales.get(clave) || null;
-                            producto.imagenes = todasImagenes.get(clave) || [];
-                            
-                            if (producto.imagen_principal) {
-                                console.log(`✅ Imagen cargada para: ${producto.nombre}`);
-                            }
-                        }
+                for (const producto of productos) {
+                    const clave = producto.referencia || producto.sku;
+                    if (clave) {
+                        producto.imagen_principal = imagenesPrincipales.get(clave) || null;
+                        producto.imagenes = todasImagenes.get(clave) || [];
                     }
-                    
-                    console.log(`✅ Imágenes cargadas para ${productos.length} productos`);
                 }
-
-                return productos;
             }
 
-            return [];
+            return {
+                productos,
+                total: respuesta.total,
+                page: respuesta.Pagina,
+                pageSize: respuesta.pageSize,
+                totalPages: respuesta.Paginas
+            };
+        }
 
+        return { productos: [], total: 0, page, pageSize, totalPages: 0 };
+
+    } catch (error) {
+        console.error('Error al obtener los productos:', error);
+        return { productos: [], total: 0, page, pageSize, totalPages: 0 };
+    }
+}
+ 
+    //Obtener la informacion del producto con la referencia
+    async getProductByReference(reference: string): Promise<IProduct | null> {
+        try {
+            // Pasamos la referencia directamente en la URL para que concuerde con el backend /api/productos/:referencia
+            const response = await this.get<{ success: boolean; data: any; }>(`productos/${reference}`);
+
+            // Solo se verifica que response.success sea true y response.data exista
+            if (response.success && response.data) {
+                const p = response.data;
+                
+                // Mapeamos directamente al objeto sin usar .map()
+                const producto: IProduct = {
+                    id: String(p.id || ''), 
+                    referencia: p.referencia || '',
+                    sku: p.sku || '',
+                    nombre: p.nombre || '',
+                    stock: String(p.stock || '0'), // Valor por defecto si no viene
+                    precio: String(p.precio || '0'), 
+                    precio_oferta: p.precio_oferta ? String(p.precio_oferta) : null,
+                    precio_sin_oferta: String(p.precio_sin_oferta || p.precio || '0'),
+                    oferta: Boolean(p.oferta),
+                    moneda: p.moneda || 'MXN', // Valor por defecto si no viene
+                    
+                    // Ajuste de los mapeos según los campos de la respuesta JSON
+                    marca_id: String(p.marca_id || ''),
+                    marca_nombre: p.marca || '', // En el JSON viene solo como 'marca'
+                    subcategoria_id: String(p.subcategoria || ''), // JSON usa 'subcategoria'
+                    subcategoria_nombre: p.subcategoria_nombre || '',
+                    categoria_id: String(p.categoria || ''), // JSON usa 'categoria'
+                    categoria_nombre: p.categoria_nombre || '',
+                    
+                    imagenes: [],
+                    imagen_principal: null
+                };
+                
+                // Obtener las imágenes del producto
+                const imagenes = await this.getImagenesProducto(producto.referencia || producto.sku || '');
+                producto.imagenes = imagenes;
+                producto.imagen_principal = imagenes.length > 0 ? imagenes[0] : null;
+                
+                return producto; // Se retorna el objeto
+            }
+
+            return null;
         } catch (error) {
-            console.error('Error al obtener los productos:', error);
-            return [];
+            console.error(`Error al obtener producto ${reference}:`, error);
+            return null;
         }
     }
 

@@ -18,7 +18,7 @@ export class UIProductoCard {
   @Input() stock: number = 0;
   @Input() marca: string = '';
   @Input() categoria: string = '';
-  @Input() productoId: number = 0;
+  @Input() referencia: string = '';
 
   @Output() agregar = new EventEmitter<void>();
 

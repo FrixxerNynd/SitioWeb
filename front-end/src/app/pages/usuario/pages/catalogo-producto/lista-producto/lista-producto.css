@@ -886,3 +886,55 @@
   background-size: 200% 100%;
   animation: shimmer 1.5s linear infinite;
 }
+
+.paginacion-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem 0;
+}
+
+.paginacion-controles {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.btn-pagina {
+    min-width: 36px;
+    height: 36px;
+    border: 1px solid #dee2e6;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.btn-pagina:hover:not(:disabled) {
+    background: #0d1b6e;
+    color: white;
+    border-color: #0d1b6e;
+}
+
+.btn-pagina.active {
+    background: #0d1b6e;
+    color: white;
+    border-color: #0d1b6e;
+}
+
+.btn-pagina:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pagina-ellipsis {
+    padding: 0 0.5rem;
+    color: #6c757d;
+}
+
+.paginacion-info {
+    color: #6c757d;
+    font-size: 0.85rem;
+}

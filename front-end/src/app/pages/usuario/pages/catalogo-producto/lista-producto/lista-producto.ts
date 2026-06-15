@@ -22,7 +22,7 @@ export class PageListaProducto implements OnInit {
     // ========== SEÑALES ==========
     allProducts = signal<IProduct[]>([]);
     displayedProducts = signal<IProduct[]>([]);
-
+totalProductosBackend = signal(0); 
     mostrarModalFiltros = signal(false);
 
     
@@ -116,7 +116,7 @@ export class PageListaProducto implements OnInit {
     });
     
     totalResultados = computed(() => this.filteredProducts().length);
-    totalPagesCalculated = computed(() => Math.ceil(this.totalResultados() / this.pageSize));
+    totalPagesCalculated = computed(() => Math.ceil(this.totalProductosBackend() / this.pageSize));
     
     hasActiveFilters = computed(() => {
         return this.activeSelectedBrands().size > 0 ||
@@ -134,7 +134,7 @@ export class PageListaProducto implements OnInit {
                this.tempPrecioMaximo() < this.rangoMaximoAbsoluto;
     });
     
-    // Lista de filtros activos para mostrar como etiquetas
+    // Lista de filtros acaativos para mostrar como etiquetas
     activeFiltersList = computed(() => {
         const filters: { type: string; label: string; value: string; id: string }[] = [];
         
@@ -399,6 +399,7 @@ export class PageListaProducto implements OnInit {
     nextPage() {
         if (this.currentPage() < this.totalPagesCalculated()) {
             this.currentPage.update(p => p + 1);
+            this.cargarImagenesPaginaActual()
             document.querySelector('.productos-grid')?.scrollIntoView({ behavior: 'smooth' });
         }
     }
@@ -406,6 +407,7 @@ export class PageListaProducto implements OnInit {
     prevPage() {
         if (this.currentPage() > 1) {
             this.currentPage.update(p => p - 1);
+            this.cargarImagenesPaginaActual()
             document.querySelector('.productos-grid')?.scrollIntoView({ behavior: 'smooth' });
         }
     }
@@ -413,6 +415,7 @@ export class PageListaProducto implements OnInit {
     goToPage(page: number) {
         if (page >= 1 && page <= this.totalPagesCalculated()) {
             this.currentPage.set(page);
+            this.cargarImagenesPaginaActual()
             document.querySelector('.productos-grid')?.scrollIntoView({ behavior: 'smooth' });
         }
     }
@@ -498,34 +501,54 @@ export class PageListaProducto implements OnInit {
     
     // METODO PARA CARGAR DATOS (CATEGORIAS, MARCAS Y PRODUCTOS)
     async cargandoDatos() {
-        this.isLoading.set(true);
-        try {
-            const [categorias, marcas, productos] = await Promise.all([
-                this.catalogoService.getAllCategories(),
-                this.catalogoService.getAllBrands(),
-                this.catalogoService.getAllProducts()
-            ]);
-            
-            this.categories.set(categorias);
-            this.brands.set(marcas);
-            this.allProducts.set(productos);
-            
-            console.log('Categorías cargadas:', categorias.length);
-            console.log('Marcas cargadas:', marcas.length);
-            console.log('Productos cargados:', productos.length);
-            
-            this.calcularRangoPrecios(productos);
-            this.tempPrecioMinimo.set(this.rangoMinimoAbsoluto);
-            this.tempPrecioMaximo.set(this.rangoMaximoAbsoluto);
-            
-            this.aplicarFiltros();
-            
-        } catch (error) {
-            console.error('Error al cargar los datos:', error);
-        } finally {
-            this.isLoading.set(false);
+    this.isLoading.set(true);
+    try {
+        const [categorias, marcas] = await Promise.all([
+            this.catalogoService.getAllCategories(),
+            this.catalogoService.getAllBrands()
+        ]);
+
+        this.categories.set(categorias);
+        this.brands.set(marcas);
+
+        // ── Cargar primera página para saber el total ──────────────────
+        const PAGE_SIZE = 500;
+        const primeraRespuesta = await this.catalogoService.getAllProducts(false, 1, PAGE_SIZE);
+        this.totalProductosBackend.set(primeraRespuesta.total); 
+        let todosLosProductos: IProduct[] = [...primeraRespuesta.productos];
+        const totalPaginas = primeraRespuesta.totalPages;
+
+        console.log(`📦 Página 1/${totalPaginas} cargada — ${todosLosProductos.length} productos`);
+
+        // ── Cargar el resto en lotes de 5 páginas ──────────────────────
+        if (totalPaginas > 1) {
+            const BATCH_SIZE = 5;
+            const paginas = Array.from({ length: totalPaginas - 1 }, (_, i) => i + 2);
+
+            for (let i = 0; i < paginas.length; i += BATCH_SIZE) {
+                const lote = paginas.slice(i, i + BATCH_SIZE);
+                const respuestas = await Promise.all(
+                    lote.map(p => this.catalogoService.getAllProducts(false, p, PAGE_SIZE))
+                );
+                respuestas.forEach(r => todosLosProductos.push(...r.productos));
+                console.log(`📦 Lote cargado — ${todosLosProductos.length}/${primeraRespuesta.total} productos`);
+            }
         }
+
+        console.log(`✅ Total productos cargados: ${todosLosProductos.length}`);
+        this.allProducts.set(todosLosProductos);
+
+        this.calcularRangoPrecios(todosLosProductos);
+        this.tempPrecioMinimo.set(this.rangoMinimoAbsoluto);
+        this.tempPrecioMaximo.set(this.rangoMaximoAbsoluto);
+        this.aplicarFiltros();
+        this.cargarImagenesPaginaActual()
+    } catch (error) {
+        console.error('Error al cargar los datos:', error);
+    } finally {
+        this.isLoading.set(false);
     }
+}
 
 
     abrirModalFiltros() {
@@ -542,4 +565,51 @@ export class PageListaProducto implements OnInit {
         this.aplicarFiltros();
         this.cerrarModalFiltros();
     }    
+    async cargarImagenesPaginaActual() {
+    const productosVisibles = this.paginatedProducts();
+    const referencias = productosVisibles
+        .map(p => p.referencia || p.sku)
+        .filter((ref): ref is string => !!ref);
+
+    if (referencias.length === 0) return;
+
+    console.log(`🖼️ Cargando imágenes para ${referencias.length} productos...`);
+
+    const [imagenesPrincipales, todasImagenes] = await Promise.all([
+        this.catalogoService.getImagenesPrincipalesMultiples(referencias),
+        this.catalogoService.getImagenesMultiplesProductos(referencias)
+    ]);
+
+    this.allProducts.update(productos =>
+        productos.map(p => {
+            const clave = p.referencia || p.sku;
+            if (clave && referencias.includes(clave)) {
+                return {
+                    ...p,
+                    imagen_principal: imagenesPrincipales.get(clave) || null,
+                    imagenes: todasImagenes.get(clave) || []
+                };
+            }
+            return p;
+        })
+    );
+
+    // IMPORTANTE: También debemos actualizar displayedProducts porque es una señal independiente (no es computed)
+    // Si no la actualizamos, la vista de la página no se refresca con las imágenes cargadas.
+    this.displayedProducts.update(productos =>
+        productos.map(p => {
+            const clave = p.referencia || p.sku;
+            if (clave && referencias.includes(clave)) {
+                return {
+                    ...p,
+                    imagen_principal: imagenesPrincipales.get(clave) || null,
+                    imagenes: todasImagenes.get(clave) || []
+                };
+            }
+            return p;
+        })
+    );
+
+    console.log(`✅ Imágenes cargadas para página ${this.currentPage()}`);
+}
 }

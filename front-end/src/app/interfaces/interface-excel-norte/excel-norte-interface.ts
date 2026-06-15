@@ -1,3 +1,11 @@
+export interface IProductosPageResponse {
+    productos: IProduct[];
+    total: number;
+    page: number;       // ← viene de Pagina
+    pageSize: number;
+    totalPages: number; // ← viene de Paginas
+}
+
 export interface IProduct {
     id: string;
     referencia: string;
@@ -47,6 +55,7 @@ export interface ISubcategory {
 }
 
 export interface IApiResponse<T> {
+    data: any;
     resultado: boolean;
     mensaje: string;
     datos: T;

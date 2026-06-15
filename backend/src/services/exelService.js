@@ -126,7 +126,7 @@ class ExelService {
    *                         lo que devuelve solo las referencias que cumplen TODOS los filtros.
    *   null si Redis no está disponible (el llamador debe hacer fallback a la API externa).
    */
-  async getProductsRedis({ categoria, subcategoria, marca, limite = 50, offset = 0 } = {}) {
+  async getProductsRedis({ categoria, subcategoria, marca, pageSize = 100, page = 1 } = {}) {
     const client = redisClient.getClient();
 
     if (!client) {
@@ -135,7 +135,7 @@ class ExelService {
     }
 
     try {
-      // ── 1. Determinar el conjunto de referencias a devolver ──────────────
+      // ── 1. Determinar el conjunto de referencias ──────────────────────────
       let referencias = [];
 
       const indicesActivos = [
@@ -145,42 +145,65 @@ class ExelService {
       ].filter(Boolean);
 
       if (indicesActivos.length === 0) {
-        // Sin filtros → catálogo completo
         referencias = await client.sMembers('catalogo:referencias');
         logger.info(`Cache HIT catálogo completo: ${referencias.length} referencias`);
-
       } else if (indicesActivos.length === 1) {
-        // Un solo filtro → lectura directa del índice
         referencias = await client.sMembers(indicesActivos[0]);
         logger.info(`Cache HIT índice [${indicesActivos[0]}]: ${referencias.length} referencias`);
-
       } else {
-        // Múltiples filtros → intersección de índices (AND lógico)
         referencias = await client.sInter(indicesActivos);
-        logger.info(
-          `Cache HIT SINTER [${indicesActivos.join(' ∩ ')}]: ${referencias.length} referencias`
-        );
+        logger.info(`Cache HIT SINTER [${indicesActivos.join(' ∩ ')}]: ${referencias.length} referencias`);
       }
 
-      // ── 2. Validar que existan resultados ────────────────────────────────
+      // ── 2. Validar resultados ─────────────────────────────────────────────
       if (referencias.length === 0) {
-        return { productos: [], total: 0 };
+        return { productos: [], total: 0, page, pageSize, totalPages: 0 };
       }
 
       const total = referencias.length;
+      const totalPages = Math.ceil(total / pageSize);
 
-      // ── 3. Aplicar paginación sobre las referencias ──────────────────────
-      const pagina = referencias.slice(offset, offset + limite);
+      // Clamp: si piden una página fuera de rango, devolver vacío
+      if (page < 1 || page > totalPages) {
+        return { productos: [], total, page, pageSize, totalPages };
+      }
 
-      // ── 4. Obtener los hashes de cada referencia en paralelo ─────────────
-      const hgets = pagina.map(ref => client.hGetAll(`producto:${ref}`));
-      const resultados = await Promise.all(hgets);
+      // ── 3. Paginación ─────────────────────────────────────────────────────
+      const offset = (page - 1) * pageSize;
+      const pagina = referencias.slice(offset, offset + pageSize);
 
-      // Filtrar hashes vacíos (referencias huérfanas sin hash correspondiente)
-      const productos = resultados.filter(p => p && Object.keys(p).length > 0);
+      // ── 4. Obtener hashes en paralelo ─────────────────────────────────────
+      const resultados = await Promise.all(
+        pagina.map(ref => client.hGetAll(`producto:${ref}`))
+      );
 
-      logger.info(`Devolviendo ${productos.length}/${total} productos desde Redis`);
-      return { productos, total };
+      const productosBrutos = resultados.filter(p => p && Object.keys(p).length > 0);
+
+      // ── 5. Enriquecer con precio/stock ────────────────────────────────────
+      const productos = await Promise.all(
+        productosBrutos.map(async (prod) => {
+          const ref = prod.referencia;
+          if (!ref) return prod;
+          try {
+            const precioHash = await client.hGetAll(`precio_existencia:${ref}`);
+            if (precioHash && Object.keys(precioHash).length > 0) {
+              return {
+                ...prod,
+                precio: parseFloat(precioHash.precio ?? 0),
+                precio_oferta: precioHash.precio_oferta ? parseFloat(precioHash.precio_oferta) : null,
+                precio_sin_oferta: parseFloat(precioHash.precio_sin_oferta ?? precioHash.precio ?? 0),
+                oferta: precioHash.oferta === 'true',
+                stock: parseInt(precioHash.existencia ?? 0),
+              };
+            }
+          } catch (_) { /* devolver producto sin precio si falla */ }
+          return prod;
+        })
+      );
+
+      logger.info(`Devolviendo página ${page}/${totalPages} — ${productos.length}/${total} productos desde Redis`);
+
+      return { productos, total, page, pageSize, totalPages };
 
     } catch (error) {
       logger.error(`Error al consultar productos en Redis: ${error.message}`);
@@ -188,6 +211,33 @@ class ExelService {
     }
   }
 
+  async getProductByReference(reference) {
+    const client = redisClient.getClient();
+    if (!client) {
+      logger.warn('Redis no disponible, se omite caché para la consulta');
+      return null;
+    }
+    try {
+      const producto = await client.hGetAll(`producto:${reference}`);
+      if (!producto || Object.keys(producto).length === 0) return null;
+      
+      try {
+        const precioHash = await client.hGetAll(`precio_existencia:${reference}`);
+        if (precioHash && Object.keys(precioHash).length > 0) {
+          producto.precio = parseFloat(precioHash.precio ?? 0);
+          producto.precio_oferta = precioHash.precio_oferta ? parseFloat(precioHash.precio_oferta) : null;
+          producto.precio_sin_oferta = parseFloat(precioHash.precio_sin_oferta ?? precioHash.precio ?? 0);
+          producto.oferta = precioHash.oferta === 'true';
+          producto.stock = parseInt(precioHash.existencia ?? 0);
+        }
+      } catch (_) { /* si falla obtener precio, devolver producto base */ }
+      
+      return producto;
+    } catch (error) {
+      logger.error(`Error al consultar producto por referencia en Redis: ${error.message}`);
+      return null;
+    }
+  }
   /**
    * Obtiene las categorias desde la API externa y las guarda en Redis.
    */
@@ -292,19 +342,22 @@ class ExelService {
     }
   }
 
-  async getImagenesBatch({ idsSetKey = 'catalogo:imagenes', page = 1, limit = 50 } = {}) {
+  async getImagenesBatch({ idsSetKey = 'catalogo:imagenes', page = 1, limit = 50, refs = null } = {}) {
     const client = await redisClient.getClient();
 
-    if (!client) {
-      logger.warn('Redis no disponible, no se pudieron leer imágenes');
-      return { total: 0, page, limit, totalPages: 0, datos: [] };
+    if (!client) return { total: 0, page, limit, totalPages: 0, datos: [] };
+
+    let idsPagina;
+
+    if (refs && refs.length > 0) {
+      // Referencias específicas — sin paginar
+      idsPagina = refs;
+    } else {
+      // Sin filtro — paginar el catálogo completo
+      const allIds = await client.sMembers(idsSetKey);
+      const start = (page - 1) * limit;
+      idsPagina = allIds.slice(start, start + limit);
     }
-
-    const allIds = await client.sMembers(idsSetKey);
-    const total = allIds.length;
-
-    const start = (page - 1) * limit;
-    const idsPagina = allIds.slice(start, start + limit);
 
     const datos = await Promise.all(
       idsPagina.map(async (referencia) => {
@@ -316,14 +369,9 @@ class ExelService {
       })
     );
 
-    return {
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-      datos
-    };
+    return { datos };
   }
+
 
 
   async getPrecio(referencia) {

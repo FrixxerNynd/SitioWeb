@@ -20,8 +20,8 @@ class ExelController {
                 categoria,
                 subcategoria,
                 marca,
-                limite = 50,
-                offset = 0,
+                pageSize = 50,
+                page
             } = req.query;
 
             // ── Intento desde Redis ───────────────────────────────
@@ -29,8 +29,8 @@ class ExelController {
                 categoria,
                 subcategoria,
                 marca,
-                limite: parseInt(limite),
-                offset: parseInt(offset),
+                pageSize: parseInt(pageSize),
+                page: parseInt(page),
             });
 
             if (redisResult) {
@@ -39,6 +39,9 @@ class ExelController {
                     source: 'redis',
                     total: redisResult.total,
                     data: redisResult.productos,
+                    pageSize: parseInt(redisResult.pageSize),
+                    Pagina: parseInt(redisResult.page),
+                    Paginas: redisResult.totalPages,
                 });
             }
 
@@ -48,9 +51,26 @@ class ExelController {
                 success: true,
                 source: 'api',
                 total: productos.length,
-                data: productos,
+                data: productos
             });
 
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * GET /api/productos/:referencia
+     * Devuelve un producto por referencia desde Redis.
+     */
+    async getProductByReference(req, res, next) {
+        try {
+            const { referencia } = req.params;
+            const producto = await exelService.getProductByReference(referencia);
+            if (!producto) {
+                return res.status(404).json({ success: false, message: 'Producto no encontrado' });
+            }
+            res.status(200).json({ success: true, data: producto });
         } catch (error) {
             next(error);
         }
@@ -76,13 +96,20 @@ class ExelController {
      */
     async getImagenes(req, res, next) {
         try {
-            const { page = 1, limit = 50 } = req.query;
-            const data = await exelService.getImagenesBatch({ page, limit });
+            const { page = 1, limit = 50, referencias, referencia } = req.query;
+            // Acepta tanto ?referencias=A,B,C como ?referencia=A
+            const refsRaw = referencias || referencia;
+            const refs = refsRaw ? refsRaw.split(',') : null;
+
+            console.log('refs parseadas:', refs);
+
+            const data = await exelService.getImagenesBatch({ page, limit, refs });
             res.status(200).json({ success: true, data });
         } catch (error) {
             next(error);
         }
     }
+
     // #region Metodos de sincronizacion Redis
 
     /**
