@@ -22,8 +22,7 @@
 
     @case('cerrar') {
     <button class="items-center justify-center font-medium transition btn-cerrar
-                text-[#71717b] bg-white
-                disabled:opacity-60
+                text-zinc-600 bg-white
                 px-3 py-2 text-sm md:px-4 md:py-2 md:text-base lg:px-5 lg:py-3 lg:text-lg"
         [class.w-full]="widthType === 'full'" [style.width]="widthType === 'full' ? '100%' : 'auto'" type="button"
         [disabled]="disabled" (click)="onClick($event)" aria-label="Cerrar">
