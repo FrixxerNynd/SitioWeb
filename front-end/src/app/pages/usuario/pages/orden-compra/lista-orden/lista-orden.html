@@ -122,7 +122,7 @@
       <!-- TABLA - SKELETON O CONTENIDO -->
       <div class="border border-zinc-200 rounded-lg overflow-hidden my-4">
         @if (loadingData) {
-        <!-- Skeleton de tabla usando tu CSS -->
+        <!-- Skeleton de tabla con acciones a la derecha -->
         <div class="overflow-x-auto">
           <table class="w-full border-collapse">
             <thead class="bg-gray-50 text-left text-gray-500 font-semibold text-xs uppercase"
@@ -133,7 +133,7 @@
                 <th class="p-4">Tipo de pago</th>
                 <th class="p-4">Total</th>
                 <th class="p-4">Estado</th>
-                <th class="p-4 text-end w-4">Acciones</th>
+                <th class="p-4 w-24 text-end">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -154,7 +154,9 @@
                   <div class="skeleton-shimmer h-6 rounded w-20"></div>
                 </td>
                 <td class="p-4 text-end">
-                  <div class="skeleton-shimmer h-5 w-5 rounded ml-auto"></div>
+                  <div class="flex justify-end">
+                    <div class="skeleton-shimmer h-5 w-5 rounded"></div>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -179,7 +181,7 @@
                 <th class="p-4">Tipo de pago</th>
                 <th class="p-4">Total</th>
                 <th class="p-4">Estado</th>
-                <th class="p-4 text-end w-4">Acciones</th>
+                <th class="p-4 text-end w-24">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -198,7 +200,7 @@
                     {{ orden.estado }}
                   </span>
                 </td>
-                <td class="p-4 text-end w-16">
+                <td class="p-4 text-end">
                   <button class="text-gray-600 hover:text-[#1e3a5f] transition-colors p-1"
                     (click)="verDetalleOrden(orden)">
                     <app-ui-icono name="eye" size="h-5 w-5"></app-ui-icono>
@@ -256,8 +258,10 @@
 </div>
 
 <!-- Modal de detalles -->
+@if(modalVisible == true){
 <modal-detalles-orden
   [orden]="ordenSeleccionada" 
   [(visible)]="modalVisible" 
   (cerrar)="cerrarModal()">
 </modal-detalles-orden>
+}

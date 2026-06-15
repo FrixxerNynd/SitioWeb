@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UiBoton } from '../../../../components/shared/boton/boton';
 import { UiIconComponent } from '../../../../components/shared/icono/icono.component';
-import { ModalDetallesUsuarioComponent } from './detalles-usuario/detalles-usuario'; 
+import { ModalDetallesUsuarioComponent } from './detalles-usuario/detalles-usuario';
+import { ModalRegistrarUsuarioComponent } from './registrar-usuario/registrar-usuario';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, UiBoton, UiIconComponent, ModalDetallesUsuarioComponent],
+  imports: [CommonModule, FormsModule, UiBoton, UiIconComponent, ModalDetallesUsuarioComponent, ModalRegistrarUsuarioComponent],
   styleUrl: './lista-usuario.css',
   templateUrl: './lista-usuario.html',
 })
@@ -29,9 +30,12 @@ export class PagueListaUsuario implements OnInit {
   // Datos
   usuariosFiltrados: any[] = [];
   
-  // Modal
+  // Modal detalles
   usuarioSeleccionado: any = null;
   modalVisible: boolean = false;
+
+  // Modal registro
+  modalRegistroVisible: boolean = false;
 
   usuariosOriginales: any[] = [];
 
@@ -334,8 +338,14 @@ export class PagueListaUsuario implements OnInit {
     this.usuarioSeleccionado = null;
   }
 
-  registrarUsuario() {
-    console.log('Registrar usuario');
+  abrirModalRegistro() {
+    this.modalRegistroVisible = true;
+  }
+
+  onUsuarioRegistrado(usuario: any) {
+    console.log('Usuario registrado:', usuario);
+    // Aquí puedes agregar la lógica para guardar el usuario
+    // Por ejemplo: agregar a la lista, llamar a una API, etc.
   }
 
   formatCurrency(value: number): string {

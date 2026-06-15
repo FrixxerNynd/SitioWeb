@@ -9,7 +9,8 @@
               <span class="text-3xl font-semibold text-gray-900">Usuarios registrados</span>
               <p class="text-gray-600 text-base">Revisa fácilmente los datos de los usuarios</p>
             </div>
-            <ui-boton text="Registrar usuario" size="xs" [disabled]="false" (btnClick)="registrarUsuario()"></ui-boton>
+            <ui-boton text="Registrar usuario" size="xs" [disabled]="false"
+              (btnClick)="abrirModalRegistro()"></ui-boton>
           </div>
 
           <!-- filtros -->
@@ -80,13 +81,27 @@
             </thead>
             <tbody>
               <tr *ngFor="let _ of [1,2,3,4,5]" class="bg-white" style="border-bottom: 1px solid #e4e4e7;">
-                <td class="p-3"><div class="skeleton h-4 rounded w-24"></div></td>
-                <td class="p-3"><div class="skeleton h-4 rounded w-32"></div></td>
-                <td class="p-3"><div class="skeleton h-4 rounded w-20"></div></td>
-                <td class="p-3"><div class="skeleton h-4 rounded w-16"></div></td>
-                <td class="p-3"><div class="skeleton h-4 rounded w-16"></div></td>
-                <td class="p-3"><div class="skeleton h-6 rounded w-20"></div></td>
-                <td class="p-3"><div class="skeleton h-4 rounded w-24"></div></td>
+                <td class="p-3">
+                  <div class="skeleton h-4 rounded w-24"></div>
+                </td>
+                <td class="p-3">
+                  <div class="skeleton h-4 rounded w-32"></div>
+                </td>
+                <td class="p-3">
+                  <div class="skeleton h-4 rounded w-20"></div>
+                </td>
+                <td class="p-3">
+                  <div class="skeleton h-4 rounded w-16"></div>
+                </td>
+                <td class="p-3">
+                  <div class="skeleton h-4 rounded w-16"></div>
+                </td>
+                <td class="p-3">
+                  <div class="skeleton h-6 rounded w-20"></div>
+                </td>
+                <td class="p-3">
+                  <div class="skeleton h-4 rounded w-24"></div>
+                </td>
                 <td class="p-3 text-end w-16">
                   <div class="flex items-center justify-end">
                     <div class="skeleton h-5 w-5 rounded"></div>
@@ -187,5 +202,13 @@
   </div>
 </div>
 
+@if(modalVisible == true){
 <modal-detalles-usuario [usuario]="usuarioSeleccionado" [(visible)]="modalVisible"
   (cerrar)="cerrarModal()"></modal-detalles-usuario>
+}
+
+
+@if(modalRegistroVisible == true){
+<modal-registrar-usuario [(visible)]="modalRegistroVisible" (usuarioRegistrado)="onUsuarioRegistrado($event)">
+</modal-registrar-usuario>
+}
