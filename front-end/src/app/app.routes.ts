@@ -14,6 +14,7 @@ import { MainLayout } from './layouts/main-layout/main-layout';
 import { AuthLayout } from './layouts/auth-layout/auth-layout';
 import { PagueListaPreRegistro } from './pages/administrador/pages/lista-pre-registro/lista-pre-registro'; 
 import { PagueDetallesPreRegistro } from './pages/administrador/pages/lista-pre-registro/detalles-pre-registro/detalles-pre-registro';
+import { PagueListaUsuario } from './pages/administrador/pages/lista-usuario/lista-usuario';
 //import { AuthGuard } from './guards/auth.guard'; 
 
 export const routes: Routes = [
@@ -69,6 +70,7 @@ export const routes: Routes = [
                 children:[
                     { path: 'lista-pre-registro', component: PagueListaPreRegistro },
                     { path: 'lista-pre-registro/detalle/:id', component: PagueDetallesPreRegistro },
+                    { path: 'lista-usuario', component: PagueListaUsuario},
                     { path: '', redirectTo: 'lista-pre-registro', pathMatch: 'full' }
 
                 ]

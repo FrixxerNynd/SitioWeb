@@ -1,0 +1,191 @@
+<div class="bg-gray-50 min-h-screen">
+  <div class="container-fluid">
+    <div class="container">
+      <!-- Encabezado -->
+      <div class="bg-white rounded-lg border my-4 overflow-hidden">
+        <div class="flex flex-col gap-2 p-4">
+          <div class="flex justify-between items-center">
+            <div class="flex flex-col gap-1">
+              <span class="text-3xl font-semibold text-gray-900">Usuarios registrados</span>
+              <p class="text-gray-600 text-base">Revisa fácilmente los datos de los usuarios</p>
+            </div>
+            <ui-boton text="Registrar usuario" size="xs" [disabled]="false" (btnClick)="registrarUsuario()"></ui-boton>
+          </div>
+
+          <!-- filtros -->
+          <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-3">
+              <label class="form-label text-sm font-semibold text-gray-600 mb-1">Buscador de usuario</label>
+              <div class="input-group">
+                <input type="text"
+                  class="form-control h-10 rounded-end-md border-gray-300 text-sm focus:ring-2 focus:ring-[#1e3a5f]"
+                  placeholder="Buscador de rfc o nombre" [(ngModel)]="filtroTexto" />
+              </div>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label text-sm font-semibold text-gray-600 mb-1">Estado permiso exceder</label>
+              <select class="form-select h-10 rounded-md border-gray-300 text-sm focus:ring-2 focus:ring-[#1e3a5f]"
+                [(ngModel)]="filtroEstatus">
+                <option value="">Todos</option>
+                <option value="true">Permitido</option>
+                <option value="false">Denegado</option>
+              </select>
+            </div>
+
+            <div class="col-12 col-md-2">
+              <label class="form-label text-sm font-semibold text-gray-600 mb-1">Fecha inicio</label>
+              <input type="date"
+                class="form-control h-10 rounded-md border-gray-300 text-sm focus:ring-2 focus:ring-[#1e3a5f]"
+                [(ngModel)]="filtroFechaInicio" />
+            </div>
+
+            <div class="col-12 col-md-2">
+              <label class="form-label text-sm font-semibold text-gray-600 mb-1">Fecha fin</label>
+              <input type="date"
+                class="form-control h-10 rounded-md border-gray-300 text-sm focus:ring-2 focus:ring-[#1e3a5f]"
+                [(ngModel)]="filtroFechaFin" />
+            </div>
+
+            <!-- Botones -->
+            <div class="col-12 col-md-2">
+              <div class="d-flex gap-2">
+                <ui-boton text="Limpiar" type="reset" tipo="cerrar" (btnClick)="limpiarFiltros()"
+                  [disabled]="false"></ui-boton>
+                <ui-boton text="Buscar" type="reset" tipo="cerrar" (btnClick)="buscarUsuarios()"
+                  [disabled]="false"></ui-boton>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLA -->
+      <div class="border border-zinc-200 rounded-lg overflow-hidden my-4">
+        @if (loadingData) {
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead class="bg-gray-50 text-left text-gray-500 font-semibold text-xs uppercase"
+              style="border-bottom: 1px solid #e4e4e7;">
+              <tr>
+                <th class="p-3">RFC</th>
+                <th class="p-3">Nombre</th>
+                <th class="p-3">Límite de crédito</th>
+                <th class="p-3">Días de crédito</th>
+                <th class="p-3">Límites Doc. Vencido</th>
+                <th class="p-3">Permiso Exceder</th>
+                <th class="p-3">Fecha registro</th>
+                <th class="p-3 w-16 text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let _ of [1,2,3,4,5]" class="bg-white" style="border-bottom: 1px solid #e4e4e7;">
+                <td class="p-3"><div class="skeleton h-4 rounded w-24"></div></td>
+                <td class="p-3"><div class="skeleton h-4 rounded w-32"></div></td>
+                <td class="p-3"><div class="skeleton h-4 rounded w-20"></div></td>
+                <td class="p-3"><div class="skeleton h-4 rounded w-16"></div></td>
+                <td class="p-3"><div class="skeleton h-4 rounded w-16"></div></td>
+                <td class="p-3"><div class="skeleton h-6 rounded w-20"></div></td>
+                <td class="p-3"><div class="skeleton h-4 rounded w-24"></div></td>
+                <td class="p-3 text-end w-16">
+                  <div class="flex items-center justify-end">
+                    <div class="skeleton h-5 w-5 rounded"></div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-gray-50 border-t border-gray-200">
+          <div class="skeleton h-4 rounded w-32"></div>
+          <div class="flex items-center gap-3">
+            <div class="skeleton h-8 rounded w-24"></div>
+            <div class="skeleton h-8 rounded w-20"></div>
+          </div>
+        </div>
+        } @else {
+        @if (usuariosFiltrados.length > 0) {
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead class="bg-gray-50 text-left text-gray-500 font-semibold text-xs uppercase"
+              style="border-bottom: 1px solid #e4e4e7;">
+              <tr>
+                <th class="p-3">RFC</th>
+                <th class="p-3">Nombre</th>
+                <th class="p-3">Límite de crédito</th>
+                <th class="p-3">Días de crédito</th>
+                <th class="p-3">Límites Doc. Vencido</th>
+                <th class="p-3">Permiso Exceder</th>
+                <th class="p-3">Fecha registro</th>
+                <th class="p-3 text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let usuario of usuariosPaginados"
+                class="bg-white text-gray-600 font-medium text-sm text-left table-row-hover"
+                style="border-bottom: 1px solid #e4e4e7;">
+                <td class="p-3">{{ usuario.RFC }}</td>
+                <td class="p-3">{{ usuario.nombre }}</td>
+                <td class="p-3">{{ formatCurrency(usuario.limiteCredito) }}</td>
+                <td class="p-3">{{ usuario.diasCredito }} días</td>
+                <td class="p-3">{{ usuario.limiteDocumentosVencido }} doc.</td>
+                <td class="p-3">
+                  <span class="inline-block px-3 py-1 rounded text-xs font-semibold" [ngClass]="{
+                    'bg-green-100 text-green-700': usuario.permisoExcederLimiteCredito === true,
+                    'bg-red-100 text-red-700': usuario.permisoExcederLimiteCredito === false
+                  }">
+                    {{ usuario.permisoExcederLimiteCredito ? 'Permitido' : 'Denegado' }}
+                  </span>
+                </td>
+                <td class="p-3">{{ usuario.fechaRegistroFormateada }}</td>
+                <td class="p-3 text-end">
+                  <button class="text-gray-600 hover:text-[#1e3a5f] transition-colors p-1"
+                    (click)="verDetalleUsuario(usuario)">
+                    <app-ui-icono name="eye" size="h-5 w-5"></app-ui-icono>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-gray-50 border-t border-gray-200">
+          <span class="text-gray-500 text-sm">{{ totalItemsRegistros }}</span>
+          <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-2">
+              <span class="text-gray-500 text-sm">Filas por página:</span>
+              <select
+                class="h-8 px-2 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]"
+                (change)="cambiarFilasPorPagina($event)">
+                <option *ngFor="let op of opcionesFilasPorPagina" [value]="op">{{ op }}</option>
+              </select>
+            </div>
+            <div class="flex items-center gap-2">
+              <ui-boton tipo="btn-tabla-pie" nomeIco="chevron-left" [disabled]="paginaActual === 1"
+                (btnClick)="paginaAnterior()"></ui-boton>
+              <span class="text-gray-600 text-sm">{{ paginaActual }}/{{ totalPaginas }}</span>
+              <ui-boton tipo="btn-tabla-pie" nomeIco="chevron-right" [disabled]="paginaActual === totalPaginas"
+                (btnClick)="paginaSiguiente()"></ui-boton>
+            </div>
+          </div>
+        </div>
+        } @else {
+        <div class="flex flex-col items-center justify-center w-full bg-white"
+          style="padding-bottom: 62px; padding-top: 62px;">
+          <div class="text-center">
+            <div class="mb-4 inline-flex items-center justify-center w-16 h-16 bg-amber-50 rounded-full">
+              <app-ui-icono name="magnifying-glass" size="w-8 h-8" color="text-amber-500"></app-ui-icono>
+            </div>
+            <h4 class="font-bold text-gray-900 text-xl mb-2">No se encontraron usuarios</h4>
+            <p class="text-gray-500 text-sm">Prueba ajustar tus filtros de búsqueda.</p>
+          </div>
+        </div>
+        }
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<modal-detalles-usuario [usuario]="usuarioSeleccionado" [(visible)]="modalVisible"
+  (cerrar)="cerrarModal()"></modal-detalles-usuario>
