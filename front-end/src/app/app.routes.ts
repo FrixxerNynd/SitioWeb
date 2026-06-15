@@ -15,6 +15,7 @@ import { AuthLayout } from './layouts/auth-layout/auth-layout';
 import { PagueListaPreRegistro } from './pages/administrador/pages/lista-pre-registro/lista-pre-registro'; 
 import { PagueDetallesPreRegistro } from './pages/administrador/pages/lista-pre-registro/detalles-pre-registro/detalles-pre-registro';
 import { PagueListaUsuario } from './pages/administrador/pages/lista-usuario/lista-usuario';
+import { PagueConfiguracionMargenes } from './pages/administrador/pages/configuracion-margenes/configuracion-margenes';
 //import { AuthGuard } from './guards/auth.guard'; 
 
 export const routes: Routes = [
@@ -71,8 +72,8 @@ export const routes: Routes = [
                     { path: 'lista-pre-registro', component: PagueListaPreRegistro },
                     { path: 'lista-pre-registro/detalle/:id', component: PagueDetallesPreRegistro },
                     { path: 'lista-usuario', component: PagueListaUsuario},
+                    { path: 'configuracion-margenes', component: PagueConfiguracionMargenes},                    
                     { path: '', redirectTo: 'lista-pre-registro', pathMatch: 'full' }
-
                 ]
             }
         ]

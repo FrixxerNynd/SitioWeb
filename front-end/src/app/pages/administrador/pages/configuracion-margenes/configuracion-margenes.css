@@ -1,0 +1,77 @@
+/* Shimmer animation para skeletons */
+.skeleton {
+  background: linear-gradient(
+    110deg,
+    #ececec 8%,
+    #f5f5f5 18%,
+    #ececec 33%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Estilos específicos para el skeleton */
+.skeleton.rounded-full {
+  border-radius: 9999px;
+}
+
+.skeleton.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.skeleton {
+  display: inline-block;
+  height: 1rem;
+}
+
+/* Estilos Bootstrap para inputs */
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+  color: #212529;
+  background-color: #fff;
+  border-color: #1e3a5f;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(30, 58, 95, 0.25);
+}
+
+/* Ajustes para el input de número */
+input[type="number"].form-control {
+  text-align: center;
+}
+
+/* Quitar flechas del input number en navegadores */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.5;
+}
+
+h2 {
+  margin: 0px;
+}
+
+p {
+  margin: 0px;
+}
