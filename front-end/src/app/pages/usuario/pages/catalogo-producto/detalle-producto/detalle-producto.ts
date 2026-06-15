@@ -14,7 +14,7 @@ export class PageDetalleProducto implements OnInit {
   selectedImage: string = '';
   quantity: number = 1;
   activeTab: 'caracteristicas' | 'medidasDimensiones' = 'caracteristicas';
-  
+
   // Signal para controlar el estado de carga
   isLoading = signal<boolean>(true);
 
@@ -38,12 +38,12 @@ export class PageDetalleProducto implements OnInit {
     weightUnit: '',
     volume: '',
     volumeUnit: '',
-    images: []
+    images: [],
   };
 
   constructor(
     private route: ActivatedRoute,
-    private exelService: ExcelNorteCatalogoService
+    private exelService: ExcelNorteCatalogoService,
   ) {}
 
   ngOnInit(): void {
@@ -60,7 +60,7 @@ export class PageDetalleProducto implements OnInit {
     this.isLoading.set(true);
     try {
       const p = await this.exelService.getProductByReference(referencia);
-      
+      const m = await this.exelService.getMedidaProducto(referencia);
       if (p) {
         // Mapeamos los datos reales del producto a las variables de la vista
         this.product = {
@@ -75,10 +75,26 @@ export class PageDetalleProducto implements OnInit {
           brand: p.marca_nombre || p.marca_id || '',
           subcategory: p.subcategoria_nombre || p.subcategoria_id || 'Sin subcategoría',
           // Usar imagen_principal si existe, o imagenes, de lo contrario un placeholder
-          images: p.imagenes && p.imagenes.length > 0 
-            ? p.imagenes 
-            : (p.imagen_principal ? [p.imagen_principal] : ['https://placehold.co/600x400/eeeeee/888888?text=Sin+Imagen'])
+          images:
+            p.imagenes && p.imagenes.length > 0
+              ? p.imagenes
+              : p.imagen_principal
+                ? [p.imagen_principal]
+                : ['https://placehold.co/600x400/eeeeee/888888?text=Sin+Imagen'],
         };
+        if (m) {
+          //Mapeo de datos faltantes de las medidas
+          this.product = {
+            ...this.product,
+            height: m.altura || 'N/A',
+            width: m.ancho || 'N/A',
+            depth: m.largo || 'N/A',
+            weight: m.peso || 'N/A',
+            weightUnit: m.medida_peso || 'N/A',
+            volume: m.volumen || 'N/A',
+            volumeUnit: m.medida_volumen || 'N/A',
+          };
+        }
         this.selectedImage = this.product.images[0];
       } else {
         console.warn('No se encontró el producto o la respuesta fue vacía.');
@@ -100,7 +116,7 @@ export class PageDetalleProducto implements OnInit {
     console.log('Agregado al carrito:', {
       product: this.product.name,
       quantity: this.quantity,
-      price: this.product.price
+      price: this.product.price,
     });
     alert(`✅ ${this.quantity} unidad(es) agregadas al carrito`);
   }
@@ -108,7 +124,7 @@ export class PageDetalleProducto implements OnInit {
   buyNow(): void {
     console.log('Comprar ahora:', {
       product: this.product.name,
-      quantity: this.quantity
+      quantity: this.quantity,
     });
     alert(`🛒 Procediendo con la compra de ${this.quantity} unidad(es)`);
   }

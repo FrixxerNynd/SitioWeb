@@ -211,7 +211,8 @@
           </div>
 
           <div class="filtro-item">
-            <input class="form-check-input cursor-pointer mr-2" type="checkbox" />
+            <input class="form-check-input cursor-pointer mr-2" type="checkbox" [(ngModel)]="stock"
+              (change)="onStockChange()" />
             <label class="form-check-label filtro-label text-sm cursor-pointer">
               Mostrar productos sin stock
             </label>
@@ -361,7 +362,8 @@
               </div>
 
               <div class="filtro-item">
-                <input class="form-check-input cursor-pointer mr-2" type="checkbox" />
+                <input class="form-check-input cursor-pointer mr-2" type="checkbox" [(ngModel)]="stock"
+                  (change)="onStockChange()" />
                 <label class="form-check-label filtro-label text-sm cursor-pointer">
                   Mostrar productos sin stock
                 </label>
@@ -476,44 +478,35 @@
 
           @if (totalPagesCalculated() > 1) {
           @if (totalPagesCalculated() > 1) {
-<div class="paginacion-container">
-    <div class="paginacion-info">
-        Mostrando {{ getRangoInicio() }} - {{ getRangoFin() }} de {{ filteredProducts().length }} productos
-    </div>
+          <div class="paginacion-container">
+            <div class="paginacion-info">
+              Mostrando {{ getRangoInicio() }} - {{ getRangoFin() }} de {{ filteredProducts().length }} productos
+            </div>
 
-    <div class="paginacion-controles">
-        <!-- Anterior -->
-        <button 
-            class="btn-pagina" 
-            (click)="prevPage()" 
-            [disabled]="currentPage() === 1">
-            ‹
-        </button>
+            <div class="paginacion-controles">
+              <!-- Anterior -->
+              <button class="btn-pagina" (click)="prevPage()" [disabled]="currentPage() === 1">
+                ‹
+              </button>
 
-        <!-- Números de página -->
-        @for (page of getPageNumbers(); track page) {
-            @if (page === -1) {
-                <span class="pagina-ellipsis">...</span>
-            } @else {
-                <button 
-                    class="btn-pagina"
-                    [class.active]="page === currentPage()"
-                    (click)="goToPage(page)">
-                    {{ page }}
-                </button>
-            }
-        }
+              <!-- Números de página -->
+              @for (page of getPageNumbers(); track page) {
+              @if (page === -1) {
+              <span class="pagina-ellipsis">...</span>
+              } @else {
+              <button class="btn-pagina" [class.active]="page === currentPage()" (click)="goToPage(page)">
+                {{ page }}
+              </button>
+              }
+              }
 
-        <!-- Siguiente -->
-        <button 
-            class="btn-pagina" 
-            (click)="nextPage()" 
-            [disabled]="currentPage() === totalPagesCalculated()">
-            ›
-        </button>
-    </div>
-</div>
-}
+              <!-- Siguiente -->
+              <button class="btn-pagina" (click)="nextPage()" [disabled]="currentPage() === totalPagesCalculated()">
+                ›
+              </button>
+            </div>
+          </div>
+          }
           }
 
           @if (filteredProducts().length === 0 && !isLoading()) {

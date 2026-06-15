@@ -20,6 +20,7 @@ class ExelController {
                 categoria,
                 subcategoria,
                 marca,
+                stock,
                 pageSize = 50,
                 page
             } = req.query;
@@ -29,6 +30,7 @@ class ExelController {
                 categoria,
                 subcategoria,
                 marca,
+                stock,
                 pageSize: parseInt(pageSize),
                 page: parseInt(page),
             });
@@ -147,6 +149,23 @@ class ExelController {
         }
     }
     /**
+     * POST /api/productos/sync-marcas
+     * Fuerza una sincronización de las marcas desde la API a Redis.
+     * Útil para refrescar manualmente el caché de marcas.
+     */
+    async syncMarcas(req, res, next) {
+        try {
+            const marcas = await exelService.getSaveExternalBrand();
+            res.status(200).json({
+                success: true,
+                message: `Marcas sincronizadas: ${marcas.saved} marcas guardadas en Redis, ${marcas.skipped} marcas saltadas`,
+                total: marcas.saved,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+    /**
      * POST /api/productos/sync-imagenes
      * Fuerza una sincronización del catálogo de imágenes desde la API a Redis.
      * Útil para refrescar manualmente el caché de imágenes.
@@ -223,8 +242,21 @@ class ExelController {
         }
     }
 
-    // ── Nuevos handlers ─────────────────────────────────────
+    // ── GETS DE REDIS ─────────────────────────────────────
 
+
+    /**
+     * GET /api/productos/marcas
+     * Devuelve el listado de marcas desde Redis.
+     */
+    async getMarcas(req, res, next) {
+        try {
+            const data = await exelService.getBrandsRedis();
+            res.status(200).json({ success: true, data });
+        } catch (error) {
+            next(error);
+        }
+    }
     /**
      * GET /api/productos/subcategorias
      * Devuelve el listado de subcategorías desde Redis.
@@ -254,6 +286,20 @@ class ExelController {
     }
 
     /**
+     * GET /api/productos/medida/{referencia}
+     * Devuelve la medida de un producto por referencia desde Redis
+     */
+    async getMedidaRedisRef(req, res, next) {
+        try {
+            const { referencia } = req.params;
+            const data = await exelService.getMedidaRedisRef(referencia);
+            res.status(200).json({ success: true, data });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
      * GET /api/productos/fichas-tecnicas
      * Devuelve fichas técnicas paginadas desde Redis.
      * Acepta: ?page=1&limit=50
@@ -262,6 +308,20 @@ class ExelController {
         try {
             const { page = 1, limit = 50 } = req.query;
             const data = await exelService.getFichasTecnicasRedis(parseInt(page), parseInt(limit));
+            res.status(200).json({ success: true, data });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * GET /api/productos/ficha-tecnica/{referencia}
+     * Devuelve la ficha tecnica de un producto por referencia desde Redis
+     */
+    async getFichaTecnicaRedisRef(req, res, next) {
+        try {
+            const { referencia } = req.params;
+            const data = await exelService.getFichaTecnicaRedisRef(referencia);
             res.status(200).json({ success: true, data });
         } catch (error) {
             next(error);

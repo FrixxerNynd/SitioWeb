@@ -8,9 +8,11 @@ import MedidasResponseDto from "./Productos/MedidasResponseDto.js";
 import FichaTecnicaResponseDto from "./Productos/FichaProductosDto.js";
 import PrecioStockResponseDto from "./Productos/PrecioStockDto.js";
 import SubCategoriaDto from "./Categorias/SubCategoriaDto.js";
+import MarcaResponseDto from "./Categorias/MarcaResponseDto.js";
 
 export const responseDto = {
     categoria: CategoriaResponseDto,
+    marca: MarcaResponseDto,
     subcategoria: SubCategoriaDto,
     pedido: PedidoResponseDto,
     productos: ProductosResponseDto,

@@ -16,7 +16,7 @@ namespace back_cabs.CRM.services.Legacy
     /// OPTIMIZADO CON REDIS para búsquedas rápidas
     /// </summary>
     public class AdmClienteService : IAdmClienteService
-    {   
+    {
         private readonly IAdmClienteRepository _repository;
         private readonly LegacyCompacReadOnlyContext _context;
         private readonly ReadOnlyContext _authContext;
@@ -422,25 +422,24 @@ namespace back_cabs.CRM.services.Legacy
             {
                 var cliente = await _context.AdmClientes
                     .FirstOrDefaultAsync(c =>
-                        c.CEmail1.ToLower() == email.ToLower() ||
-                        c.CEmail2.ToLower() == email.ToLower() ||
-                        c.CEmail3.ToLower() == email.ToLower());
+                        c.CEmail1.ToLower() == email.ToLower());
 
                 if (cliente == null)
                 {
                     _logger.LogWarning("⚠️ Cliente no encontrado para actualizar contraseña: {Email}", email);
                     return false;
                 }
-
+                _logger.LogWarning("⚠️ CONTRASEÑA: {nuevaPassword}", nuevaPassword);
                 cliente.CTextoExtra1 = nuevaPassword;
                 await _repository.UpdateAsync(cliente);
+                _logger.LogInformation("Cliente actualizado: {client}", cliente);
 
                 _logger.LogInformation("Contraseña Actualizada para los datos del cliente, actualizando contraseña hash");
 
                 var AuthCliente = await _authContext.Auth_Clientes
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id_Cliente == cliente.CIdClienteProveedor);
-                
+
                 if (AuthCliente != null)
                 {
                     var password = ApiUtilities.GenerateSha256Hash(nuevaPassword);
@@ -458,7 +457,7 @@ namespace back_cabs.CRM.services.Legacy
             }
         }
 
-        
+
         /// <summary>
         /// Cargar domicilios para una lista de clientes (evitando OPENJSON con foreach)
         /// </summary>
@@ -694,7 +693,7 @@ namespace back_cabs.CRM.services.Legacy
         {
             return await _context.AdmClientes
                 .AsNoTracking()
-                .AnyAsync(c => c.CIdClienteProveedor == idCliente );
+                .AnyAsync(c => c.CIdClienteProveedor == idCliente);
         }
 
         /// <summary>

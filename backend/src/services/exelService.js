@@ -37,6 +37,7 @@ class ExelService {
         subcategoria: item.subcategoria_id ?? '',
         referencia: item.referencia ?? '',
         categoria: item.categoria_id ?? '',
+        stock: item.stock ?? 0,
       }));
       const precio_existencia = items.map(item => new responseDto.precio_stock({
         referencia: item.referencia,
@@ -126,7 +127,7 @@ class ExelService {
    *                         lo que devuelve solo las referencias que cumplen TODOS los filtros.
    *   null si Redis no está disponible (el llamador debe hacer fallback a la API externa).
    */
-  async getProductsRedis({ categoria, subcategoria, marca, pageSize = 100, page = 1 } = {}) {
+  async getProductsRedis({ categoria, subcategoria, marca, stock, pageSize = 100, page = 1 } = {}) {
     const client = redisClient.getClient();
 
     if (!client) {
@@ -142,6 +143,7 @@ class ExelService {
         categoria ? `indice:categoria:${categoria}` : null,
         subcategoria ? `indice:subcategoria:${subcategoria}` : null,
         marca ? `indice:marca:${marca}` : null,
+        stock !== undefined ? `indice:stock:${stock}` : null,
       ].filter(Boolean);
 
       if (indicesActivos.length === 0) {
@@ -267,6 +269,50 @@ class ExelService {
     }
   }
 
+  /**
+   * Obtiene las marcas desde la API externa y las guarda en Redis.
+   */
+  async getSaveExternalBrand() {
+    try {
+      const apiUrl = 'https://api01.exeldelnorte.com.mx/marcas';
+      const response = await axios.get(apiUrl, {
+        headers: {
+          Authorization: apiKey
+        }
+      });
+
+      const marcas = response.data.datos.map(marca => new responseDto.marca({
+        id_marca: marca.id,
+        nombre_marca: marca.nombre,
+      }))
+      //Guardar las marcas en Redis
+      const saved = await this.saveBrandsRedis(marcas);
+
+      return saved;
+    } catch(error) {
+      logger.error(`Error al obtener las marcas de Exel del Norte: ${error.message}`);
+      throw new Error("No se pudo obtener el catálogo de marcas externo");
+    }
+  }
+
+   /**
+   * Obtiene las marcas desde Redis.
+   */
+  async getBrandsRedis() {
+    const client = redisClient.getClient();
+    const helper = new RedisHelper(client);
+
+    const marcas = await helper.getAll({
+      keyPrefix: 'marca',
+      idsSetKey: 'catalogo:marcas'
+    });
+    return marcas
+  }
+
+
+  /**
+   * Obtiene las categorias desde Redis.
+   */
   async getCategoriesRedis() {
     const client = redisClient.getClient();
     const helper = new RedisHelper(client);
@@ -277,6 +323,8 @@ class ExelService {
     });
     return categorias
   }
+
+ 
 
   async getExternalImagenes(query) {
     try {
@@ -448,43 +496,53 @@ class ExelService {
     const client = await redisClient.getClient();
 
     if (!client) {
-      logger.warn("Redis no disponible, productos no guardados en redis")
-      return;
+        logger.warn("Redis no disponible, productos no guardados en redis");
+        return;
     }
 
     try {
-      const multi = client.multi();
+        const multi = client.multi();
 
-      for (const p of productos) {
-        if (!p.referencia) continue;
+        for (const p of productos) {
+            if (!p.referencia) continue;
 
-        multi.hSet(`producto:${p.referencia}`, {
-          referencia: p.referencia ?? '',
-          sku: String(p.sku ?? ''),
-          nombre: p.nombre ?? '',
-          marca: p.marca ?? '',
-          categoria: p.categoria ?? '',
-          subcategoria: p.subcategoria ?? '',
-          codigoBarras: p.codigoBarras ?? '',
-          codigoSAT: p.codigoSAT ?? '',
-        });
+            multi.hSet(`producto:${p.referencia}`, {
+                referencia:   p.referencia ?? '',
+                sku:          String(p.sku ?? ''),
+                nombre:       p.nombre ?? '',
+                marca:        p.marca ?? '',
+                categoria:    p.categoria ?? '',
+                subcategoria: p.subcategoria ?? '',
+                codigoBarras: p.codigoBarras ?? '',
+                codigoSAT:    p.codigoSAT ?? '',
+            });
 
-        multi.sAdd('catalogo:referencias', p.referencia);
-        if (p.categoria) {
-          multi.sAdd(`indice:categoria:${p.categoria}`, p.referencia);
+            multi.sAdd('catalogo:referencias', p.referencia);
+
+            if (p.categoria) {
+                multi.sAdd(`indice:categoria:${p.categoria}`, p.referencia);
+            }
+            if (p.subcategoria) {
+                multi.sAdd(`indice:subcategoria:${p.subcategoria}`, p.referencia);
+            }
+            if (p.marca) {
+                multi.sAdd(`indice:marca:${p.marca}`, p.referencia);
+            }
+
+            // ← índice de stock
+            if (p.stock > 0) {
+                multi.sAdd('indice:stock:true', p.referencia);
+                multi.sRem('indice:stock:false', p.referencia); // limpia el contrario
+            } else {
+                multi.sAdd('indice:stock:false', p.referencia);
+                multi.sRem('indice:stock:true', p.referencia); // limpia el contrario
+            }
         }
-        if (p.subcategoria) {
-          multi.sAdd(`indice:subcategoria:${p.subcategoria}`, p.referencia);
-        }
-        if (p.marca) {
-          multi.sAdd(`indice:marca:${p.marca}`, p.referencia);
-        }
-      }
 
-      await multi.exec();
-      logger.info(`Se guardaron ${productos.length} productos en Redis`);
+        await multi.exec();
+        logger.info(`Se guardaron ${productos.length} productos en Redis`);
     } catch (error) {
-      logger.error("Error al guardar productos en redis: " + error.message);
+        logger.error("Error al guardar productos en redis: " + error.message);
     }
   }
 
@@ -586,6 +644,29 @@ class ExelService {
     }
   }
 
+  async saveBrandsRedis(marcas) {
+    const client = await redisClient.getClient();
+    const helper = new RedisHelper(client);
+
+    try {
+      const { saved, skipped } = await helper.saveBatch(marcas, {
+        keyPrefix: 'marca',
+        idField: 'id_marca',
+        allKeysSet: 'catalogo:marcas',
+        toHash: (m) => ({
+          id_marca: String(m.id_marca ?? ''),
+          nombre_marca: String(m.nombre?? ''),
+        }),
+        indices: [],
+      })
+      logger.info(`Marcas: ${saved} guardadas, ${skipped} saltadas`);
+      return { saved, skipped }
+    } catch (error) {
+      logger.error("Error al guardar marcas en redis: " + error.message);
+      throw new Error("Error al guardar marcas en redis: " + error.message)
+    }
+  }
+
   async saveSubcategoriasRedis(subcategorias) {
     const client = redisClient.getClient();
     const helper = new RedisHelper(client);
@@ -656,6 +737,7 @@ class ExelService {
     });
   }
 
+  
   /**
    * Lee medidas paginadas desde Redis.
    */
@@ -681,6 +763,32 @@ class ExelService {
   }
 
   /**
+   * Obtener medidas de un producto por referencia desde redis
+   */
+  async getMedidaRedisRef(referencia) {
+    const client = redisClient.getClient();
+    const helper = new RedisHelper(client);
+    const data = await helper.getOne({
+      keyPrefix: 'medida',
+      id: referencia,
+      fromHash: (hash) => ({
+        referencia: hash.referencia,
+        altura: parseFloat(hash.altura ?? 0),
+        ancho: parseFloat(hash.ancho ?? 0),
+        largo: parseFloat(hash.largo ?? 0),
+        peso: parseFloat(hash.peso ?? 0),
+        medida_peso: hash.medida_peso ?? '',
+        volumen: parseFloat(hash.volumen ?? 0),
+        medida_volumen: hash.medida_volumen ?? '',
+      }),
+    });
+    if (!data) {
+      return null;
+    }
+    return data;
+  }
+
+  /**
    * Lee fichas técnicas paginadas desde Redis.
    */
   async getFichasTecnicasRedis(page = 1, limit = 50) {
@@ -693,6 +801,23 @@ class ExelService {
       limit,
       fromJson: (parsed, id) => ({ referencia: id, fichaTecnica: parsed }),
     });
+  }
+
+  /**
+   * Obtener ficha tecnica por referencia desde redis
+   */
+  async getFichaTecnicaRedisRef(referencia) {
+    const client = redisClient.getClient();
+    const helper = new RedisHelper(client);
+    const data = await helper.getJson({
+      keyPrefix: 'ficha_tecnica',
+      id: referencia,
+      fromJson: (parsed, id) => ({ referencia: id, fichaTecnica: parsed }),
+   })
+    if (!data) {
+      return null;
+    }
+    return data;
   }
 
   //#endregion

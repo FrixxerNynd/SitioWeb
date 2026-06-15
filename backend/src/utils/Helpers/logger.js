@@ -15,17 +15,17 @@ const logger = wins.createLogger({
     transports: [
         //Errores graves: ERROR.log
         new wins.transports.File({
-            filename: path.join(__dirname, '../../logs/ERROR.log'),
+            filename: path.join(__dirname, '../../../logs/ERROR.log'),
             level: 'error'
         }),
         //Advertencias: WARN.log
         new wins.transports.File({
-            filename: path.join(__dirname, '../../logs/WARN.log'),
+            filename: path.join(__dirname, '../../../logs/WARN.log'),
             level: 'warn'
         }),
         //Todo lo demas: INFO.log
         new wins.transports.File({
-            filename: path.join(__dirname, '../../logs/INFO.log'),
+            filename: path.join(__dirname, '../../../logs/INFO.log'),
             level: 'info'
         }),
     ]

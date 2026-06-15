@@ -120,7 +120,7 @@ namespace back_cabs.CRM.services.Auth
                 _logger.LogDebug("Hash de contraseña generado para usuario: {Email}", request.Email);
 
                 // PASO 4: CREAR ENTIDAD DE USUARIO
-                
+
                 var nuevoUsuario = new UsuarioAuth
                 {
                     // Id se genera automáticamente por IDENTITY en la base de datos
@@ -622,6 +622,7 @@ namespace back_cabs.CRM.services.Auth
             if (_writeContext == null) throw new InvalidOperationException("WriteContext no disponible");
             var usuario = await _writeContext.UsuariosAuth.FirstOrDefaultAsync(u => u.Email == email);
             if (usuario == null) return false;
+            _logger.LogWarning("⚠️ CONTRASEÑA: {nuevaPassword}", nuevaPassword);
             usuario.Password = back_cabs.CRM.Middleware.ApiUtilities.GenerateSha256Hash(nuevaPassword);
             usuario.ActualizadoEn = DateTime.UtcNow;
             await _writeContext.SaveChangesAsync();

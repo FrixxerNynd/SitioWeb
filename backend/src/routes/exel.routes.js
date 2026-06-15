@@ -42,6 +42,11 @@ const exelRouter = Router();
  *           type: string
  *         description: ID de la marca para filtrar
  *       - in: query
+ *         name: stock
+ *         schema:
+ *           type: string
+ *         description: true si tiene stock, false si no tiene
+ *       - in: query
  *         name: pageSize
  *         schema:
  *           type: integer
@@ -92,6 +97,20 @@ exelRouter.get('/', exelController.getProductos.bind(exelController));
  *         description: Error interno del servidor
  */
 exelRouter.get('/categorias', exelController.getCategorias.bind(exelController));
+
+/**
+ * @swagger
+ * /api/productos/marcas:
+ *   get:
+ *     summary: Listar marcas del catálogo
+ *     tags: [Productos]
+ *     responses:
+ *       200:
+ *         description: Marcas obtenidas exitosamente
+ *       500:
+ *         description: Error interno del servidor
+ */
+exelRouter.get('/marcas', exelController.getMarcas.bind(exelController));
 
 /**
  * @swagger
@@ -337,6 +356,79 @@ exelRouter.get('/precios', exelController.getPrecios.bind(exelController));
  * */
 exelRouter.get('/:referencia', exelController.getProductByReference.bind(exelController));
 
+/**
+ * @swagger
+ * /api/productos/medida/{referencia}:
+ *   get:
+ *     summary: Obtener medida por referencia
+ *     tags: [Productos]
+ *     parameters:
+ *       - in: path
+ *         name: referencia
+ *         schema:
+ *           type: string
+ *         description: Referencia del producto
+ *     responses:
+ *       200:
+ *         description: Medida obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     referencia:
+ *                       type: string
+ *                     medida:
+ *                       type: object
+ *       404:
+ *         description: Producto no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ * */
+exelRouter.get('/medida/:referencia', exelController.getMedidaRedisRef.bind(exelController));
+
+/**
+ * @swagger
+ * /api/productos/ficha-tecnica/{referencia}:
+ *   get:
+ *     summary: Obtener ficha técnica por referencia
+ *     tags: [Productos]
+ *     parameters:
+ *       - in: path
+ *         name: referencia
+ *         schema:
+ *           type: string
+ *         description: Referencia del producto
+ *     responses:
+ *       200:
+ *         description: Ficha técnica obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     referencia:
+ *                       type: string
+ *                     fichaTecnica:
+ *                       type: object
+ *       404:
+ *         description: Producto no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ * */
+exelRouter.get('/ficha-tecnica/:referencia', exelController.getFichaTecnicaRedisRef.bind(exelController));
 //#endregion
 
 //#region Sincronizacion de datos con Redis
@@ -391,6 +483,32 @@ exelRouter.post('/sync', exelController.syncCatalogo.bind(exelController));
  *         description: Error interno del servidor
  */
 exelRouter.post('/sync-categorias', exelController.syncCategorias.bind(exelController));
+
+/**
+ * @swagger
+ * /api/productos/sync-marcas:
+ *   post:
+ *     summary: Sincronizar marcas del catálogo en Redis
+ *     description: Fuerza una descarga de todas las marcas desde la API externa y los guarda en Redis.
+ *     tags: [Productos]
+ *     responses:
+ *       200:
+ *         description: Marcas sincronizadas exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 total:
+ *                   type: integer
+ *       500:
+ *         description: Error interno del servidor
+ */
+exelRouter.post('/sync-marcas', exelController.syncMarcas.bind(exelController));
 
 /**
  * @swagger
