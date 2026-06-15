@@ -13,6 +13,7 @@ const exelRouter = Router();
  *   name: Productos
  *   description: Catálogo de productos Exel del Norte
  */
+//#region Gets con info desde redis
 
 /**
  * @swagger
@@ -112,6 +113,210 @@ exelRouter.get('/categorias', exelController.getCategorias.bind(exelController))
  *         description: Error interno del servidor
  */
 exelRouter.get('/imagenes', exelController.getImagenes.bind(exelController));
+
+/**
+ * @swagger
+ * /api/productos/subcategorias:
+ *   get:
+ *     summary: Listar subcategorías del catálogo
+ *     description: Devuelve todas las subcategorías desde Redis. Cada subcategoría incluye su ID, nombre e ID de categoría padre.
+ *     tags: [Productos]
+ *     responses:
+ *       200:
+ *         description: Subcategorías obtenidas exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       500:
+ *         description: Error interno del servidor
+ */
+exelRouter.get('/subcategorias', exelController.getSubcategorias.bind(exelController));
+
+/**
+ * @swagger
+ * /api/productos/medidas:
+ *   get:
+ *     summary: Listar medidas de productos
+ *     description: Devuelve medidas de productos paginadas desde Redis (alto, ancho, largo, peso, volumen).
+ *     tags: [Productos]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Número de página
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *         description: Resultados por página
+ *     responses:
+ *       200:
+ *         description: Medidas obtenidas exitosamente
+ *       500:
+ *         description: Error interno del servidor
+ */
+exelRouter.get('/medidas', exelController.getMedidas.bind(exelController));
+
+/**
+ * @swagger
+ * /api/productos/fichas-tecnicas:
+ *   get:
+ *     summary: Listar fichas técnicas de productos
+ *     description: Devuelve fichas técnicas paginadas desde Redis.
+ *     tags: [Productos]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Número de página
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *         description: Resultados por página
+ *     responses:
+ *       200:
+ *         description: Fichas técnicas obtenidas exitosamente
+ *       500:
+ *         description: Error interno del servidor
+ */
+exelRouter.get('/fichas-tecnicas', exelController.getFichasTecnicas.bind(exelController));
+
+/**
+ * @swagger
+ * /api/productos/ofertas:
+ *   get:
+ *     summary: Listar productos en oferta
+ *     description: Devuelve productos con precio de oferta activo, paginados desde Redis.
+ *     tags: [Productos]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Número de página
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *         description: Resultados por página
+ *     responses:
+ *       200:
+ *         description: Productos en oferta obtenidos exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ *                     datos:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *       500:
+ *         description: Error interno del servidor
+ */
+exelRouter.get('/ofertas', exelController.getProductosEnOferta.bind(exelController));
+
+/**
+ * @swagger
+ * /api/productos/precios:
+ *   get:
+ *     summary: Listar todos los precios y stock
+ *     description: |
+ *       Devuelve el precio, precio de oferta, precio sin oferta, existencia (stock)
+ *       y estado de oferta de todos los productos, paginados desde Redis.
+ *       No filtra por oferta — devuelve el catálogo completo de precios.
+ *     tags: [Productos]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Número de página
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *         description: Resultados por página
+ *     responses:
+ *       200:
+ *         description: Precios y stock obtenidos exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ *                     datos:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           referencia:
+ *                             type: string
+ *                           precio:
+ *                             type: number
+ *                           precioOferta:
+ *                             type: number
+ *                           precioSinOferta:
+ *                             type: number
+ *                           oferta:
+ *                             type: boolean
+ *                           existencia:
+ *                             type: integer
+ *                           fechaActualizacion:
+ *                             type: string
+ *                             format: date-time
+ *       500:
+ *         description: Error interno del servidor
+ */
+exelRouter.get('/precios', exelController.getPrecios.bind(exelController));
+
+//#endregion
 
 //#region Sincronizacion de datos con Redis
 /**
@@ -213,5 +418,90 @@ exelRouter.post('/sync-imagenes', exelController.syncImagenes.bind(exelControlle
 exelRouter.get('/redis-stats', exelController.getRedisStats.bind(exelController));
 
 
+/**
+ * @swagger
+ * /api/productos/sync-medidas:
+ *   post:
+ *     summary: Sincronizar medidas de productos en Redis
+ *     description: Fuerza una descarga de todas las medidas de productos desde la API externa y las guarda en Redis.
+ *     tags: [Productos]
+ *     responses:
+ *       200:
+ *         description: Medidas sincronizadas exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 saved:
+ *                   type: integer
+ *                 skipped:
+ *                   type: integer
+ *       500:
+ *         description: Error interno del servidor
+ */
+exelRouter.post('/sync-medidas', exelController.syncMedidas.bind(exelController));
+
+/**
+ * @swagger
+ * /api/productos/sync-fichas:
+ *   post:
+ *     summary: Sincronizar fichas técnicas en Redis
+ *     description: Fuerza una descarga de todas las fichas técnicas de productos desde la API externa y las guarda en Redis.
+ *     tags: [Productos]
+ *     responses:
+ *       200:
+ *         description: Fichas técnicas sincronizadas exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 total:
+ *                   type: integer
+ *                 saved:
+ *                   type: integer
+ *                 skipped:
+ *                   type: integer
+ *       500:
+ *         description: Error interno del servidor
+ */
+exelRouter.post('/sync-fichas', exelController.syncFichas.bind(exelController));
+
+/**
+ * @swagger
+ * /api/productos/sync-subcategorias:
+ *   post:
+ *     summary: Sincronizar subcategorías en Redis
+ *     description: Fuerza una descarga de todas las subcategorías desde la API externa y las guarda en Redis.
+ *     tags: [Productos]
+ *     responses:
+ *       200:
+ *         description: Subcategorías sincronizadas exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 total:
+ *                   type: integer
+ *       500:
+ *         description: Error interno del servidor
+ */
+exelRouter.post('/sync-subcategorias', exelController.syncSubcategorias.bind(exelController));
+
 //#endregion
+
 export default exelRouter;

@@ -15,10 +15,10 @@ class CartController {
   async getCart(req, res, next) {
     console.log("Usuario del token: ", req?.user)
     try {
-     
-      const result = await cartService.getCart(getUserId(req), req.user?.name);      
+
+      const result = await cartService.getCart(getUserId(req), req.user?.name);
       res.status(200).json({ success: true, data: result });
-   
+
     } catch (error) {
       next(error);
     }

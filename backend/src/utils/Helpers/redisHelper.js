@@ -41,9 +41,9 @@ class RedisHelper {
 
             //Indices secundarios
             for (const index of indices) {
-                const value = item[idx.field];
+                const value = item[index.field];
                 if (value) {
-                    multi.sAdd(`indice:${idx.name}:${value}`, String(id));
+                    multi.sAdd(`indice:${index.name}:${value}`, String(id));
                 }
             }
             saved++;
@@ -53,6 +53,37 @@ class RedisHelper {
 
         return { saved, skipped };
     }
+
+    async saveJsonBatch(items, { keyPrefix, idField, toJson, allKeysSet }) {
+        if (!this.client) {
+            logger.warn(`Redis no disponible, no se guardó ${keyPrefix}`);
+            return { saved: 0, skipped: items.length };
+        }
+
+        const multi = this.client.multi();
+        let saved = 0;
+        let skipped = 0;
+
+        for (const item of items) {
+            const id = item[idField];
+            if (!id) { skipped++; continue; }
+
+            const jsonData = toJson(item);
+            if (!jsonData || (Array.isArray(jsonData) && jsonData.length === 0)) {
+                skipped++;
+                continue;
+            }
+
+            multi.set(`${keyPrefix}:${id}`, JSON.stringify(jsonData));
+            if (allKeysSet) multi.sAdd(allKeysSet, String(id));
+
+            saved++;
+        }
+
+        await multi.exec();
+        return { saved, skipped };
+    }
+
 
     /**
      * Obtiene una página de entidades a partir de un Set que contiene los IDs.
@@ -85,7 +116,7 @@ class RedisHelper {
             total,
             page,
             limit,
-            totalPages: Math.cell(total / limit),
+            totalPages: Math.ceil(total / limit),
             datos: entidades,
         };
     }
@@ -156,6 +187,90 @@ class RedisHelper {
             totalPages: Math.ceil(total / limit),
             datos: entidades,
         };
+    }
+
+    /**
+    * Lee UN solo valor JSON por ID.
+    * @param {string} keyPrefix - ej. 'ficha_tecnica'
+    * @param {string} id - ej. '3MCACCAC016'
+    * @param {Function} [fromJson] - (parsed) => objeto transformado (opcional)
+    */
+    async getJson({ keyPrefix, id, fromJson }) {
+        if (!this.client) {
+            logger.warn(`Redis no disponible, no se pudo leer ${keyPrefix}:${id}`);
+            return null;
+        }
+
+        const raw = await this.client.get(`${keyPrefix}:${id}`);
+        if (!raw) return null;
+
+        const parsed = JSON.parse(raw);
+        return fromJson ? fromJson(parsed) : parsed;
+    }
+
+    /**
+     * Lee un batch paginado de valores JSON desde un Set de IDs.
+     * @param {string} keyPrefix - ej. 'imagenes'
+     * @param {string} idsSetKey - ej. 'catalogo:imagenes'
+     * @param {number} [page=1]
+     * @param {number} [limit=50]
+     * @param {Function} [fromJson] - (parsed, id) => objeto transformado (opcional)
+     */
+    async getJsonBatch({ keyPrefix, idsSetKey, page = 1, limit = 50, fromJson }) {
+        if (!this.client) {
+            logger.warn(`Redis no disponible, no se pudo leer ${keyPrefix}`);
+            return { total: 0, page, limit, totalPages: 0, datos: [] };
+        }
+
+        const allIds = await this.client.sMembers(idsSetKey);
+        const total = allIds.length;
+        const start = (page - 1) * limit;
+        const idsPagina = allIds.slice(start, start + limit);
+
+        const datos = await Promise.all(
+            idsPagina.map(async (id) => {
+                const raw = await this.client.get(`${keyPrefix}:${id}`);
+                if (!raw) return null;
+
+                const parsed = JSON.parse(raw);
+                return fromJson ? fromJson(parsed, id) : { id, datos: parsed };
+            })
+        );
+
+        return {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+            datos: datos.filter(Boolean), // elimina nulls si alguna key no existía
+        };
+    }
+
+    /**
+     * Lee TODOS los valores JSON de un Set sin paginar (para sets pequeños).
+     * @param {string} keyPrefix
+     * @param {string} idsSetKey
+     * @param {Function} [fromJson]
+     */
+    async getAllJson({ keyPrefix, idsSetKey, fromJson }) {
+        if (!this.client) {
+            logger.warn(`Redis no disponible, no se pudo leer ${keyPrefix}`);
+            return [];
+        }
+
+        const allIds = await this.client.sMembers(idsSetKey);
+
+        const datos = await Promise.all(
+            allIds.map(async (id) => {
+                const raw = await this.client.get(`${keyPrefix}:${id}`);
+                if (!raw) return null;
+
+                const parsed = JSON.parse(raw);
+                return fromJson ? fromJson(parsed, id) : { id, datos: parsed };
+            })
+        );
+
+        return datos.filter(Boolean);
     }
 }
 

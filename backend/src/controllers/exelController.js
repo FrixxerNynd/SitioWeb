@@ -196,6 +196,135 @@ class ExelController {
         }
     }
 
+    // ── Nuevos handlers ─────────────────────────────────────
+
+    /**
+     * GET /api/productos/subcategorias
+     * Devuelve el listado de subcategorías desde Redis.
+     */
+    async getSubcategorias(req, res, next) {
+        try {
+            const data = await exelService.getSubcategoriasRedis();
+            res.status(200).json({ success: true, data });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * GET /api/productos/medidas
+     * Devuelve medidas de productos paginadas desde Redis.
+     * Acepta: ?page=1&limit=50
+     */
+    async getMedidas(req, res, next) {
+        try {
+            const { page = 1, limit = 50 } = req.query;
+            const data = await exelService.getMedidasRedis(parseInt(page), parseInt(limit));
+            res.status(200).json({ success: true, data });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * GET /api/productos/fichas-tecnicas
+     * Devuelve fichas técnicas paginadas desde Redis.
+     * Acepta: ?page=1&limit=50
+     */
+    async getFichasTecnicas(req, res, next) {
+        try {
+            const { page = 1, limit = 50 } = req.query;
+            const data = await exelService.getFichasTecnicasRedis(parseInt(page), parseInt(limit));
+            res.status(200).json({ success: true, data });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * GET /api/productos/ofertas
+     * Devuelve productos en oferta paginados desde Redis.
+     * Acepta: ?page=1&limit=50
+     */
+    async getProductosEnOferta(req, res, next) {
+        try {
+            const { page = 1, limit = 50 } = req.query;
+            const data = await exelService.getProductosEnOferta(parseInt(page), parseInt(limit));
+            res.status(200).json({ success: true, data });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * GET /api/productos/precios
+     * Devuelve todos los precios y stock paginados desde Redis,
+     * independientemente de si están en oferta o no.
+     * Acepta: ?page=1&limit=50
+     */
+    async getPrecios(req, res, next) {
+        try {
+            const { page = 1, limit = 50 } = req.query;
+            const data = await exelService.getPreciosStockRedis(parseInt(page), parseInt(limit));
+            res.status(200).json({ success: true, data });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // #region Sync handlers nuevos
+
+    /**
+     * POST /api/productos/sync-medidas
+     * Fuerza una descarga de las medidas de productos desde la API y las guarda en Redis.
+     */
+    async syncMedidas(req, res, next) {
+        try {
+            const result = await exelService.getSaveExternalSizeProducts(req.query);
+            res.status(200).json({
+                success: true,
+                message: `Medidas sincronizadas: ${result?.saved ?? 0} guardadas, ${result?.skipped ?? 0} omitidas`,
+                ...result,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * POST /api/productos/sync-fichas
+     * Fuerza una descarga de las fichas técnicas desde la API y las guarda en Redis.
+     */
+    async syncFichas(req, res, next) {
+        try {
+            const result = await exelService.getSaveFichaProducts();
+            res.status(200).json({
+                success: true,
+                message: `Fichas técnicas sincronizadas: ${result.total} obtenidas, ${result.saved} guardadas, ${result.skipped} omitidas`,
+                ...result,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * POST /api/productos/sync-subcategorias
+     * Fuerza una descarga de las subcategorías desde la API y las guarda en Redis.
+     */
+    async syncSubcategorias(req, res, next) {
+        try {
+            const subcategorias = await exelService.getExternalSubcategorias();
+            res.status(200).json({
+                success: true,
+                message: `Subcategorías sincronizadas: ${subcategorias.length} guardadas en Redis`,
+                total: subcategorias.length,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     //#endregion
 }
 

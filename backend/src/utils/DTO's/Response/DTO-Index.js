@@ -5,14 +5,19 @@ import PedidoCreateDto from "../Request/Pedidos/PedidoCreateDto.js";
 import ProductosCreateDto from "../Request/Productos/ProductosCreateDto.js";
 import ImagenesResponseDto from "./Imagenes/ImagenesResponseDto.js";
 import MedidasResponseDto from "./Productos/MedidasResponseDto.js";
-
+import FichaTecnicaResponseDto from "./Productos/FichaProductosDto.js";
+import PrecioStockResponseDto from "./Productos/PrecioStockDto.js";
+import SubCategoriaDto from "./Categorias/SubCategoriaDto.js";
 
 export const responseDto = {
     categoria: CategoriaResponseDto,
+    subcategoria: SubCategoriaDto,
     pedido: PedidoResponseDto,
     productos: ProductosResponseDto,
+    precio_stock: PrecioStockResponseDto,
     medidas: MedidasResponseDto,
-    imagenes: ImagenesResponseDto
+    imagenes: ImagenesResponseDto,
+    fichaTecnica: FichaTecnicaResponseDto
 }
 
 export const requestDto = {

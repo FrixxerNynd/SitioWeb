@@ -26,10 +26,10 @@ class ProductosResponseDto {
     this.sku = data.sku ?? '';
     this.codigoSAT = data.codigoSAT ?? '';
     this.codigoBarras = data.codigoBarras ?? '';
-    this.marca = data.marca ?? 0;
-    this.subcategoria = data.subcategoria ?? 0;
-    this.referencia = data.referencia ?? 0;
-    this.categoria = data.categoria ?? 0;
+    this.marca = data.marca ?? '';
+    this.subcategoria = data.subcategoria ?? '';
+    this.referencia = data.referencia ?? '';
+    this.categoria = data.categoria ?? '';
     this.fechaCreacion = data.fechaCreacion ? new Date(data.fechaCreacion) : new Date();
   }
 }

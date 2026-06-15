@@ -4,6 +4,8 @@ import redisClient from '../config/redis.js';
 import RedisHelper from '../utils/Helpers/redisHelper.js';
 import dotenv from "dotenv";
 import { responseDto } from "../utils/DTO's/Response/DTO-Index.js"
+import { stringify } from 'node:querystring';
+import redis from '../config/redis.js';
 
 dotenv.config();
 
@@ -25,23 +27,29 @@ class ExelService {
         response.data?.datos ??
         (Array.isArray(response.data) ? response.data : []);
 
-      const productos = items.map(item => new responseDto.ProductosResponseDto({
-        id: item.id,
-        nombre: item.nombre,
-        precio: parseFloat(item.precio ?? 0),
-        precioOriginal: parseFloat(item.precio_sin_oferta ?? 0),
-        stock: parseInt(item.stock ?? 0),
-        descripcion: item.descripcion_extendida,
-        sku: item.sku,
-        codigoSAT: item.codigo_sat,
-        codigoBarras: item.codigo_barras,
-        marca: item.marca_id,
-        subcategoria: item.subcategoria_id,
-        referencia: item.referencia,
-        categoria: item.categoria_id,
+      const productos = items.map(item => new responseDto.productos({
+        nombre: item.nombre ?? '',
+        descripcion: item.descripcion_extendida ?? '',
+        sku: item.sku ?? '',
+        codigoSAT: item.codigo_sat ?? '',
+        codigoBarras: item.codigo_barras ?? '',
+        marca: item.marca_id ?? '',
+        subcategoria: item.subcategoria_id ?? '',
+        referencia: item.referencia ?? '',
+        categoria: item.categoria_id ?? '',
       }));
+      const precio_existencia = items.map(item => new responseDto.precio_stock({
+        referencia: item.referencia,
+        existencia: item.stock,
+        precio: parseFloat(item.precio ?? 0),
+        precioOferta: parseFloat(item.precio_oferta ?? 0),
+        precioSinOferta: parseFloat(item.precio_sin_oferta ?? 0),
+        oferta: item.oferta ?? false
+      }))
+
 
       await this.saveProductsRedis(productos);
+      await this.savePreciosExistenciaProductosRedis(precio_existencia);
 
       return productos;
     } catch (error) {
@@ -59,8 +67,8 @@ class ExelService {
       const response = await axios.get(apiUrl, {
         headers: {
           Authorization: apiKey,
-          params: queryParams
         },
+        params: queryParams,
       });
 
       const items = response.data?.datos ?? (Array.isArray(response.data) ? response.data : []);
@@ -78,12 +86,35 @@ class ExelService {
       const { saved, skipped } = await this.saveMedidasRedis(medidas);
       logger.info(`Medidas guardadas: ${saved}, Medidas omitidas: ${skipped}`);
 
+      return { total: items.length, saved, skipped }
     } catch (error) {
       logger.error(`Error al obtener y guardar medidas: ${error.message}`);
       throw new Error('No se pudo obtener las medidas de los productos.');
     }
   }
 
+  async getSaveFichaProducts() {
+    try {
+      const apiUrl = "https://api01.exeldelnorte.com.mx/productos_fichatecnica";
+      const response = await axios.get(apiUrl, {
+        headers: { 'Authorization': apiKey }
+      });
+
+      const items = response.data?.datos ?? (Array.isArray(response.data) ? response.data : []);
+
+      const fichasTecnicas = items.map(item => new responseDto.fichaTecnica({
+        referencia: item.referencia,
+        fichaTecnica: item.ficha_tecnica,
+      }));
+
+      const { saved, skipped } = await this.saveFichasTecnicasRedis(fichasTecnicas);
+
+      return { total: fichasTecnicas.length, saved, skipped };
+    } catch (error) {
+      logger.error("Error al obtener y guardar ficha técnica de productos: " + error.message);
+      throw new Error('No se pudo obtener las fichas técnicas de los productos.');
+    }
+  }
 
   /**
    * Consulta productos desde Redis aplicando filtros por índice.
@@ -93,14 +124,6 @@ class ExelService {
    *  - Con un filtro      → usa el índice directo (p.ej. `indice:categoria:5`)
    *  - Múltiples filtros  → intersección (SINTER) de los índices involucrados,
    *                         lo que devuelve solo las referencias que cumplen TODOS los filtros.
-   *
-   * @param {Object} filtros
-   * @param {string|number} [filtros.categoria]    - ID de categoría
-   * @param {string|number} [filtros.subcategoria] - ID de subcategoría
-   * @param {string|number} [filtros.marca]        - ID de marca
-   * @param {number}        [filtros.limite=50]    - Máximo de resultados
-   * @param {number}        [filtros.offset=0]     - Índice de inicio (paginación)
-   * @returns {Promise<{productos: Object[], total: number}|null>}
    *   null si Redis no está disponible (el llamador debe hacer fallback a la API externa).
    */
   async getProductsRedis({ categoria, subcategoria, marca, limite = 50, offset = 0 } = {}) {
@@ -302,6 +325,76 @@ class ExelService {
     };
   }
 
+
+  async getPrecio(referencia) {
+    const client = redisClient.getClient();
+    const helper = new RedisHelper(client);
+
+    const precio = await helper.getOne({
+      keyPrefix: 'precio',
+      id: referencia,
+      fromHash: (hash) => ({
+        referencia: hash.referencia,
+        precio: parseFloat(hash.precio),
+        precioOferta: parseFloat(hash.precio_oferta),
+        precioSinOferta: parseFloat(hash.precio_sin_oferta),
+        oferta: hash.oferta === 'true',
+      }),
+    });
+
+    if (!precio) {
+      return { found: false, message: `Precio de ${referencia} no encontrado` };
+    }
+
+    return { found: true, data: precio };
+  }
+
+  //Todos los productos en oferta
+  async getProductosEnOferta(page = 1, limit = 50) {
+    const client = redisClient.getClient();
+    const helper = new RedisHelper(client);
+
+    const result = await helper.getBatchByFilters({
+      keyPrefix: 'precio',
+      indexKeys: [`indice:oferta:true`],
+      page,
+      limit,
+      fromHash: (hash) => ({
+        referencia: hash.referencia,
+        precio: parseFloat(hash.precio),
+        precioOferta: parseFloat(hash.precio_oferta),
+        precioSinOferta: parseFloat(hash.precio_sin_oferta),
+        oferta: hash.oferta === 'true',
+      }),
+    });
+
+    return result;
+  }
+
+  /**
+   * Lee todos los precios/stock paginados desde Redis, sin importar si están en oferta o no.
+   */
+  async getPreciosStockRedis(page = 1, limit = 50) {
+    const client = redisClient.getClient();
+    const helper = new RedisHelper(client);
+
+    return helper.getBatch({
+      keyPrefix: 'precio_existencia',
+      idsSetKey: 'catalogo:precios_existencias',
+      page,
+      limit,
+      fromHash: (hash) => ({
+        referencia: hash.referencia,
+        precio: parseFloat(hash.precio ?? 0),
+        precioOferta: parseFloat(hash.precio_oferta ?? 0),
+        precioSinOferta: parseFloat(hash.precio_sin_oferta ?? 0),
+        oferta: hash.oferta === 'true',
+        existencia: parseInt(hash.existencia ?? 0),
+        fechaActualizacion: hash.fecha_actualizacion ?? null,
+      }),
+    });
+  }
+
   //#region Metodos Guardado en Redis
   async saveProductsRedis(productos) {
     const client = await redisClient.getClient();
@@ -318,12 +411,12 @@ class ExelService {
         if (!p.referencia) continue;
 
         multi.hSet(`producto:${p.referencia}`, {
-          referencia: parseInt(p.referencia ?? 0),
-          sku: String(p.sku ?? 0),
+          referencia: p.referencia ?? '',
+          sku: String(p.sku ?? ''),
           nombre: p.nombre ?? '',
-          marca: parseInt(p.marca ?? 0),
-          categoria: parseInt(p.categoria ?? 0),
-          subcategoria: parseInt(p.subcategoria ?? 0),
+          marca: p.marca ?? '',
+          categoria: p.categoria ?? '',
+          subcategoria: p.subcategoria ?? '',
           codigoBarras: p.codigoBarras ?? '',
           codigoSAT: p.codigoSAT ?? '',
         });
@@ -350,9 +443,75 @@ class ExelService {
   async saveMedidasRedis(medidas) {
     const client = await redisClient.getClient();
     const helper = new RedisHelper(client);
+    try {
+      const { saved, skipped } = await helper.saveBatch(medidas, {
+        keyPrefix: 'medida',
+        idField: 'referencia',
+        allKeysSet: 'catalogo:medidas',
+        toHash: (m) => ({
+          referencia: String(m.referencia ?? ''),
+          altura: String(parseFloat(m.altura ?? 0)),
+          ancho: String(parseFloat(m.ancho ?? 0)),
+          largo: String(parseFloat(m.largo ?? 0)),
+          peso: String(parseFloat(m.peso ?? 0)),
+          medida_peso: String(m.medida_peso ?? ''),
+          volumen: String(parseFloat(m.volumen ?? 0)),
+          medida_volumen: String(m.medida_volumen ?? ''),
+        })
+      });
 
+      logger.info(`Medidas: ${saved} guardadas, ${skipped} saltadas`);
+      return { saved, skipped };
+    } catch (error) {
+      logger.error("Error al guardar medidas en redis: " + error.message);
+      throw new Error("Error al guardar medidas en redis: " + error.message);
+    }
+  }
 
+  async savePreciosExistenciaProductosRedis(precioExistencia) {
+    const client = redisClient.getClient();
+    const helper = new RedisHelper(client);
+    try {
 
+      const { saved, skipped } = await helper.saveBatch(precioExistencia, {
+        keyPrefix: 'precio_existencia',
+        idField: 'referencia',
+        allKeysSet: 'catalogo:precios_existencias',
+        toHash: (p) => ({
+          referencia: String(p.referencia ?? ''),
+          precio: String(p.precio ?? 0),
+          precio_oferta: String(p.precioOferta ?? 0),
+          precio_sin_oferta: String(p.precioSinOferta ?? 0),
+          oferta: String(p.oferta ?? false),
+          existencia: String(p.existencia ?? 0),
+          fecha_actualizacion: new Date().toISOString(),
+        })
+      })
+      logger.info(`Precios y existencias: ${saved} guardados, ${skipped} saltados`);
+    } catch (error) {
+      logger.error("Error al guardar precios y existencias en redis: " + error.message);
+      throw new Error("Error al guardar precios y existencias en redis: " + error.message)
+    }
+  }
+
+  async saveFichasTecnicasRedis(fichas) {
+    const client = await redisClient.getClient();
+    const helper = new RedisHelper(client);
+
+    const { saved, skipped } = await helper.saveJsonBatch(fichas, {
+      keyPrefix: 'ficha_tecnica',
+      idField: 'referencia',
+      allKeysSet: 'catalogo:fichas_tecnicas',
+      toJson: (f) => ({
+        caracteristicasGenerales: f.caracteristicasGenerales,
+        detalleTecnico: f.detalleTecnico,
+        especificacionesGenerales: f.especificacionesGenerales,
+      }),
+      indices: [], // no necesarios con solo 3 grupos fijos
+    });
+
+    logger.info(`Fichas técnicas: ${saved} guardadas, ${skipped} saltadas`);
+    return { saved, skipped };
   }
 
   async saveCategoriesRedis(categorias) {
@@ -380,7 +539,7 @@ class ExelService {
   }
 
   async saveSubcategoriasRedis(subcategorias) {
-    const client = new redisClient.getClient();
+    const client = redisClient.getClient();
     const helper = new RedisHelper(client);
     try {
       const { saved, skipped } = await helper.saveBatch(subcategorias, {
@@ -435,7 +594,58 @@ class ExelService {
       return { saved: 0, skipped: imagenes.length };
     }
   }
+  // ----------------------------------------------------------
 
+  /**
+   * Lee subcategorías desde Redis (todas, sin paginar).
+   */
+  async getSubcategoriasRedis() {
+    const client = redisClient.getClient();
+    const helper = new RedisHelper(client);
+    return helper.getAll({
+      keyPrefix: 'subcategoria',
+      idsSetKey: 'catalogo:subcategorias',
+    });
+  }
+
+  /**
+   * Lee medidas paginadas desde Redis.
+   */
+  async getMedidasRedis(page = 1, limit = 50) {
+    const client = redisClient.getClient();
+    const helper = new RedisHelper(client);
+    return helper.getBatch({
+      keyPrefix: 'medida',
+      idsSetKey: 'catalogo:medidas',
+      page,
+      limit,
+      fromHash: (hash) => ({
+        referencia: hash.referencia,
+        altura: parseFloat(hash.altura ?? 0),
+        ancho: parseFloat(hash.ancho ?? 0),
+        largo: parseFloat(hash.largo ?? 0),
+        peso: parseFloat(hash.peso ?? 0),
+        medida_peso: hash.medida_peso ?? '',
+        volumen: parseFloat(hash.volumen ?? 0),
+        medida_volumen: hash.medida_volumen ?? '',
+      }),
+    });
+  }
+
+  /**
+   * Lee fichas técnicas paginadas desde Redis.
+   */
+  async getFichasTecnicasRedis(page = 1, limit = 50) {
+    const client = redisClient.getClient();
+    const helper = new RedisHelper(client);
+    return helper.getJsonBatch({
+      keyPrefix: 'ficha_tecnica',
+      idsSetKey: 'catalogo:fichas_tecnicas',
+      page,
+      limit,
+      fromJson: (parsed, id) => ({ referencia: id, fichaTecnica: parsed }),
+    });
+  }
 
   //#endregion
 }
