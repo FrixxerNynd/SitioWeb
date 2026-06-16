@@ -1,0 +1,195 @@
+<!-- Fondo -->
+<div class="min-h-screen">
+  <div class="container-fluid">
+    <div class="container p-5">
+
+
+      <div class="flex flex-col gap-6">
+
+        <!-- Título -->
+        <span class="text-3xl font-extrabold text-gray-800">
+          Mi carrito de compras
+        </span>
+
+        <!-- Contenido -->
+        <div class="flex flex-col lg:flex-row gap-6 items-start">
+
+          <!-- ===================== -->
+          <!-- COLUMNA PRODUCTOS -->
+          <!-- ===================== -->
+          <div class="flex-1 bg-white rounded-xl border border-gray-200 p-5">
+
+            <!-- Header -->
+            <div class="border-b border-gray-200 pb-3">
+              <p class="font-semibold text-2xl text-zinc-900 ">
+                Productos ({{ productos.length }})
+              </p>
+            </div>
+
+            <!-- Lista -->
+            <!-- div padre -->
+            <div class="max-h-162.5 overflow-y-auto">
+
+              <div *ngFor="let producto of productos"
+                class="flex flex-row items-center  gap-5 py-6 border-b border-gray-100">
+
+                <!-- Imagen -->
+                <div class="w-28 h-28 bg-gray-50 rounded-lg flex items-center justify-center shrink-0">
+                  <img [src]="producto.imagen" [alt]="producto.nombre" class="w-24 h-24 object-contain" />
+                </div>
+
+                <!-- Información -->
+                <div class="flex-1 min-w-0 flex justify-between items-start gap-6">
+                  <!-- Lado izquierdo-->
+                  <div class="flex-1 min-w-0 py-5" >
+                    <!-- Nombre -->
+                    <p class="font-bold text-gray-800 text-base truncate">
+                      {{ producto.nombre }}
+                    </p>
+
+                    <!-- Descripción -->
+                    <p class="text-sm text-gray-500 mt-1 truncate">
+                      {{ producto.descripcion }}
+                    </p>
+
+                    <!-- Parte inferior -->
+                    <div class="flex flex-wrap items-center justify-between gap-4  mt-5">
+
+                      <!-- Precios -->
+                      <div class="flex items-center gap-3">
+
+                        <span class="text-3xl font-extrabold text-[#334291]">
+                          {{ formatearPrecio(producto.precio) }}
+                        </span>
+
+                        <span class="text-gray-400 line-through text-xl">
+                          {{ formatearPrecio(producto.precioOriginal) }}
+                        </span>
+
+                      </div>
+                    </div>
+
+                  </div>
+                  <!-- Acciones -->
+                  <div class="flex flex-col items-end gap-4 shrink-0 py-5 mr-4 p-4 ">
+
+                    <!-- Contador -->
+                    <div class="flex items-center border border-gray-300 rounded-full overflow-hidden h-10">
+                      <!--
+                        <button (click)="decrementar(producto)"
+                          class="w-10 h-10 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition">
+                          −
+                        </button>
+                      -->
+                      <ui-boton type="button" tipo="contador" [contador]="producto.cantidad"
+                        (incrementarClick)="producto.cantidad = producto.cantidad + 1"
+                        (decrementarClick)="producto.cantidad > 0 ? producto.cantidad = producto.cantidad - 1 : 0">
+                      </ui-boton>
+
+
+
+                    </div>
+
+                    <!-- Quitar -->
+                    <button (click)="quitar(producto.id)"
+                      class="flex items-center gap-2 text-gray-500 hover:text-red-500 transition">
+                      <i class="fi fi-rr-trash text-sm"></i>
+                      <span class="text-sm font-medium">Quitar</span>
+                    </button>
+
+                  </div>
+
+
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- ===================== -->
+          <!-- RESUMEN -->
+          <!-- ===================== -->
+          <!-- div  padre -->
+          <div class="bg-white rounded-xl border border-gray-200 p-5 sticky top-6 flex flex-col gap-8">
+
+            <!-- Título -->
+            <h2 class="font-bold text-gray-800 text-lg ">
+              Información del pedido
+            </h2>
+            <!-- DIV HIJO-->
+            <!-- Tipo de pago -->
+            <div class="flex flex-col gap-2 text-zinc-500">
+
+              <p class="text-sm font-semibold text-gray-600">Tipo de pago</p>
+
+              <div class="flex flex-wrap gap-4">
+
+                <label *ngFor="let tipo of tiposPago"
+                  class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                  <input type="radio" [value]="tipo.valor" [(ngModel)]="tipoPagoSeleccionado"
+                    class="accent-[#334291]" />
+
+                  {{ tipo.etiqueta }}
+                </label>
+
+              </div>
+              <div class="border-t border-gray-200 pt-4 flex justify-between items-center">
+
+              </div>
+              <p class="text-sm font-semibold text-gray-600"> Resumen financieros</p>
+              <!-- Resumen financiero -->
+              <div class="border border-gray-200 rounded-lg p-4">
+
+
+
+                <!-- Subtotal -->
+                <div class="flex justify-between text-sm text-gray-800 ">
+
+                  <span>Subtotal</span>
+
+                  <span>
+                    {{ formatearPrecio(subtotal) }}
+                  </span>
+
+                </div>
+
+                <!-- Total -->
+                <div class="border-t border-gray-200 pt-4 flex justify-between items-center">
+
+                  <span class="text-gray-800">Total</span>
+
+                  <span class="text-2xl text-gray-800 ">
+                    {{ formatearPrecio(total) }}
+                  </span>
+
+                </div>
+
+              </div>
+
+              <!-- Botón 
+      
+         <button
+            (click)="siguiente()"
+            class="w-full mt-6 bg-[#334291] hover:opacity-90 transition text-white font-semibold py-3 rounded-lg shadow-md"
+          >
+            Siguiente
+          </button>
+        -->
+
+              <ui-boton type="submit" class="w-full mt-6" text="siguiente" btnClick="siguiente()"
+                widthType="full"></ui-boton>
+
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>

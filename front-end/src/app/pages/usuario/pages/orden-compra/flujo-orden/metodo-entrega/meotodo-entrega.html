@@ -1,0 +1,243 @@
+<div class="min-h-screen">
+    <div class="container-fluid">
+        <div class="container p-5">
+            <div class="flex flex-col gap-6 border rounded-2xl p-5">
+                <span class="text-3xl font-extrabold text-gray-800">
+                    Mi carrito de compras
+                </span>
+                <div class="flex flex-row">
+                    <!--div de metodo de entrega-->
+                    <div class="flex flex-col lg:flex-row gap-6 items-start w-full">
+
+                        <div class="flex-1 bg-white rounded-xl border-gray-200 p-5">
+
+                            <div class="border-b border-gray-200 pb-3">
+                                <p class="font-semibold text-2xl text-zinc-900">Método de entrega</p>
+                            </div>
+
+                            <p class="font-medium text-zinc-600 mb-4">
+                                Selecciona cómo deseas recibir tu paquete para continuar con el proceso.
+                            </p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+
+                                <div (click)="tipoEntrega = 'domicilio'" [ngClass]="{
+                                        'border-blue-600 bg-blue-50/50': tipoEntrega === 'domicilio',
+                                        'border-zinc-200': tipoEntrega !== 'domicilio'
+                                    }"
+                                    class="text-center flex flex-col items-center border-2 p-4 rounded-2xl cursor-pointer transition-all duration-200 w-full">
+
+                                    <input type="radio" name="metodo-envio" [checked]="tipoEntrega === 'domicilio'"
+                                        class="bg-zinc-400 self-start mb-2 accent-blue-600 h-5 w-5 cursor-pointer">
+
+                                    <div [ngClass]="{
+                                            'bg-blue-600': tipoEntrega === 'domicilio',
+                                            'bg-blue-50': tipoEntrega !== 'domicilio'
+                                        }"
+                                        class="rounded-full p-2 h-16 w-16 flex items-center justify-center transition-colors duration-200 mb-2">
+                                        <app-ui-icono name="building-storefront" size="h-12 w-12"
+                                            [color]="tipoEntrega === 'domicilio' ? 'text-white' : 'text-blue-600'">
+                                        </app-ui-icono>
+                                    </div>
+
+                                    <p class="text-zinc-800 text-xl font-bold mb-2">Entrega a domicilio</p>
+                                    <p class="text-sm text-zinc-600">Recibe tus productos en la puerta de tu casa u
+                                        oficina
+                                        de manera segura.<br><b>Con cargo de envío</b></p>
+                                </div>
+
+                                <div (click)="tipoEntrega = 'sucursal'" [ngClass]="{
+                                        'border-blue-600 bg-blue-50/50': tipoEntrega === 'sucursal',
+                                        'border-zinc-200': tipoEntrega !== 'sucursal'
+                                    }"
+                                    class="text-center flex flex-col items-center border-2 p-4 rounded-2xl cursor-pointer transition-all duration-200 w-full">
+
+                                    <input type="radio" name="metodo-envio" [checked]="tipoEntrega === 'sucursal'"
+                                        class="self-start mb-2 accent-blue-600 h-5 w-5 cursor-pointer">
+
+                                    <div [ngClass]="{
+                                            'bg-blue-600': tipoEntrega === 'sucursal',
+                                            'bg-blue-50': tipoEntrega !== 'sucursal'
+                                        }"
+                                        class="rounded-full p-2 h-16 w-16 flex items-center justify-center transition-colors duration-200 mb-2">
+                                        <app-ui-icono name="home" size="h-12 w-12"
+                                            [color]="tipoEntrega === 'sucursal' ? 'text-white' : 'text-blue-600'">
+                                        </app-ui-icono>
+                                    </div>
+
+                                    <p class="text-zinc-800 text-xl font-bold mb-2">Recoger en sucursal</p>
+                                    <p class="text-sm text-zinc-600">Retira tu pedido en la sucursal de CABS COMPUTACION
+                                        sin
+                                        costo de envío.<br><b>Sin costo de envío</b></p>
+                                </div>
+
+                            </div>
+                            <!--Como la ruleta esa que lleva todas las tarjetas de direcciones -->
+                            <div class="mt-8 border-t border-gray-100 pt-4">
+                                <div *ngIf="tipoEntrega === 'domicilio'">
+                                    <p class="text-zinc-900 font-semibold text-2xl">Dirección de entrega</p>
+                                    <p class="text-zinc-600 font-medium mb-3">Selecciona a qué dirección te lo enviamos:
+                                    </p>
+                                </div>
+
+                                <div *ngIf="tipoEntrega === 'sucursal'">
+                                    <p class="text-zinc-900 font-semibold text-2xl">Sucursales disponibles</p>
+                                    <p class="text-zinc-600 font-medium mb-3">Selecciona en cuál sucursal deseas
+                                        recoger:
+                                    </p>
+                                </div>
+                                <div class="flex flex-col max-h-162.5 overflow-y-auto gap-4 p-2">
+                                    <div *ngFor="let local of locales" (click)="direccionSeleccionadaId = local.id"
+                                        [ngClass]="{
+                                            'border-blue-600 bg-blue-50/50': direccionSeleccionadaId === local.id,
+                                            'border-zinc-200 bg-white': direccionSeleccionadaId !== local.id
+                                        }"
+                                        class="text-left flex flex-col w-full border-2 p-5 rounded-2xl cursor-pointer transition-all duration-200 shadow-sm">
+
+                                        <div
+                                            class="flex flex-row justify-between items-center mb-4 border-b border-zinc-100 pb-2">
+                                            <div class="flex items-center gap-3">
+                                                <input type="radio" name="direccion-entrega"
+                                                    [checked]="direccionSeleccionadaId === local.id"
+                                                    class="accent-blue-600 h-5 w-5 cursor-pointer">
+                                                <span class="text-zinc-800 text-xl font-bold">{{ local.nombre }}</span>
+                                            </div>
+
+                                            <div class="flex gap-4 text-sm font-medium">
+                                                <button
+                                                    class="text-blue-600 hover:underline cursor-pointer">Editar</button>
+                                                <button
+                                                    class="text-red-600 hover:underline cursor-pointer">Eliminar</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 md:grid-cols-3 ">
+                                            <div class="flex flex-col gap-1">
+                                                <div>
+                                                    <p
+                                                        class="text-zinc-500 text-xs font-semibold tracking-wider mb-0.5">
+                                                        Calle</p>
+                                                    <p class="text-zinc-900 font-bold text-sm">{{ local.calle }}</p>
+                                                </div>
+                                                <div>
+                                                    <p
+                                                        class="text-zinc-500 text-xs font-semibold tracking-wider mb-0.5">
+                                                        Colonia</p>
+                                                    <p class="text-zinc-900 font-bold text-sm">Col. {{ local.colonia }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p
+                                                        class="text-zinc-500 text-xs font-semibold tracking-wider mb-0.5">
+                                                        Estado</p>
+                                                    <p class="text-zinc-900 font-bold text-sm">{{ local.estado }}</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex flex-col gap-3">
+                                                <div>
+                                                    <p
+                                                        class="text-zinc-500 text-xs font-semibold tracking-wider mb-0.5">
+                                                        N°
+                                                        exterior</p>
+                                                    <p class="text-zinc-900 font-bold text-sm">#{{ local.n_exterior }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p
+                                                        class="text-zinc-500 text-xs font-semibold tracking-wider mb-0.5">
+                                                        Ciudad</p>
+                                                    <p class="text-zinc-900 font-bold text-sm">{{ local.ciudad }},</p>
+                                                </div>
+                                                <div>
+                                                    <p
+                                                        class="text-zinc-500 text-xs font-semibold tracking-wider mb-0.5">
+                                                        Codigo postal</p>
+                                                    <p class="text-zinc-900 font-bold text-sm">{{ local.codigo_postal }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex flex-col gap-3">
+                                                <div>
+                                                    <p
+                                                        class="text-zinc-500 text-xs font-semibold tracking-wider mb-0.5">
+                                                        N°
+                                                        Interior</p>
+                                                    <p class="text-zinc-900 font-bold text-sm">
+                                                        {{ (local.n_interior && local.n_interior !== '-') ? 'Int. ' +
+                                                        local.n_interior : 'N/A' }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <div class="hidden md:block h-9"></div>
+                                                </div>
+                                                <div>
+                                                    <p
+                                                        class="text-zinc-500 text-xs font-semibold tracking-wider mb-0.5">
+                                                        Pais</p>
+                                                    <p class="text-zinc-900 font-bold text-sm">{{ local.pais }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!--Boton para agregar mas direcciones -->
+                            <ui-boton type='submit' text='+ Agregar direccion' tipo="secundario"></ui-boton>
+                        </div>
+                    </div>
+                    <!--Div de infrormacion del pedido -->
+                    <div class="w-full lg:w-1/3  border rounded-2xl p5">
+                        <p class="text-2xl font-bold">Información del pedido</p>
+                        <div class="max-h-162.5  overflow-y-auto">
+
+                            <div *ngFor="let producto of productos"
+                                class="flex flex-row items-center  gap-5 py-6 border-b border-gray-100">
+
+                                <!-- Imagen -->
+                                <div class="w-28 h-28 bg-gray-50 rounded-lg flex items-center justify-center shrink-0">
+                                    <img [src]="producto.imagen" [alt]="producto.nombre"
+                                        class="w-24 h-24 object-contain" />
+                                </div>
+
+                                <!-- Información -->
+                                <div class="flex-1 min-w-0 flex justify-between items-start gap-6">
+                                    <!-- Lado izquierdo-->
+                                    <div class="flex-1 min-w-0 py-5">
+                                        <!-- Nombre -->
+                                        <p class="font-bold text-gray-800 text-base truncate">
+                                            {{ producto.nombre }}
+                                        </p>
+
+                                        <!-- Descripción -->
+                                        <p class="text-sm text-gray-500 mt-1 truncate">
+                                            {{ producto.descripcion }}
+                                        </p>
+
+                                        <!-- Parte inferior -->
+                                        <div class="flex flex-wrap items-center justify-between gap-4  mt-5">
+
+                                            <!-- Precios -->
+                                            <div class="flex items-center gap-3">
+
+                                                <span class="text-3xl font-extrabold text-[#334291]">
+                                                    {{ formatearPrecio(producto.precio) }}
+                                                </span>
+
+                                                <span class="text-gray-400 line-through text-xl">
+                                                    {{ formatearPrecio(producto.precioOriginal) }}
+                                                </span>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>

@@ -1,5 +1,5 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; 
+import { Component, Input, Output, EventEmitter, OnInit, input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { UiIconComponent } from '../icono/icono.component';
 
 @Component({
@@ -15,28 +15,30 @@ export class UiBoton implements OnInit {
   @Input() text: string = 'texto boton';
   @Input() viewIcon: boolean = false;
   @Input() size: 'xs' | 'md' | 'lg' = 'xs';
-  @Input() disabled: boolean = true; 
+  @Input() disabled: boolean = true;
   @Input() nomeIco: string = 'home';
   @Input() widthType: 'fixed' | 'full' | 'auto' = 'auto';
   @Input() customWidth: string = '';
-  
+
   // Inputs para activar el botón automáticamente
-  @Input() enableWhen: any = null; 
+  @Input() enableWhen: any = null;
   @Input() enableWhenFormValid: boolean = false;
 
-  contador: number = 0;
+  //LI NO MOVER PORFA
+  @Input() contador: number = 0;
+  @Output() contadorChange = new EventEmitter<number>();
 
-  
+
   get fullWidth(): boolean {
     return this.widthType === 'full';
   }
-  
+
   get buttonWidth(): string {
     if (this.widthType === 'full') return '100%';
     if (this.widthType === 'fixed' && this.customWidth) return this.customWidth;
     return 'auto';
   }
-  
+
   @Output() btnClick = new EventEmitter<Event>();
 
   ngOnInit() {
@@ -63,15 +65,18 @@ export class UiBoton implements OnInit {
     }
   }
 
+  //modifque un poco la logica del contador
 
-incrementar() {
-  this.contador++;
-}
-
-decrementar() {
-  if (this.contador > 0) {
-    this.contador--;
+  incrementar() {
+    this.contador++;
+    this.contadorChange.emit(this.contador);
   }
-}
+
+  decrementar() {
+    if (this.contador > 0) {
+      this.contador--;
+      this.contadorChange.emit(this.contador)
+    }
+  }
 
 }
