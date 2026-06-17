@@ -1,0 +1,249 @@
+<!-- Overlay -->
+@if(visible) {
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 z-[1040]"
+    (click)="cerrarPanel()">
+</div>
+}
+
+<!-- PANEL LATERAL -->
+<div class="fixed right-0 top-0 bottom-0 w-full md:w-2/3 lg:w-[550px] h-auto z-[1041] transform transition-transform duration-300 ease-out flex flex-col bg-white rounded-2xl m-2 overflow-hidden shadow-xl"
+    [class.translate-x-full]="!visible" [class.translate-x-0]="visible" (click)="$event.stopPropagation()">
+
+    @if(mostrarEsqueleto()){
+        <div class="h-auto w-full flex flex-row justify-between items-center animate-pulse p-4 border-b border-zinc-100">
+            <div class="flex flex-col gap-2">
+                <div class="h-5 w-28 bg-gray-200 rounded"></div>
+                <div class="h-5 w-40 bg-gray-200 rounded"></div>
+            </div>
+            <div class="size-6 bg-gray-200 rounded"></div>
+        </div>
+
+        <div class="h-full w-full overflow-y-auto flex flex-col gap-5 mb-4 animate-pulse">
+            <section class="flex flex-col gap-3 border-b border-zinc-100 pb-4">
+                <div class="h-5 w-32 bg-gray-200 rounded px-4 mb-2 mt-4"  style="margin-left: 16px;"></div>
+                <div class="grid grid-cols-4 items-start px-4">
+                    <div class="col-span-2 h-5 w-16 bg-gray-200 rounded"></div>
+                    <div class="col-span-1 h-7 w-20 bg-gray-200 rounded-full"></div>
+                </div>
+                <div class="grid grid-cols-2 items-start px-4">
+                    <div class="h-5 w-24 bg-gray-200 rounded"></div>
+                    <div class="h-5 w-32 bg-gray-200 rounded"></div>
+                </div>
+            </section>
+
+            <section class="flex flex-col gap-3 border-b border-zinc-100 pb-4">
+                <div class="h-5 w-24 bg-gray-200 rounded ml-4" style="margin-left: 16px;"></div>
+                @for (i of [1,2,3]; track i) {
+                <div class="grid grid-cols-2 items-start px-4">
+                    <div class="h-5 w-20 bg-gray-200 rounded"></div>
+                    <div class="h-5 w-32 bg-gray-200 rounded"></div>
+                </div>
+                }
+            </section>
+
+            <section class="flex flex-col gap-3 border-b border-zinc-100 pb-4">
+                <div class="flex justify-between items-center px-4">
+                    <div class="h-5 w-20 bg-gray-200 rounded"></div>
+                    <div class="h-6 w-16 bg-gray-200 rounded-full"></div>
+                </div>
+                @for (i of [1,2]; track i) {
+                <div class="mx-4 p-3 bg-gray-50 rounded-lg border border-zinc-200">
+                    <div class="flex justify-between items-start gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-start gap-3">
+                                <div class="w-5 h-5 bg-gray-200 rounded"></div>
+                                <div class="flex-1">
+                                    <div class="h-5 w-3/4 bg-gray-200 rounded mb-2"></div>
+                                    <div class="h-4 w-1/2 bg-gray-200 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="h-5 w-20 bg-gray-200 rounded"></div>
+                    </div>
+                </div>
+                }
+            </section>
+
+            <section class="flex flex-col gap-3 py-4">
+                <div class="h-5 w-20 bg-gray-200 rounded ml-4" style="margin-left: 16px;"></div>
+                <div class="mx-4 p-4 bg-gray-50 rounded-lg border border-zinc-200">
+                    @for (i of [1,2,3]; track i) {
+                    <div class="flex justify-between items-center py-2">
+                        <div class="h-5 w-20 bg-gray-200 rounded"></div>
+                        <div class="h-5 w-24 bg-gray-200 rounded"></div>
+                    </div>
+                    }
+                    <div class="border-t border-zinc-200 my-2"></div>
+                    <div class="flex justify-between items-center pt-2">
+                        <div class="h-6 w-16 bg-gray-200 rounded"></div>
+                        <div class="h-7 w-28 bg-gray-200 rounded"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="flex justify-between border-t border-neutral-200 bg-neutral-50 p-3" >
+            <div class="flex gap-4">
+                <div class="h-10 w-24 bg-neutral-200 rounded-lg animate-pulse"></div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="flex gap-4 pl-6">
+                    <div class="h-10 w-36 bg-neutral-200 rounded-lg animate-pulse"></div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if(errorDeConexion()){
+        <div class="flex flex-col items-center justify-center h-full gap-4 p-8">
+            <div class="rounded-full p-3 bg-red-50">
+                <app-ui-icono name="exclamation-triangle" size="h-8 w-8" color="text-red-800">
+                </app-ui-icono>
+            </div>
+
+            <p class="text-gray-600 text-center font-semibold">Error de conexión. No se pudieron cargar los detalles.</p>
+            <ui-boton tipo="cerrar" text="Reintentar" [disabled]="false" (btnClick)="cargarDatos()"></ui-boton>
+        </div>        
+    }
+    
+
+    @if(monstrarDatos() && ordenData()){
+    <!-- Encabezado -->
+    <div class="flex items-center justify-between p-4 border-b border-zinc-200">
+        <div class="flex flex-col gap-1">
+            <span class="text-xl font-bold text-gray-900">Orden #{{ idDocumento }}</span>
+            <p class="text-sm text-gray-500">Detalles de la orden</p>
+        </div>
+        <ui-boton tipo="icono" nomeIco="x-mark" [disabled]="false" (btnClick)="cerrarPanel()"></ui-boton>
+    </div>
+
+    <!-- Contenido del modal -->
+    <div class="flex-1 gap-4 flex flex-col overflow-y-auto p-4">
+        <!-- Información general -->
+        <section class="flex flex-col gap-3 border-b border-zinc-100 pb-4">
+            <span class="text-sm font-medium tracking-wide text-slate-800">Información general</span>
+
+            <div class="grid grid-cols-4 items-start">
+                <p class="col-span-2 text-base text-slate-500 font-medium tracking-wider">Estado</p>
+                @if (ordenData().estado === "Entregada") {
+                <div class="col-span-1 flex justify-center items-center bg-green-100 rounded-full px-3 py-1">
+                    <span class="text-xs font-semibold text-green-800">Entregada</span>
+                </div>
+                } @else if (ordenData().estado === "Procesando") {
+                <div class="col-span-1 flex justify-center items-center bg-blue-100 rounded-full px-3 py-1">
+                    <span class="text-xs font-semibold text-blue-800">Procesando</span>
+                </div>
+                } @else {
+                <div class="col-span-1 flex justify-center items-center bg-red-100 rounded-full px-3 py-1">
+                    <span class="text-xs font-semibold text-red-800">Cancelada</span>
+                </div>
+                }
+            </div>
+
+            <div class="grid grid-cols-2 items-start">
+                <p class="text-base text-slate-500 font-medium tracking-wider">Fecha de orden</p>
+                <p class="text-base text-slate-800 font-medium tracking-wider">{{ formatDate(ordenData().fecha) }}</p>
+            </div>
+        </section>
+
+        <!-- Identificación -->
+        <section class="flex flex-col gap-3 border-b border-zinc-100 pb-4">
+            <span class="text-sm font-medium tracking-wide text-slate-800">Identificación</span>
+
+            <div class="grid grid-cols-2 items-start">
+                <p class="text-base text-slate-500 font-medium tracking-wider">Número de orden</p>
+                <p class="text-base text-slate-800 font-medium tracking-wider">{{ ordenData().id }}</p>
+            </div>
+
+            <div class="grid grid-cols-2 items-start">
+                <p class="text-base text-slate-500 font-medium tracking-wider">Tipo de pago</p>
+                <p class="text-base text-slate-800 font-medium tracking-wider">{{ ordenData().tipoPago }}</p>
+            </div>
+
+            <div class="grid grid-cols-2 items-start">
+                <p class="text-base text-slate-500 font-medium tracking-wider">Transportista</p>
+                <p class="text-base text-slate-800 font-medium tracking-wider">{{ ordenData().transportista || 'Noespecificado' }}</p>
+            </div>
+
+            <div class="grid grid-cols-2 items-start">
+                <p class="text-base text-slate-500 font-medium tracking-wider">Tipo de pago</p>
+                <p class="text-base text-slate-800 font-medium tracking-wider">{{ ordenData().tipoPago }}</p>
+            </div>
+        </section>
+
+        <!-- Productos -->
+        <section class="flex flex-col gap-3 border-b border-zinc-100 pb-4">
+            <div class="flex justify-between items-center">
+                <span class="text-sm font-medium tracking-wide text-slate-800">Productos</span>
+                <span class="text-xs font-semibold text-blue-800 bg-blue-100 px-2 py-1 rounded-full">
+                    {{ ordenData().productos?.length || 0 }} productos
+                </span>
+            </div>
+
+            @for (producto of ordenData().productos; track producto.sku) {
+            <div class="p-3 bg-gray-50 rounded-lg border border-zinc-200 hover:border-blue-300 transition-colors">
+                <div class="flex justify-between items-start gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-start gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-5 h-5 text-gray-500 mt-1">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                            </svg>
+                            <div class="flex-1">
+                                <p class="text-base font-medium text-slate-800 mb-1">{{ producto.nombre }}</p>
+                                <div class="flex flex-wrap gap-2 text-sm text-slate-500">
+                                    <span>SKU: {{ producto.sku }}</span>
+                                    <span>•</span>
+                                    <span>{{ producto.cantidad }} un. x {{ formatCurrency(producto.precioUnitario)
+                                        }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-base font-semibold text-slate-800">{{ formatCurrency(producto.cantidad *
+                            producto.precioUnitario) }}</p>
+                    </div>
+                </div>
+            </div>
+            }
+        </section>
+
+        <!-- Resumen -->
+        <section class="flex flex-col gap-3 pb-4">
+            <span class="text-sm font-medium tracking-wide text-slate-800">Resumen</span>
+            <div class="p-4 bg-gray-50 rounded-lg border border-zinc-200">
+                <div class="flex justify-between items-center py-2">
+                    <p class="text-base text-slate-600">Subtotal</p>
+                    <p class="text-base font-medium text-slate-800">{{ formatCurrency(ordenData().subtotal) }}</p>
+                </div>
+                <div class="flex justify-between items-center py-2">
+                    <p class="text-base text-slate-600">Flete</p>
+                    <p class="text-base font-medium text-slate-800">{{ formatCurrency(ordenData().flete) }}</p>
+                </div>
+                <div class="flex justify-between items-center py-2">
+                    <p class="text-base text-slate-600">IVA (16%)</p>
+                    <p class="text-base font-medium text-slate-800">{{ formatCurrency(ordenData().iva) }}</p>
+                </div>
+                <div class="border-t border-zinc-200 my-2"></div>
+                <div class="flex justify-between items-center pt-2">
+                    <p class="text-lg font-semibold text-slate-700">Total</p>
+                    <p class="text-xl font-bold text-slate-900">{{ formatCurrency(getTotalCalculado()) }}</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Pie de página -->
+    <div class="flex justify-between border-t border-neutral-200 bg-neutral-50" style="padding: 14px;">
+        <ui-boton tipo="cerrar" text="Cerrar"[disabled]="false" (btnClick)="cerrarPanel()"></ui-boton>
+        <div class="flex gap-2">
+            <ui-boton tipo="cerrar" text="Cancelar orden" (btnClick)="cerrarPanel()"></ui-boton>
+            <ui-boton text="Aceptar orden" (btnClick)="cerrarPanel()"></ui-boton>
+        </div>
+
+
+    </div>
+    }
+</div>

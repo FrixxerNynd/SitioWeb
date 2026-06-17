@@ -16,10 +16,7 @@ import { PagueListaPreRegistro } from './pages/administrador/pages/lista-pre-reg
 import { PagueDetallesPreRegistro } from './pages/administrador/pages/lista-pre-registro/detalles-pre-registro/detalles-pre-registro';
 import { PagueListaUsuario } from './pages/administrador/pages/lista-usuario/lista-usuario';
 import { PagueConfiguracionMargenes } from './pages/administrador/pages/configuracion-margenes/configuracion-margenes';
-import { PageCarritoComponent } from './pages/usuario/pages/orden-compra/flujo-orden/producto/producto';
-import { PageMeotodoEntrega } from './pages/usuario/pages/orden-compra/flujo-orden/metodo-entrega/meotodo-entrega';
-
-
+import { PageListaOrdenAdministrador } from './pages/administrador/pages/lista-orden/lista-orden';
 //import { AuthGuard } from './guards/auth.guard'; 
 
 export const routes: Routes = [
@@ -68,9 +65,6 @@ export const routes: Routes = [
                 path: 'ordenes',
                 children: [
                     { path: 'lista-ordenes', component: ListaOrdenPague },
-                    { path: 'flujo-orden', component: PageCarritoComponent },
-                    { path: 'flujo-orden/metodo-entrega', component: PageMeotodoEntrega }
-
                 ]
             },
             {
@@ -78,8 +72,9 @@ export const routes: Routes = [
                 children: [
                     { path: 'lista-pre-registro', component: PagueListaPreRegistro },
                     { path: 'lista-pre-registro/detalle/:id', component: PagueDetallesPreRegistro },
-                    { path: 'lista-usuario', component: PagueListaUsuario },
-                    { path: 'configuracion-margenes', component: PagueConfiguracionMargenes },
+                    { path: 'lista-usuario', component: PagueListaUsuario},
+                    { path: 'ordenes', component: PageListaOrdenAdministrador},
+                    { path: 'configuracion-margenes', component: PagueConfiguracionMargenes},                    
                     { path: '', redirectTo: 'lista-pre-registro', pathMatch: 'full' }
                 ]
             }
