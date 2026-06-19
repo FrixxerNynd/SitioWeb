@@ -3,11 +3,12 @@ import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SecureAuthService, User } from '../../../services/secure-auth.service';
 import { CookieService } from '../../../services/cookie.service';
+import { UiIconComponent } from "../../shared/icono/icono.component";
 
 @Component({
   selector: 'ui-navbar-component',
   standalone: true,
-  imports: [RouterModule, CommonModule],
+  imports: [RouterModule, CommonModule, UiIconComponent],
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css']
 })
@@ -18,6 +19,8 @@ export class UiNavbarComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   
   dropOpciones: boolean = false;
+  mostrarModalConfirmacion: boolean = false;
+  mostrarSidebar: boolean = false;
   usuarioActual: User | null = null;
   private clickListener: any;
 
@@ -33,6 +36,7 @@ export class UiNavbarComponent implements OnInit, OnDestroy {
     if (this.clickListener) {
       document.removeEventListener('click', this.clickListener);
     }
+    document.body.style.overflow = '';
   }
 
   private handleStorageChange(event: StorageEvent) {
@@ -43,9 +47,9 @@ export class UiNavbarComponent implements OnInit, OnDestroy {
 
   private onClickOutside(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    const userMenu = document.querySelector('.user-menu');
+    const userMenuWrapper = document.querySelector('.relative.inline-block');
     
-    if (userMenu && !userMenu.contains(target) && this.dropOpciones) {
+    if (userMenuWrapper && !userMenuWrapper.contains(target) && this.dropOpciones) {
       this.dropOpciones = false;
     }
   }
@@ -55,17 +59,44 @@ export class UiNavbarComponent implements OnInit, OnDestroy {
     console.log('👤 Usuario cargado en navbar:', this.usuarioActual);
   }
 
-  toggleDropdown(event?: MouseEvent) {
-    if (event) {
-      event.stopPropagation();
-    }
+  toggleDropdown() {
     this.dropOpciones = !this.dropOpciones;
   }
 
-  cerrarSesion() {
+  cerrarDropdown() {
+    this.dropOpciones = false;
+  }
+
+  toggleSidebar() {
+    this.mostrarSidebar = !this.mostrarSidebar;
+    if (this.mostrarSidebar) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }
+
+  cerrarSidebar() {
+    this.mostrarSidebar = false;
+    document.body.style.overflow = '';
+  }
+
+  abrirModalConfirmacion() {
+    this.dropOpciones = false;
+    this.mostrarSidebar = false;
+    this.mostrarModalConfirmacion = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  cerrarModal() {
+    this.mostrarModalConfirmacion = false;
+    document.body.style.overflow = '';
+  }
+
+  confirmarCerrarSesion() {
     console.log('🔒 Cerrando sesión...');
     this.authService.logout();
-    this.dropOpciones = false;
+    this.cerrarModal();
     this.router.navigate(['/inicio-sesion']);
   }
 
@@ -105,5 +136,12 @@ export class UiNavbarComponent implements OnInit, OnDestroy {
     }
     
     return 'Usuario';
+  }
+
+  getRolUsuario(): string {
+    if (!this.usuarioActual) return 'Sin rol';
+    
+    const rol = this.usuarioActual.rol || '';
+    return rol.charAt(0).toUpperCase() + rol.slice(1).toLowerCase();
   }
 }

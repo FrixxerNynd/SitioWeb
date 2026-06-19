@@ -12,7 +12,6 @@ import { UiFooterComponent } from '../../components/shared/footer/footer';
     <ui-navbar-component></ui-navbar-component>
     <router-outlet></router-outlet>
     <ui-footer></ui-footer>
-
   `
 })
 export class MainLayout {}
