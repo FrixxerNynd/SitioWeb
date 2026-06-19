@@ -1,9 +1,10 @@
-import orderService from '../services/order.service.js';
+import orderService from "../services/order.service.js";
+import cartService from "../services/cart.service.js";
 
 // ── Helper: extrae y valida el userId del token JWT ──
 const getUserId = (req) => {
   const id = parseInt(req.user?.id);
-  if (isNaN(id)) throw new Error('Token inválido: userId no encontrado');
+  if (isNaN(id)) throw new Error("Token inválido: userId no encontrado");
   return id;
 };
 
@@ -12,7 +13,6 @@ const getUserId = (req) => {
 // ═══════════════════════════════════════════════════════════
 
 class OrderController {
-
   // GET /api/orders
   async getOrders(req, res, next) {
     try {
@@ -28,7 +28,7 @@ class OrderController {
     try {
       const result = await orderService.getOrderById(
         getUserId(req),
-        parseInt(req.params.id)
+        parseInt(req.params.id),
       );
       res.status(200).json({ success: true, data: result });
     } catch (error) {
@@ -42,8 +42,40 @@ class OrderController {
       const result = await orderService.updateOrderStatus(
         getUserId(req),
         parseInt(req.params.id),
-        req.body.status
+        req.body.status,
       );
+      res.status(200).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // POST /api/orders/checkout
+  async checkout(req, res, next) {
+    try {
+      const result = await cartService.processCheckout(getUserId(req));
+      res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // DELETE /api/orders/:id
+  async deleteOrder(req, res, next) {
+    try {
+      await orderService.deleteOrder(getUserId(req), parseInt(req.params.id));
+      res
+        .status(200)
+        .json({ success: true, message: "Pedido eliminado exitosamente" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // GET /api/orders/summary/total
+  async getExistingOrders(req, res, next) {
+    try {
+      const result = await orderService.getExistingOrders(getUserId(req));
       res.status(200).json({ success: true, data: result });
     } catch (error) {
       next(error);

@@ -1,6 +1,6 @@
-import { Router } from 'express';
-import orderController from '../controllers/order.controller.js';
-import { validateToken } from '../middlewares/JWTValidator.js';
+import { Router } from "express";
+import orderController from "../controllers/order.controller.js";
+import { validateToken } from "../middlewares/JWTValidator.js";
 
 const orderRouter = Router();
 
@@ -111,7 +111,67 @@ orderRouter.use(validateToken);
  *       500:
  *         description: Error interno del servidor
  */
-orderRouter.get('/', orderController.getOrders.bind(orderController));
+orderRouter.get("/", orderController.getOrders.bind(orderController));
+
+/**
+ * @swagger
+ * /api/orders/checkout:
+ *   post:
+ *     summary: Convierte el carrito activo del usuario en una orden
+ *     tags: [Órdenes]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       201:
+ *         description: Orden creada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/OrderResponse'
+ *       400:
+ *         description: Carrito vacío o sin método de entrega seleccionado
+ *       401:
+ *         description: No autenticado
+ *       500:
+ *         description: Error interno del servidor
+ */
+orderRouter.post("/checkout", orderController.checkout.bind(orderController));
+
+/**
+ * @swagger
+ * /api/orders/summary/total:
+ *   get:
+ *     summary: Obtener el total de órdenes registradas del usuario
+ *     tags: [Órdenes]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Total de órdenes obtenido exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: integer
+ *                   example: 14
+ *       500:
+ *         description: Error interno del servidor
+ */
+orderRouter.get(
+  "/summary/total",
+  orderController.getExistingOrders.bind(orderController),
+);
 
 /**
  * @swagger
@@ -148,7 +208,7 @@ orderRouter.get('/', orderController.getOrders.bind(orderController));
  *       500:
  *         description: Error interno del servidor
  */
-orderRouter.get('/:id', orderController.getOrderById.bind(orderController));
+orderRouter.get("/:id", orderController.getOrderById.bind(orderController));
 
 /**
  * @swagger
@@ -199,6 +259,36 @@ orderRouter.get('/:id', orderController.getOrderById.bind(orderController));
  *       500:
  *         description: Error interno del servidor
  */
-orderRouter.patch('/:id/status', orderController.updateOrderStatus.bind(orderController));
+orderRouter.patch(
+  "/:id/status",
+  orderController.updateOrderStatus.bind(orderController),
+);
+
+/**
+ * @swagger
+ * /api/orders/{id}:
+ *   delete:
+ *     summary: Eliminar un pedido
+ *     tags: [Órdenes]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del pedido a eliminar
+ *     responses:
+ *       200:
+ *         description: Pedido eliminado exitosamente
+ *       403:
+ *         description: El pedido no pertenece al usuario autenticado
+ *       404:
+ *         description: Pedido no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ */
+orderRouter.delete("/:id", orderController.deleteOrder.bind(orderController));
 
 export default orderRouter;
