@@ -1,0 +1,481 @@
+<div class="bg-gray-50 min-h-screen">
+    <div class="container-fluid">
+        <div class="container flex flex-col gap-4 py-4">
+            <!-- Título y progreso -->
+            <div class="flex items-center justify-between">
+                <span class="text-2xl font-semibold text-zinc-800 tracking-tighter">
+                    {{ pasoActual === 1 ? 'Mi carrito de compras' : 'Confirmar pedido' }}
+                </span>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-500">Paso {{ pasoActual }} de 2</span>
+                </div>
+            </div>
+
+            <!-- PASO 1: Carrito de compras -->
+            @if(pasoActual === 1) {
+            <div class="flex flex-col lg:flex-row gap-4">
+                <!-- Lista de productos -->
+                <div class="flex-[2] bg-white border rounded-2xl p-4">
+                    <div class="border-b border-gray-200 pb-3 mb-3">
+                        <span class="text-xl font-semibold text-zinc-700 tracking-tighter">
+                            Productos ({{ totalProductos }})
+                        </span>
+                    </div>
+
+                    <div class="flex flex-col w-full h-full truncate gap-2 max-h-[500px] overflow-y-auto pr-2">
+                        @for(producto of productos; track producto.id) {
+                        <div
+                            class="flex items-center gap-4 p-3 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors duration-200">
+                            <div
+                                class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-xs text-gray-500 font-medium">{{ producto.imagen }}</span>
+                            </div>
+
+                            <div class="flex-1 min-w-0">
+                                <p class="font-semibold text-gray-800 text-sm truncate">{{ producto.nombre }}</p>
+                                <div class="flex flex-wrap items-center gap-2 mt-0.5">
+                                    <span class="text-xs text-gray-800 bg-gray-100"
+                                        style="padding: 4px 6px; border-radius: 6px;">{{ producto.categoria }}</span>
+                                    <span class="text-xs font-medium text-indigo-800">${{ producto.precio.toFixed(2)
+                                        }}</span>
+                                </div>
+                            </div>
+
+                            <ui-boton tipo="contador" [contador]="producto.cantidad"
+                                (contadorChange)="actualizarCantidad(producto, $event)" size="sm"></ui-boton>
+
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-semibold text-gray-800 min-w-[70px] text-right">
+                                    ${{ producto.subtotal.toFixed(2) }}
+                                </span>
+                                <button (click)="eliminarProducto(producto.id)"
+                                    class="p-1.5 text-gray-400 hover:text-red-500 transition-colors duration-200 hover:bg-red-50 truncate"
+                                    style="border-radius: 6px">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        } @empty {
+                        <div class="flex flex-col truncate justify-center items-center text-center"
+                            style="padding-top: 100px;">
+                            <div class="flex justify-center items-center rounded-full p-3 bg-blue-50">
+                                <svg class="w-10 h-10 mx-auto text-blue-800" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
+                            </div>
+                            <p class="text-gray-600 mt-2 font-semibold">No hay productos en el carrito</p>
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Información del pedido - Paso 1 -->
+                <div class="flex-1 bg-white border rounded-2xl p-4 h-fit lg:sticky lg:top-4">
+                    <div class="border-b border-gray-200 pb-3">
+                        <span class="text-xl font-semibold text-zinc-700 tracking-tighter">Información del pedido</span>
+                    </div>
+
+                    <div class="flex flex-col gap-4">
+                        <!-- Tipo de pago -->
+                        <div class="flex flex-col gap-2 pt-3">
+                            <p class="text-sm font-semibold text-gray-700">Tipo de pago</p>
+                            <div class="flex justify-between items-center" style="padding: 10px;">
+                                <div class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="radio" name="tipoPago" value="efectivo"
+                                        [checked]="orden.tipoPago === 'efectivo'" (change)="cambiarTipoPago('efectivo')"
+                                        class="w-4 h-4 text-indigo-600 border-gray-300 transition-all duration-200">
+                                    <span class="text-sm font-medium text-gray-700">Efectivo</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="radio" name="tipoPago" value="tarjeta"
+                                        [checked]="orden.tipoPago === 'tarjeta'" (change)="cambiarTipoPago('tarjeta')"
+                                        class="w-4 h-4 text-indigo-600 border-gray-300 transition-all duration-200">
+                                    <span class="text-sm font-medium text-gray-700">Tarjeta</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="radio" name="tipoPago" value="credito"
+                                        [checked]="orden.tipoPago === 'credito'" (change)="cambiarTipoPago('credito')"
+                                        class="w-4 h-4 text-indigo-600 border-gray-300 transition-all duration-200">
+                                    <span class="text-sm font-medium text-gray-700">Crédito</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Totales -->
+                        <div class="flex flex-col gap-2 border-t border-gray-200 pt-3">
+                            <p class="text-sm font-semibold text-gray-700">Resumen financieros</p>
+                            <div class="flex flex-col gap-2 border border-gray-200 bg-zinc-50 text-lg rounded-xl"
+                                style="padding: 10px;">
+                                <div class="flex justify-between font-medium">
+                                    <span class="text-gray-500">Subtotal</span>
+                                    <span class="text-gray-800">${{ orden.subtotal.toFixed(2) }}</span>
+                                </div>
+                                <div class="flex justify-between font-medium">
+                                    <span class="text-gray-500">Flete</span>
+                                    <span class="text-gray-800">${{ orden.totalFlete.toFixed(2) }}</span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center font-medium pt-1 border-t border-gray-200">
+                                    <span class="text-gray-500">Total</span>
+                                    <span class="text-indigo-800 text-2xl">${{ orden.total.toFixed(2) }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botón siguiente -->
+                        <div class="size-full">
+                            <ui-boton widthType="full" text="Siguiente" (btnClick)="irAlSiguientePaso()"
+                                [disabled]="productos.length === 0"></ui-boton>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }
+
+            <!-- PASO 2: Confirmar pedido -->
+            @if(pasoActual === 2) {
+            <div class="flex flex-col lg:flex-row gap-4">
+                <!-- Contenedor izquierdo - Selección de dirección y productos -->
+                <div class="flex-[2] flex flex-col gap-4">
+                    <!-- Método de entrega -->
+                    <div class="bg-white border rounded-2xl p-4">
+                        <div class="border-b border-gray-200 pb-3 mb-4">
+                            <span class="text-lg font-semibold text-zinc-700 tracking-tighter">Método de entrega</span>
+                            <p class="text-sm text-gray-500 mt-1">Selecciona cómo deseas recibir tu paquete para
+                                continuar con el proceso.</p>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <!-- Entrega a domicilio -->
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="tipoEntrega" value="domicilio"
+                                    [checked]="tipoEntrega === 'domicilio'" (change)="cambiarTipoEntrega('domicilio')"
+                                    class="hidden peer">
+                                <div class="p-4 border-2 rounded-xl transition-all duration-200
+                                peer-checked:border-indigo-600 peer-checked:bg-indigo-50
+                                hover:border-indigo-300 hover:shadow-sm
+                                border-gray-200">
+                                    <div class="flex items-start gap-3">
+                                        <svg class="w-6 h-6 text-gray-500 peer-checked:text-indigo-600 mt-1 flex-shrink-0"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                        </svg>
+                                        <div>
+                                            <p class="font-semibold text-gray-800">Entrega a domicilio</p>
+                                            <p class="text-xs text-gray-500 mt-0.5">Recibe tus productos en la puerta de
+                                                tu casa u oficina de manera segura.</p>
+                                            <p class="text-xs font-medium text-gray-600 mt-1">Con cargo de envío</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- Recoger en sucursal -->
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="tipoEntrega" value="sucursal"
+                                    [checked]="tipoEntrega === 'sucursal'" (change)="cambiarTipoEntrega('sucursal')"
+                                    class="hidden peer">
+                                <div class="p-4 border-2 rounded-xl transition-all duration-200
+                                peer-checked:border-indigo-600 peer-checked:bg-indigo-50
+                                hover:border-indigo-300 hover:shadow-sm
+                                border-gray-200">
+                                    <div class="flex items-start gap-3">
+                                        <svg class="w-6 h-6 text-gray-500 peer-checked:text-indigo-600 mt-1 flex-shrink-0"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                        <div>
+                                            <p class="font-semibold text-gray-800">Recoger en sucursal</p>
+                                            <p class="text-xs text-gray-500 mt-0.5">Retira tu pedido en la sucursal de
+                                                CABS COMPUTACION sin costo de envío.</p>
+                                            <p class="text-xs font-medium text-green-600 mt-1">Sin costo de envío</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Dirección de entrega -->
+                    <div class="bg-white border rounded-2xl p-4">
+                        <div class="border-b border-gray-200 pb-3 mb-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-semibold text-zinc-700 tracking-tighter">
+                                    {{ tipoEntrega === 'domicilio' ? 'Dirección de envío' : 'Dirección de la sucursal' }}
+                                </span>
+                                @if(tipoEntrega === 'domicilio') {
+                                <button (click)="agregarDireccion()"
+                                    class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+                                    + Agregar nueva
+                                </button>
+                                }
+                            </div>
+                        </div>
+
+                        @if(tipoEntrega === 'domicilio') {
+                        <!-- Lista de direcciones -->
+                        <div class="flex flex-col gap-3">
+                            @for(direccion of direcciones; track direccion.id) {
+                            <div class="flex items-start justify-between p-4 border rounded-xl hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+                                [class.border-indigo-600]="direccionSeleccionada?.id === direccion.id"
+                                [class.bg-indigo-50]="direccionSeleccionada?.id === direccion.id"
+                                (click)="seleccionarDireccion(direccion)">
+
+                                <div class="flex items-start gap-3 flex-1">
+                                    <!-- Radio button -->
+                                    <input type="radio" name="direccionSeleccionada"
+                                        [checked]="direccionSeleccionada?.id === direccion.id"
+                                        class="w-4 h-4 text-indigo-600 border-gray-300 mt-1 flex-shrink-0">
+
+                                    <!-- Información de la dirección -->
+                                    <div class="flex-1">
+                                        <div class="flex justify-between items-center">
+                                            <!-- Nombre de la dirección -->
+                                            <p class="text-base font-semibold text-gray-800">{{ direccion.nombre }}</p>
+
+                                            <!-- Botones de acción con texto -->
+                                            <div class="flex gap-2 flex-shrink-0 ml-2">
+                                                <button (click)="editarDireccion(direccion); $event.stopPropagation()"
+                                                    class="px-3 py-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 transition-colors duration-200 rounded-lg">
+                                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                    </svg>
+                                                    Editar
+                                                </button>
+                                                <button (click)="eliminarDireccion(direccion); $event.stopPropagation()"
+                                                    class="px-3 py-1.5 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors duration-200 rounded-lg">
+                                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                    Eliminar
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Dirección en formato de filas -->
+                                        <div class="mt-1.5 space-y-1">
+                                            <!-- Fila 1: Calle, N° exterior, N° Interior -->
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm text-zinc-600 min-w-[70px]">Calle</span>
+                                                <span class="text-sm text-zinc-800">{{ direccion.calle }}</span>
+                                                <span class="text-sm text-zinc-600 ml-4 min-w-[80px]">N° exterior</span>
+                                                <span class="text-sm text-zinc-800">#{{ direccion.numeroExterior
+                                                    }}</span>
+                                                <span class="text-sm text-zinc-600 ml-4 min-w-[70px]">N° Interior</span>
+                                                <span class="text-sm text-zinc-800">{{ direccion.numeroInterior || 'N/A'
+                                                    }}</span>
+                                            </div>
+
+                                            <!-- Fila 2: Colonia, Ciudad -->
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm text-zinc-600 min-w-[70px]">Colonia</span>
+                                                <span class="text-sm text-zinc-800">{{ direccion.colonia }}</span>
+                                                <span class="text-sm text-zinc-600 ml-4 min-w-[70px]">Ciudad</span>
+                                                <span class="text-sm text-zinc-800">{{ direccion.ciudad }}</span>
+                                            </div>
+
+                                            <!-- Fila 3: Estado, Código postal, País -->
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm text-zinc-600 min-w-[70px]">Estado</span>
+                                                <span class="text-sm text-zinc-800">{{ direccion.estado }}</span>
+                                                <span class="text-sm text-zinc-600 ml-4 min-w-[70px]">C.P.</span>
+                                                <span class="text-sm text-zinc-800">{{ direccion.codigoPostal }}</span>
+                                                <span class="text-sm text-zinc-600 ml-4 min-w-[70px]">País</span>
+                                                <span class="text-sm text-zinc-800">{{ direccion.pais }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                        } @else {
+                        <!-- Dirección de sucursal -->
+                        <div class="flex items-start gap-3">
+                            <div
+                                class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">{{ sucursal.nombre }}</p>
+                                <p class="text-sm text-gray-600">{{ sucursal.calle }} #{{ sucursal.numero }}</p>
+                                <p class="text-sm text-gray-600">{{ sucursal.colonia }}</p>
+                                <p class="text-sm text-gray-600">{{ sucursal.ciudad }}, {{ sucursal.estado }}</p>
+                                <p class="text-sm text-gray-600">C.P. {{ sucursal.codigoPostal }}</p>
+                                <div
+                                    class="mt-2 flex items-start gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                    <svg class="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p class="text-xs text-yellow-700">
+                                        <span class="font-medium">Puedes pasar por tu paquete durante nuestro horario de
+                                            atención</span>
+                                        <br>{{ sucursal.horario }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Contenedor derecho - Confirmación -->
+                <div class="flex-1 flex flex-col gap-3 bg-white border rounded-2xl p-4 h-fit lg:sticky lg:top-4">
+                    <!-- Encabezado -->
+                    <div>
+                        <span class="text-xl font-semibold text-zinc-700 tracking-tighter">Información del pedido</span>
+                    </div>
+
+                    <div class="h-[1px] w-full bg-[#dee2e6]"></div>
+
+                    <!-- Resumen de productos (lado derecho) -->
+                    <div class="flex flex-col gap-2">
+                        <div class="flex justify-between items-center">
+                            <p class="text-sm font-semibold text-gray-700">Resumen de productos</p>
+                            <button (click)="irAlPasoAnterior()"
+                                class="cursor-pointer font-semibold text-blue-600 tracking-wide hover:text-blue-800"
+                                style="font-size: 12px;">
+                                Editar
+                            </button>
+                        </div>
+                        <div class="flex flex-col gap-2 max-h-[250px] overflow-y-auto pr-1">
+                            @for(producto of productos; track producto.id) {
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                <div class="flex items-center gap-2">
+                                    <!-- Imagen del producto más grande -->
+                                    <div
+                                        class="w-14 h-14 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <span class="text-xs text-gray-500 font-medium">{{ producto.imagen }}</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-medium text-gray-800 truncate max-w-[140px]">{{
+                                            producto.nombre }}</span>
+                                        <span class="text-xs text-gray-500">{{ producto.cantidad }} x
+                                            {{producto.precio.toFixed(2)}}</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end">
+                                    <span class="text-sm font-semibold text-gray-800">${{ producto.subtotal.toFixed(2)
+                                        }}</span>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="h-[1px] w-full bg-[#dee2e6]"></div>
+
+                    <!-- Tipo de pago -->
+                    <div class="flex flex-col gap-2">
+                        <div class="flex justify-between items-center">
+                            <p class="text-sm font-semibold text-gray-700">Tipo de pago</p>
+                            @if(estadoCambiarTipoPago === false ){
+                            <p class="text-xs cursor-pointer font-semibold text-blue-600 tracking-wide hover:text-blue-800"
+                                (click)="cambiarTipoPagoNuevo()">Cambiar</p>
+                            }
+                        </div>
+                        @if(estadoCambiarTipoPago){
+                        <div class="flex flex-col gap-2">
+                            <div class="flex justify-between items-center" style="padding: 10px;">
+                                <div class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="radio" name="tipoPago" value="efectivo"
+                                        [checked]="orden.tipoPago === 'efectivo'" (change)="cambiarTipoPago('efectivo')"
+                                        class="w-4 h-4 text-indigo-600 border-gray-300 transition-all duration-200">
+                                    <span class="text-sm font-medium text-gray-700">Efectivo</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="radio" name="tipoPago" value="tarjeta"
+                                        [checked]="orden.tipoPago === 'tarjeta'" (change)="cambiarTipoPago('tarjeta')"
+                                        class="w-4 h-4 text-indigo-600 border-gray-300 transition-all duration-200">
+                                    <span class="text-sm font-medium text-gray-700">Tarjeta</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="radio" name="tipoPago" value="credito"
+                                        [checked]="orden.tipoPago === 'credito'" (change)="cambiarTipoPago('credito')"
+                                        class="w-4 h-4 text-indigo-600 border-gray-300 transition-all duration-200">
+                                    <span class="text-sm font-medium text-gray-700">Crédito</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-end gap-2">
+                                <ui-boton size="xs" tipo="cerrar" text="Cancelar"
+                                    (btnClick)="cancelarCambioTipoPago()"></ui-boton>
+                                <ui-boton size="xs" text="Guardar" (btnClick)="guardarCambioTipoPago()"></ui-boton>
+                            </div>
+                        </div>
+                        } @else {
+                        <div class="flex bg-zinc-50 border rounded-xl" style="padding: 10px;">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-sm font-medium text-gray-700 capitalize">{{ orden.tipoPago }}</span>
+                            </div>
+                        </div>
+                        }
+                    </div>
+
+                    <div class="h-[1px] w-full bg-[#dee2e6]"></div>
+
+                    <!-- Resumen financiero -->
+                    <div class="flex flex-col gap-2">
+                        <div class="flex flex-col  gap-2">
+                            <p class="text-start text-sm font-semibold text-gray-700">Resumen financieros</p>
+                            @if(tipoEntrega === 'sucursal'){
+                            <div class="flex gap-2 items-center bg-blue-50 font-semibold text-xs text-blue-800"
+                                style="padding: 10px 14px; border: 1px solid #193cb8; border-radius: 10px;">
+                                <app-ui-icono name="information-circle" size="h-5 w-5"
+                                    color="text-blu-800"></app-ui-icono>
+                                <span>Envio: pedidos menores a $2,000 generán cargo por flete </span>
+                            </div>
+                            }
+
+                        </div>
+                        <div class="flex flex-col gap-2 border border-gray-200 bg-zinc-50 text-lg rounded-xl"
+                            style="padding: 10px;">
+                            <div class="flex justify-between font-medium">
+                                <span class="text-gray-500">Subtotal</span>
+                                <span class="text-gray-800">${{ orden.subtotal.toFixed(2) }}</span>
+                            </div>
+                            @if(tipoEntrega === 'domicilio'){
+                            <div class="flex justify-between font-medium">
+                                <span class="text-gray-500">Costo de envio</span>
+                                <span class="text-gray-800">$90.00</span>
+                            </div>
+                            }
+
+                            <div class="flex justify-between items-center font-medium pt-1 border-t border-gray-200">
+                                <span class="text-gray-500">Total</span>
+                                <span class="text-indigo-800 text-2xl">${{ orden.total.toFixed(2) }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="flex flex-col gap-2">
+                        <ui-boton widthType="full" text="Confirmar pedido" (btnClick)="confirmarPedido()"
+                            [disabled]="productos.length === 0 || (tipoEntrega === 'domicilio' && !direccionSeleccionada)"></ui-boton>
+                        <ui-boton widthType="full" text="← Retroceder" (btnClick)="irAlPasoAnterior()"
+                            tipo="secundario"></ui-boton>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</div>

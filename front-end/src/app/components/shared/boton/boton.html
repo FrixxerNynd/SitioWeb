@@ -1,7 +1,7 @@
 @switch(tipo) {
     @case('primario') {
-    <button class="flex items-center justify-center font-medium transition  btn-gradient text-white
-                px-3 py-2 text-sm md:px-4 md:py-2 md:text-base lg:px-5 lg:py-3 lg:text-lg"
+    <button class="flex items-center justify-center font-medium transition btn-gradient text-white rounded-lg
+                {{ sizeClasses }}"
         [class.w-full]="widthType === 'full'" [style.width]="buttonWidth" [type]="type" [disabled]="disabled"
         (click)="onClick($event)">
         <span>{{ text }}</span>
@@ -10,9 +10,9 @@
     }
 
     @case('secundario') {
-    <button class="inline-flex items-center justify-center gap-2 rounded-md font-medium transition  btn-secundario
+    <button class="inline-flex items-center justify-center gap-2 rounded-lg font-medium transition btn-secundario
                 bg-white text-[#1e3a8a]
-                px-3 py-2 text-sm md:px-4 md:py-2 md:text-base lg:px-5 lg:py-3 lg:text-lg"
+                {{ sizeClasses }}"
         [class.w-full]="widthType === 'full'" [style.width]="buttonWidth" [type]="type" [disabled]="disabled"
         (click)="onClick($event)">
         <span>{{ text }}</span>
@@ -22,8 +22,8 @@
 
     @case('cerrar') {
     <button class="items-center justify-center font-medium transition btn-cerrar
-                text-zinc-600 bg-white
-                px-3 py-2 text-sm md:px-4 md:py-2 md:text-base lg:px-5 lg:py-3 lg:text-lg"
+                text-zinc-600 bg-white rounded-lg
+                {{ sizeClasses }}"
         [class.w-full]="widthType === 'full'" [style.width]="widthType === 'full' ? '100%' : 'auto'" type="button"
         [disabled]="disabled" (click)="onClick($event)" aria-label="Cerrar">
         <span>{{ text }}</span>
@@ -35,45 +35,49 @@
     <button class="inline-flex items-center justify-center rounded-full transition 
                 bg-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:scale-110 
                 disabled:opacity-60 
-                p-2 md:p-3 lg:p-4" [style.width]="widthType === 'full' ? '100%' : 'auto'" [type]="type"
+                {{ size === 'xs' ? 'p-1.5' : size === 'sm' ? 'p-2' : size === 'md' ? 'p-2.5' : size === 'lg' ? 'p-3' : 'p-3.5' }}" 
+                [style.width]="widthType === 'full' ? '100%' : 'auto'" [type]="type"
         [disabled]="disabled" (click)="onClick($event)" [attr.aria-label]="text">
-        <app-ui-icono [name]="nomeIco"></app-ui-icono>
+        <app-ui-icono [name]="nomeIco" [size]="iconSize"></app-ui-icono>
         <ng-content></ng-content>
     </button>
     }
 
     @case('contador') {
-        <div class="flex items-center justify-center border rounded-md bg-white overflow-hidden h-10 w-auto ">
+        <div class="flex items-center justify-center border rounded-md bg-white overflow-hidden {{ contadorSizeClasses }}">
             <!-- Botón de restar -->
-            <button class="cursor-pointer hover:bg-gray-100 p-2 transition w-10 
-                    border-r border-gray-300" (click)="decrementar()" aria-label="Disminuir">
-                <app-ui-icono name="minus"></app-ui-icono>
+            <button class="cursor-pointer hover:bg-gray-100 transition flex items-center justify-center border-r border-gray-300 {{ contadorBtnSizeClasses }}" 
+                    (click)="decrementar()" aria-label="Disminuir">
+                <app-ui-icono name="minus" [size]="iconSize"></app-ui-icono>
             </button>
 
             <!-- Valor del contador -->
-            <div class=" flex items-center justify-center text-center truncate p-2 w-10 h-full ">
-                <p class="text-sm md:text-base lg:text-lg font-semibold"> {{ contador }} </p>
+            <div class="flex items-center justify-center text-center truncate px-2 min-w-[30px] h-full">
+                <p class="font-semibold {{ size === 'xs' ? 'text-xs' : size === 'sm' ? 'text-sm' : size === 'md' ? 'text-sm' : size === 'lg' ? 'text-base' : 'text-lg' }}">
+                    {{ contador }}
+                </p>
             </div>
 
             <!-- Botón de sumar -->
-            <button class="cursor-pointer hover:bg-gray-100 p-2 transition w-10 h-full
-                    border-l border-gray-300" (click)="incrementar()" aria-label="Incrementar">
-                <app-ui-icono name="plus"></app-ui-icono>
+            <button class="cursor-pointer hover:bg-gray-100 transition flex items-center justify-center border-l border-gray-300 {{ contadorBtnSizeClasses }}" 
+                    (click)="incrementar()" aria-label="Incrementar">
+                <app-ui-icono name="plus" [size]="iconSize"></app-ui-icono>
             </button>
         </div>
     }
+    
     @case('btn-tabla-pie'){
         <button class="inline-flex items-center justify-center transition-all duration-200 bg-white border border-gray-300 
                         text-gray-600 hover:text-white hover:bg-[#1e3a5f] hover:border-[#1e3a5f]
                         active:bg-[#0f2a4a] active:scale-95
-                        disabled:opacity-60 
-                        p-1 md:p-2 lg:p-3 rounded-2" 
+                        disabled:opacity-60 rounded-lg
+                        {{ size === 'xs' ? 'p-1' : size === 'sm' ? 'p-1.5' : size === 'md' ? 'p-2' : size === 'lg' ? 'p-2.5' : 'p-3' }}" 
                 [style.width]="widthType === 'full' ? '100%' : 'auto'" 
                 [type]="type"
                 [disabled]="disabled" 
                 (click)="onClick($event)" 
                 [attr.aria-label]="text">
-                <app-ui-icono [name]="nomeIco" size="w-4 h-4"></app-ui-icono>
+                <app-ui-icono [name]="nomeIco" [size]="iconSize"></app-ui-icono>
                 <ng-content></ng-content>
         </button>
     }

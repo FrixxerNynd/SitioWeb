@@ -17,6 +17,7 @@ import { PagueDetallesPreRegistro } from './pages/administrador/pages/lista-pre-
 import { PagueListaUsuario } from './pages/administrador/pages/lista-usuario/lista-usuario';
 import { PagueConfiguracionMargenes } from './pages/administrador/pages/configuracion-margenes/configuracion-margenes';
 import { PageListaOrdenAdministrador } from './pages/administrador/pages/lista-orden/lista-orden';
+import { PageOrdenCompra } from './pages/shared/orden-compra/orden-compra';
 //import { AuthGuard } from './guards/auth.guard'; 
 
 export const routes: Routes = [
@@ -67,6 +68,13 @@ export const routes: Routes = [
                     { path: 'lista-ordenes', component: ListaOrdenPague },
                 ]
             },
+            {
+                path: 'orden-compra',
+                children: [
+                    { path: 'comprar', component: PageOrdenCompra },
+                ]
+            },            
+
             {
                 path: 'administrador',
                 children: [

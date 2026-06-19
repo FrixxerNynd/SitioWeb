@@ -5,9 +5,15 @@
     border-radius: 8px;
     transition: all 0.3s ease;
 }
-.btn-gradient:hover {
+
+.btn-gradient:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.btn-gradient:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .btn-secundario{
@@ -17,23 +23,32 @@
     border: 1px solid #1e3a8a;    
 }
 
-.btn-secundario:hover {
+.btn-secundario:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.btn-secundario:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .btn-cerrar{
     border: none;
     border-radius: 8px;
     transition: all 0.3s ease;    
-    border: 1px solid #9f9fa9 ;    
+    border: 1px solid #9f9fa9;    
 }
 
-.btn-cerrar:hover {
+.btn-cerrar:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
+.btn-cerrar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
 
 p{
     margin: 0px;
