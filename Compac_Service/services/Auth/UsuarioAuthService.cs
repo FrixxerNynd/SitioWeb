@@ -22,14 +22,12 @@ using back_cabs.CRM.contexts;
 using back_cabs.CRM.Interfaces.Auth;
 using CRM.DTOs.Request;
 using CRM.DTOs.Response;
+using back_cabs.CRM.DTOs.Response;
 using back_cabs.CRM.models.Auth;
-using back_cabs.CRM.models;
 using back_cabs.CRM.validators.Auth;
 using back_cabs.CRM.Middleware;
 using back_cabs.services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using back_cabs.CRM.DTOs.ServiceResponse;
 using back_cabs.CRM.Interfaces.Legacy;
 
 namespace back_cabs.CRM.services.Auth
@@ -492,13 +490,13 @@ namespace back_cabs.CRM.services.Auth
         /// </summary>
         /// <param name="incluirInactivos">Si incluye usuarios inactivos</param>
         /// <returns>Lista de usuarios mapeados a DTO</returns>
-        public async Task<IEnumerable<UsuarioResponseDto>> ObtenerTodosLosUsuariosAsync(bool incluirInactivos = false)
+        public async Task<IEnumerable<UsuarioResponseDto>> ObtenerTodosLosUsuariosAsync(bool incluirInactivos = false, int idCliente = 0)
         {
             try
             {
                 _logger.LogInformation("Obteniendo todos los usuarios desde el servicio");
 
-                var usuarios = await _usuarioRepository.GetAllAsync(incluirInactivos);
+                var usuarios = await _usuarioRepository.GetAllAsync(incluirInactivos, idCliente);
 
                 var usuariosDto = usuarios.Select(u => new UsuarioResponseDto
                 {
@@ -508,11 +506,10 @@ namespace back_cabs.CRM.services.Auth
                     NombreCompleto = u.NombreCompleto,
                     Telefono = u.Telefono,
                     Email = u.Email,
-                    Rol = u.Rol,
                     Activo = u.Activo,
                     CreadoEn = u.CreadoEn,
                     TransmisionHabilitada = u.TransmisionHabilitada,
-                    PuedeUsarVehiculo = u.PuedeUsarVehiculo
+
                 }).ToList();
 
                 _logger.LogInformation("Se obtuvieron {Count} usuarios", usuariosDto.Count);
@@ -691,7 +688,7 @@ namespace back_cabs.CRM.services.Auth
                 }
 
                 // 4. Actualizar campos del usuario
-                existingUser.Activo = false;
+               existingUser.Desactivar();
 
                 // 6. Guardar cambios en la base de datos
                 var result = await _usuarioRepository.UpdateAsync(existingUser);

@@ -18,7 +18,7 @@ import {
 export class ExcelNorteCatalogoService {
   private http = inject(HttpClient);
   private cookieService = inject(CookieService);
-  private baseUrl = environment.apiCabsUrl;
+  private baseUrl = environment.backendUrl;
   private apiKey = environment.Authorization;
 
   private imagenesCache = new Map<string, string>();

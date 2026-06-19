@@ -1,12 +1,13 @@
-import { Component, Input, Output, EventEmitter, signal, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, SimpleChanges, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UiBoton } from '../../../../../components/shared/boton/boton';
 import { UiIconComponent } from '../../../../../components/shared/icono/icono.component';
+import { UserService } from '../../../../../services/user.service';
 
 @Component({
   selector: 'modal-detalles-usuario',
   standalone: true,
-  imports: [CommonModule, UiBoton, UiIconComponent],
+  imports: [CommonModule, UiBoton],
   templateUrl: './detalles-usuario.html',
   styleUrl: './detalles-usuario.css'
 })
@@ -15,6 +16,8 @@ export class ModalDetallesUsuarioComponent {
   @Input() visible: boolean = false;
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() cerrar = new EventEmitter<void>();
+  @Output() evento = new EventEmitter<void>();
+  private usuarioService = inject(UserService);
 
   usuarioData = signal<any>(null);
   mostrarEsqueleto = signal(true);
@@ -52,5 +55,18 @@ export class ModalDetallesUsuarioComponent {
   cerrarPanel() {
     this.visibleChange.emit(false);
     this.cerrar.emit();
+  }
+
+  inactivarUsuario() {
+    this.usuarioService.inactivarUsuario(this.usuarioData().id).subscribe({
+      next: (data) => {
+        this.usuarioData.set(data.data);
+        this.evento.emit();
+        this.cerrarPanel();
+      },
+      error: (error) => {
+        console.error(error);
+      }
+    });
   }
 }

@@ -47,14 +47,6 @@ class ExelController {
                 });
             }
 
-            // ── Fallback a API externa ────────────────────────────
-            const productos = await exelService.fetchExternalProducts(req.query);
-            return res.status(200).json({
-                success: true,
-                source: 'api',
-                total: productos.length,
-                data: productos
-            });
 
         } catch (error) {
             next(error);

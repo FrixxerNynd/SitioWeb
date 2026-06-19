@@ -21,11 +21,20 @@ interface ProductoCarrito {
   styleUrls: ['./navbar.css']
 })
 
+
+
 export class UiNavbarComponent implements OnInit, OnDestroy {
   private authService = inject(SecureAuthService);
   private cookieService = inject(CookieService);
   private router = inject(Router);
   
+  usuario: any = {
+  nombre: '',
+  apellido: '',
+  email: '',
+  role: '',
+};
+
   dropOpciones: boolean = false;
   mostrarModalConfirmacion: boolean = false;
   mostrarSidebar: boolean = false;

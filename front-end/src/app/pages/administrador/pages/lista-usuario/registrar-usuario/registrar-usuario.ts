@@ -1,8 +1,10 @@
-import { Component, Input, Output, EventEmitter, signal, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UiBoton } from '../../../../../components/shared/boton/boton';
 import { UiIconComponent } from '../../../../../components/shared/icono/icono.component';
+import { UserService } from '../../../../../services/user.service';
+import { UsuarioRegistroRequest } from '../../../../../interfaces/user.interfaces';
 
 @Component({
   selector: 'modal-registrar-usuario',
@@ -16,6 +18,7 @@ export class ModalRegistrarUsuarioComponent {
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() cerrar = new EventEmitter<void>();
   @Output() usuarioRegistrado = new EventEmitter<any>();
+  private userService = inject(UserService);
 
   mostrarEsqueleto = signal(false);
   errorDeConexion = signal(false);
@@ -80,9 +83,33 @@ export class ModalRegistrarUsuarioComponent {
       return;
     }
 
-    // Emitir el usuario registrado
-    this.usuarioRegistrado.emit(this.nuevoUsuario);
-    
+    //Mapear datos al modelo UsuarioRegistroRequest 
+    const request: UsuarioRegistroRequest = {
+      nombre: this.nuevoUsuario.nombre,
+      apellido: `${this.nuevoUsuario.apellidoPaterno} ${this.nuevoUsuario.apellidoMaterno}`.trim(),
+      email: this.nuevoUsuario.correo,
+      telefono: parseInt(this.nuevoUsuario.telefonoFijo, 10),
+      contrasena: this.nuevoUsuario.password,
+      confirmarContrasena: this.nuevoUsuario.password,
+      activo: true
+    }
+
+    // Hacer la llamada al backend
+    this.userService.registrarUsuario(request).subscribe({
+      next: (response) => {
+        if (response.success){
+          alert('Usuario registrado exitosamente');
+          this.usuarioRegistrado.emit(response.data);
+          this.cerrarPanel();
+        } else {
+          alert(response.message || 'Error al registrar usuario');
+        }
+      },
+      error: (error) => {
+        alert('Error al registrar usuario');
+        this.errorDeConexion.set(true);
+      }
+    })
     // Cerrar el modal
     this.cerrarPanel();
   }

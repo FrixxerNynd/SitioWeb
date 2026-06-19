@@ -161,6 +161,7 @@ namespace back_cabs.CRM.controllers.Auth
         /// <response code="400">Datos de entrada inválidos o email duplicado</response>
         /// <response code="500">Error interno del servidor</response>
         [HttpPost("registro")]
+        [Authorize]
         [ProducesResponseType(typeof(RegistroExitosoResponseDto), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
@@ -168,6 +169,13 @@ namespace back_cabs.CRM.controllers.Auth
         {
             try
             {
+                //Obtener Cliente desde 
+                var idClienteClaim = User.FindFirst("idCliente")?.Value;
+                if (string.IsNullOrEmpty(idClienteClaim) || !int.TryParse(idClienteClaim, out var idCliente))
+                {
+                    return Unauthorized(new { success = false, message = "Token inválido o sin idCliente" });
+                }
+                request.IdCliente = int.Parse(idClienteClaim);
                 _logger.LogInformation("Iniciando registro de usuario para email: {Email}", request?.Email);
 
                 // Validación básica del request
@@ -769,7 +777,7 @@ namespace back_cabs.CRM.controllers.Auth
         /// <response code="401">No autorizado</response>
         /// <response code="500">Error interno del servidor</response>
         [HttpGet("usuarios")]
-        [Authorize(Roles = "ADMINISTRACION")]
+        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<UsuarioResponseDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
@@ -777,10 +785,14 @@ namespace back_cabs.CRM.controllers.Auth
         {
             try
             {
-                _logger.LogInformation("Obteniendo todos los usuarios (incluir inactivos: {IncluirInactivos})", incluirInactivos);
+                var idClienteClaim = User.FindFirst("idCliente")?.Value;
+                if (string.IsNullOrEmpty(idClienteClaim) || !int.TryParse(idClienteClaim, out var idCliente))
+                {
+                    return Unauthorized(new { success = false, message = "Token inválido o sin idCliente" });
+                }
 
-                var usuarios = await _usuarioAuthService.ObtenerTodosLosUsuariosAsync(incluirInactivos);
-
+                _logger.LogInformation("Obteniendo usuarios para idCliente {IdCliente} (incluir inactivos: {IncluirInactivos})", idCliente, incluirInactivos);
+                var usuarios = await _usuarioAuthService.ObtenerTodosLosUsuariosAsync(incluirInactivos, idCliente);
                 return Ok(new
                 {
                     success = true,
@@ -799,7 +811,6 @@ namespace back_cabs.CRM.controllers.Auth
                 });
             }
         }
-
         /// <summary>
         /// Obtiene usuarios filtrados por rol (para selectores de técnicos, etc.)
         /// </summary>
@@ -811,7 +822,7 @@ namespace back_cabs.CRM.controllers.Auth
         /// <response code="401">No autorizado</response>
         /// <response code="500">Error interno del servidor</response>
         [HttpGet("usuarios/rol/{rol}")]
-        [Authorize(Roles = "ADMINISTRACION, RECEPCION, SOPORTE")]
+        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<UsuarioResponseDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
@@ -1181,7 +1192,7 @@ namespace back_cabs.CRM.controllers.Auth
 
         [HttpDelete("delete-user/{idUsuario}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [Authorize(Roles = "ADMINISTRACION")]
+        [Authorize]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
@@ -1197,10 +1208,13 @@ namespace back_cabs.CRM.controllers.Auth
                 }
                 //Validar que no este enlazado el usuario
                 var user = await _usuarioAuthService.ObtenerUsuarioPorIdAsync(idUsuario);
-                if (user.TieneAgenteLegacy) return BadRequest(new { message = "No se puede eliminar un usuario enlazado" });
-
                 //Validar que no sea el mismo usuario logeado
                 var userId = await GetCurrentUserIdFromJwtAsync();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized(new { message = "No se pudo identificar al usuario autenticado" });
+                }
+
                 if (user.Id == int.Parse(userId))
                     return BadRequest(new { message = "No se puede eliminar el usuario logeado" });
 
@@ -1255,7 +1269,8 @@ namespace back_cabs.CRM.controllers.Auth
                     new Claim("id", user.Id),
                     new Claim("email", user.Email),
                     new Claim("name", user.Name),
-                    new Claim("role", user.Role)
+                    new Claim("role", user.Role),
+                    new Claim("idCliente", user.IdAgenteLegacy.ToString() ??"")
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(540),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
@@ -1325,6 +1340,16 @@ namespace back_cabs.CRM.controllers.Auth
         {
             try
             {
+                // Prioridad 1: Obtener desde HttpContext.User si [Authorize] ya validó el token
+                if (User?.Identity?.IsAuthenticated == true)
+                {
+                    var idFromUser = User.FindFirst("id")?.Value ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (!string.IsNullOrEmpty(idFromUser))
+                    {
+                        return Task.FromResult<string?>(idFromUser);
+                    }
+                }
+
                 // Primero intentar obtener el token del header Authorization Bearer
                 var authHeader = Request.Headers.Authorization.FirstOrDefault();
                 if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))

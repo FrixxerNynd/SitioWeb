@@ -1,4 +1,4 @@
-using back_cabs.CRM.DTOs.ServiceResponse;
+using back_cabs.CRM.DTOs.Response;
 using back_cabs.CRM.models.Auth;
 using System.Threading.Tasks;
 
@@ -66,7 +66,7 @@ namespace back_cabs.CRM.Interfaces.Auth
         /// </summary>
         /// <param name="incluirInactivos">Si incluye usuarios inactivos</param>
         /// <returns>Lista de usuarios</returns>
-        Task<IEnumerable<UsuarioAuth>> GetAllAsync(bool incluirInactivos = false);
+        Task<IEnumerable<UsuarioAuth>> GetAllAsync(bool incluirInactivos = false, int idCliente = 0);
 
         /// <summary>
         /// Obtiene usuarios filtrados por rol

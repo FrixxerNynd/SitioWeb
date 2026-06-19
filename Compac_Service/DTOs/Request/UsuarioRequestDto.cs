@@ -104,7 +104,7 @@ namespace CRM.DTOs.Request
         public int IdCliente { get; set; }
     }
     /// <summary>
-    /// DTO para solicitud de registro de nuevo usuario
+    /// DTO para solicitud de actualizacion de usuario
     /// </summary>
     public class UpdateUserDto
     {

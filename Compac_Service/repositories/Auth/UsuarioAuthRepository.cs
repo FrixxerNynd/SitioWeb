@@ -4,7 +4,8 @@ using back_cabs.CRM.models.Auth;
 using back_cabs.CRM.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using back_cabs.CRM.DTOs.ServiceResponse;
+using back_cabs.CRM.DTOs;
+using back_cabs.CRM.DTOs.Response;
 
 namespace back_cabs.CRM.repositories.Auth
 {
@@ -250,7 +251,7 @@ namespace back_cabs.CRM.repositories.Auth
         }
 
 
-        public async Task<IEnumerable<UsuarioAuth>> GetAllAsync(bool incluirInactivos = false)
+        public async Task<IEnumerable<UsuarioAuth>> GetAllAsync(bool incluirInactivos = false, int idCliente = 0)
         {
             try
             {
@@ -266,6 +267,7 @@ namespace back_cabs.CRM.repositories.Auth
                 var usuarios = await query
                     .OrderBy(u => u.Nombre)
                     .ThenBy(u => u.Apellido)
+                    .Where(u => u.IdAgenteLegacy == idCliente)
                     .ToListAsync();
 
                 _logger.LogInformation("Se obtuvieron {Count} usuarios", usuarios.Count);

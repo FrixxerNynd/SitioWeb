@@ -323,7 +323,7 @@ app.UseRequestResponseLogging();
 // CORS (usar política apropiada según el entorno)
 // var corsPolicy = app.Environment.IsProduction() ? "Production" : "SecureFrontend";
 // app.UseCors(corsPolicy);
-app.UseCors("SecureFrontend"); // Usar política de desarrollo para pruebas, cambiar a "Production" en producción
+app.UseCors("Prueba"); // Usar política de desarrollo para pruebas, cambiar a "Production" en producción
 
 // Servir archivos estáticos (para Swagger UI custom scripts)
 app.UseStaticFiles();
