@@ -2,6 +2,11 @@ p {
     margin: 0;
 }
 
+.gradient-bg {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
+    border-radius: 8px;
+}
+
 .navbar {
     background: white;
     border-bottom: 1px solid #e9ecef;
@@ -115,10 +120,56 @@ p {
 }
 
 /* ============================================ */
-/* SIDEBAR AVATAR - */
+/* SIDEBAR AVATAR - Oculto por defecto (solo visible en móvil) */
 /* ============================================ */
 .sidebar-avatar-mobile {
     display: none !important;
+}
+
+/* ============================================ */
+/* CARRITO - Badge encima del icono */
+/* ============================================ */
+.cart-wrapper {
+    display: inline-block;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #dc2626;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    border-radius: 100%;
+    min-width: 18px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 4px;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    line-height: 1;
+}
+
+/* Scroll personalizado para el carrito */
+.max-h-60::-webkit-scrollbar {
+    width: 4px;
+}
+
+.max-h-60::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.max-h-60::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+}
+
+.max-h-60::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
 }
 
 /* ============================================ */
@@ -166,6 +217,11 @@ p {
     .container-fluid {
         justify-content: space-between !important;
     }
+
+    /* Carrito visible en tablet */
+    .cart-wrapper {
+        display: inline-block !important;
+    }
 }
 
 /* ============================================ */
@@ -208,6 +264,19 @@ p {
         display: flex !important;
     }
 
+    /* Carrito visible en móvil */
+    .cart-wrapper {
+        display: inline-block !important;
+    }
+
+    /* Ajustar badge para móvil */
+    .cart-badge {
+        min-width: 16px;
+        height: 16px;
+        font-size: 9px;
+        top: -3px;
+        right: -3px;
+    }
 }
 
 /* ============================================ */

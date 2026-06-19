@@ -4,11 +4,19 @@ import { CommonModule } from '@angular/common';
 import { SecureAuthService, User } from '../../../services/secure-auth.service';
 import { CookieService } from '../../../services/cookie.service';
 import { UiIconComponent } from "../../shared/icono/icono.component";
+import { UiBoton } from '../../shared/boton/boton';
+
+interface ProductoCarrito {
+  id: number;
+  nombre: string;
+  precio: number;
+  cantidad: number;
+}
 
 @Component({
   selector: 'ui-navbar-component',
   standalone: true,
-  imports: [RouterModule, CommonModule, UiIconComponent],
+  imports: [RouterModule, CommonModule, UiIconComponent,UiBoton],
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css']
 })
@@ -21,8 +29,29 @@ export class UiNavbarComponent implements OnInit, OnDestroy {
   dropOpciones: boolean = false;
   mostrarModalConfirmacion: boolean = false;
   mostrarSidebar: boolean = false;
+  carritoAbierto: boolean = false;
   usuarioActual: User | null = null;
   private clickListener: any;
+
+  // Datos de ejemplo para el carrito
+  productosCarrito: ProductoCarrito[] = [
+    { id: 1, nombre: 'Producto 1', precio: 99.00, cantidad: 2 },
+    { id: 2, nombre: 'Producto 2', precio: 149.00, cantidad: 1 },
+    { id: 3, nombre: 'Producto 3', precio: 149.00, cantidad: 3 },
+    { id: 4, nombre: 'Producto 3', precio: 149.00, cantidad: 3 },
+    { id: 5, nombre: 'Producto 3', precio: 149.00, cantidad: 3 },
+
+
+
+  ];
+
+  get cantidadCarrito(): number {
+    return this.productosCarrito.reduce((total, item) => total + item.cantidad, 0);
+  }
+
+  get totalCarrito(): number {
+    return this.productosCarrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
+  }
 
   ngOnInit() {
     this.cargarUsuarioActual();
@@ -47,10 +76,15 @@ export class UiNavbarComponent implements OnInit, OnDestroy {
 
   private onClickOutside(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    const userMenuWrapper = document.querySelector('.relative.inline-block');
+    const userMenuWrapper = document.querySelector('.user-menu-wrapper');
+    const cartWrapper = document.querySelector('.cart-wrapper');
     
     if (userMenuWrapper && !userMenuWrapper.contains(target) && this.dropOpciones) {
       this.dropOpciones = false;
+    }
+    
+    if (cartWrapper && !cartWrapper.contains(target) && this.carritoAbierto) {
+      this.carritoAbierto = false;
     }
   }
 
@@ -61,10 +95,24 @@ export class UiNavbarComponent implements OnInit, OnDestroy {
 
   toggleDropdown() {
     this.dropOpciones = !this.dropOpciones;
+    if (this.dropOpciones) {
+      this.carritoAbierto = false;
+    }
   }
 
   cerrarDropdown() {
     this.dropOpciones = false;
+  }
+
+  toggleCarrito() {
+    this.carritoAbierto = !this.carritoAbierto;
+    if (this.carritoAbierto) {
+      this.dropOpciones = false;
+    }
+  }
+
+  cerrarCarrito() {
+    this.carritoAbierto = false;
   }
 
   toggleSidebar() {
@@ -76,6 +124,12 @@ export class UiNavbarComponent implements OnInit, OnDestroy {
     }
   }
 
+  toggleSidebarCarrito() {
+    // Aquí puedes implementar la lógica para ver el carrito desde el sidebar
+    console.log('Abrir carrito desde sidebar');
+    this.cerrarSidebar();
+  }
+
   cerrarSidebar() {
     this.mostrarSidebar = false;
     document.body.style.overflow = '';
@@ -84,6 +138,7 @@ export class UiNavbarComponent implements OnInit, OnDestroy {
   abrirModalConfirmacion() {
     this.dropOpciones = false;
     this.mostrarSidebar = false;
+    this.carritoAbierto = false;
     this.mostrarModalConfirmacion = true;
     document.body.style.overflow = 'hidden';
   }
@@ -98,6 +153,10 @@ export class UiNavbarComponent implements OnInit, OnDestroy {
     this.authService.logout();
     this.cerrarModal();
     this.router.navigate(['/inicio-sesion']);
+  }
+
+  eliminarDelCarrito(id: number) {
+    this.productosCarrito = this.productosCarrito.filter(item => item.id !== id);
   }
 
   getInitials(): string {
@@ -143,5 +202,10 @@ export class UiNavbarComponent implements OnInit, OnDestroy {
     
     const rol = this.usuarioActual.rol || '';
     return rol.charAt(0).toUpperCase() + rol.slice(1).toLowerCase();
+  }
+
+  // Acciones
+  comprarCarrito():void{
+    console.log("Clci en comprar carrito")
   }
 }

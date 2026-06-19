@@ -24,7 +24,7 @@ export class UiBoton implements OnInit {
   @Input() enableWhen: any = null;
   @Input() enableWhenFormValid: boolean = false;
 
-  //LI NO MOVER PORFA
+  // Input del contador 
   @Input() contador: number = 0;
   @Output() contadorChange = new EventEmitter<number>();
 
