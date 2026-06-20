@@ -75,15 +75,20 @@ class CartService {
   }
 
   // ─── CREATE - Agregar un producto nuevo al carrito ───
+  // ─── CREATE - Agregar un producto nuevo al carrito ───
   async addItem(userId, productId, quantity) {
-    if (quantity <= 0) throw new Error("La cantidad debe ser mayor a 0.");
+    if (!productId || String(productId).trim() === "") {
+      throw new Error("El productId es obligatorio.");
+    }
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      throw new Error("La cantidad debe ser un número entero mayor a 0.");
+    }
 
     let cart = await prisma.cart.findUnique({
       where: { userId: parseInt(userId) },
       include: { items: true },
     });
 
-    // Crear carrito si todavía no existe
     if (!cart) {
       cart = await prisma.cart.create({
         data: { userId: parseInt(userId), paymentType: "Transferencia", subtotal: 0, total: 0 },
@@ -91,6 +96,7 @@ class CartService {
       });
     }
 
+    // Protección anti-duplicados: si el producto ya está en el carrito, no se vuelve a insertar
     const alreadyInCart = cart.items.find((i) => i.productId === productId);
     if (alreadyInCart) {
       throw new Error(
@@ -98,11 +104,10 @@ class CartService {
       );
     }
 
-    // Validar existencias reales en el catálogo externo pero de redis
     const product = await ExelService.getProductByReference(productId);
 
     if (!product)
-      throw new Error("El producto seleccionado no esta en el catalogo por el momento")
+      throw new Error("El producto seleccionado no esta en el catalogo por el momento");
 
     const availableStock = parseInt(product.stock || 0);
     if (quantity > availableStock) {
@@ -110,6 +115,7 @@ class CartService {
         `Stock insuficiente. Solo quedan ${availableStock} unidades disponibles.`
       );
     }
+
     await prisma.cartItem.create({
       data: {
         cartId: cart.id,
@@ -128,6 +134,13 @@ class CartService {
 
   // ─── UPDATE - Modificar la cantidad de un ítem ya existente ───
   async updateItemQuantity(userId, productId, quantity) {
+    if (!productId || String(productId).trim() === "") {
+      throw new Error("El productId es obligatorio.");
+    }
+    if (!Number.isInteger(quantity)) {
+      throw new Error("La cantidad debe ser un número entero válido.");
+    }
+
     const cart = await prisma.cart.findUnique({
       where: { userId: parseInt(userId) },
       include: { items: true },
@@ -135,12 +148,10 @@ class CartService {
 
     if (!cart) throw new Error("El carrito del usuario no existe.");
 
-    // Si llega quantity 0 o menor se delega al DELETE
     if (quantity <= 0) {
       return await this.removeItem(userId, productId);
     }
 
-    // Validar existencias reales en el catálogo externo DE REDIS
     const externalProduct = await ExelService.getProductByReference(productId);
 
     if (!externalProduct)
@@ -164,7 +175,6 @@ class CartService {
         },
       });
     } else {
-      // Si el ítem no existe aún se delega al CREATE
       return await this.addItem(userId, productId, quantity);
     }
 
@@ -172,6 +182,23 @@ class CartService {
     return toResponseDto(updated);
   }
 
+  // ─── UPDATE - Cambiar el tipo de pago del carrito ───
+  async setPaymentType(userId, paymentType) {
+    const TIPOS_VALIDOS = ["Efectivo", "Transferencia", "Crédito"];
+    if (!paymentType || !TIPOS_VALIDOS.includes(paymentType)) {
+      throw new Error("Tipo de pago inválido. Use: " + TIPOS_VALIDOS.join(", "));
+    }
+
+    const cart = await prisma.cart.findUnique({ where: { userId: parseInt(userId) } });
+    if (!cart) throw new Error("El carrito del usuario no existe.");
+
+    const updated = await prisma.cart.update({
+      where: { id: cart.id },
+      data: { paymentType },
+      include: { items: true },
+    });
+    return toResponseDto(updated);
+  }
   // ─── DELETE - Eliminar un producto específico del carrito ───
   async removeItem(userId, productId) {
     const cart = await prisma.cart.findUnique({

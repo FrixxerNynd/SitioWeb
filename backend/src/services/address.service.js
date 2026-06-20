@@ -4,6 +4,26 @@ import prisma from "../config/db.js";
 //  SERVICIO - Lógica de negocio de las direcciones del usuario
 // ═══════════════════════════════════════════════════════════
 
+const CAMPOS_OBLIGATORIOS = ["pais", "estado", "ciudad", "codigoPostal", "colonia", "calle", "nExterior"];
+
+// Recorta espacios y revienta si algún campo obligatorio viene vacío/undefined/null
+const limpiarYValidarObligatorios = (data, campos = CAMPOS_OBLIGATORIOS) => {
+  const limpio = {};
+  for (const campo of campos) {
+    const valor = data[campo];
+    if (valor === undefined || valor === null || String(valor).trim() === "") {
+      throw new Error(`El campo "${campo}" es obligatorio y no puede estar vacío.`);
+    }
+    limpio[campo] = String(valor).trim();
+  }
+  return limpio;
+};
+
+const limpiarNInterior = (valor) =>
+  valor !== undefined && valor !== null && String(valor).trim() !== ""
+    ? String(valor).trim()
+    : "";
+
 class AddressService {
   // ─── READ - Listar todas las direcciones del usuario ───
   async getAddresses(userId) {
@@ -25,36 +45,32 @@ class AddressService {
 
   // ─── CREATE - Agregar una nueva dirección ───
   async createAddress(userId, data) {
-    const {
-      pais,
-      estado,
-      ciudad,
-      codigoPostal,
-      colonia,
-      calle,
-      nExterior: nExteriorSinProcesar,
-      nInterior: nInteriorSinProcesar,
-    } = data;
+    const limpio = limpiarYValidarObligatorios(data);
+    const nInterior = limpiarNInterior(data.nInterior);
 
-    if (!pais || !estado || !ciudad || !codigoPostal || !colonia || !calle || !nExteriorSinProcesar) {
-      throw new Error("Faltan campos obligatorios para registrar la dirección.");
+    // Evitar registrar dos veces exactamente la misma dirección para el mismo usuario
+    const duplicada = await prisma.userAddress.findFirst({
+      where: {
+        userId,
+        calle: limpio.calle,
+        nExterior: limpio.nExterior,
+        nInterior,
+        colonia: limpio.colonia,
+        ciudad: limpio.ciudad,
+        estado: limpio.estado,
+        codigoPostal: limpio.codigoPostal,
+        pais: limpio.pais,
+      },
+    });
+
+    if (duplicada) {
+      throw new Error("Ya tienes registrada una dirección idéntica.");
     }
-
-    // Prisma espera String para nExterior; nInterior es opcional
-    // y se guarda como string vacío si no lo mandan (no null, no "0").
-    const nExterior = String(nExteriorSinProcesar);
-    const nInterior = nInteriorSinProcesar ? String(nInteriorSinProcesar) : "";
 
     return await prisma.userAddress.create({
       data: {
         userId,
-        pais,
-        estado,
-        ciudad,
-        codigoPostal,
-        colonia,
-        calle,
-        nExterior,
+        ...limpio,
         nInterior,
       },
     });
@@ -68,38 +84,49 @@ class AddressService {
 
     if (!direccionExiste) throw new Error("La dirección no existe.");
 
-    const {
-      pais,
-      estado,
-      ciudad,
-      codigoPostal,
-      colonia,
-      calle,
-      nExterior,
-      nInterior,
-    } = data;
+    const actualizacion = {};
+
+    // Solo se valida lo que realmente viene en el body; si viene, no puede ser vacío
+    for (const campo of CAMPOS_OBLIGATORIOS) {
+      if (data[campo] !== undefined) {
+        const valor = String(data[campo]).trim();
+        if (valor === "") {
+          throw new Error(`El campo "${campo}" no puede quedar vacío.`);
+        }
+        actualizacion[campo] = valor;
+      }
+    }
+
+    if (data.nInterior !== undefined) {
+      actualizacion.nInterior = limpiarNInterior(data.nInterior);
+    }
+
+    // Cómo quedaría la dirección después de aplicar los cambios
+    const resultante = { ...direccionExiste, ...actualizacion };
+
+    // Evitar que, tras la edición, quede idéntica a otra dirección ya guardada
+    const duplicada = await prisma.userAddress.findFirst({
+      where: {
+        id: { not: addressId },
+        userId,
+        calle: resultante.calle,
+        nExterior: resultante.nExterior,
+        nInterior: resultante.nInterior,
+        colonia: resultante.colonia,
+        ciudad: resultante.ciudad,
+        estado: resultante.estado,
+        codigoPostal: resultante.codigoPostal,
+        pais: resultante.pais,
+      },
+    });
+
+    if (duplicada) {
+      throw new Error("Ya existe otra dirección idéntica registrada.");
+    }
 
     return await prisma.userAddress.update({
-      where: {
-        id: addressId,
-      },
-      data: {
-        pais: pais ?? direccionExiste.pais,
-        estado: estado ?? direccionExiste.estado,
-        ciudad: ciudad ?? direccionExiste.ciudad,
-        codigoPostal: codigoPostal ?? direccionExiste.codigoPostal,
-        colonia: colonia ?? direccionExiste.colonia,
-        calle: calle ?? direccionExiste.calle,
-        nExterior: nExterior !== undefined
-          ? String(nExterior)
-          : direccionExiste.nExterior,
-        // undefined → no vino en el body, se conserva el valor anterior
-        // "" o cualquier valor falsy → se guarda como string vacío
-        // cualquier otro valor → se normaliza a string
-        nInterior: nInterior === undefined
-          ? direccionExiste.nInterior
-          : (nInterior ? String(nInterior) : ""),
-      },
+      where: { id: addressId },
+      data: actualizacion,
     });
   }
 
