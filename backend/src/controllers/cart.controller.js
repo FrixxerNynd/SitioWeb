@@ -24,12 +24,14 @@ class CartController {
     }
   }
 
+  
+
   // GET /api/cart/item/:productId
   async getCartItem(req, res, next) {
     try {
       const result = await cartService.getCartItem(
         getUserId(req),
-        parseInt(req.params.productId)
+        req.params.productId
       );
       res.status(200).json({ success: true, data: result });
     } catch (error) {
@@ -43,7 +45,7 @@ class CartController {
       const { productId, quantity } = req.body;
       const result = await cartService.addItem(
         getUserId(req),
-        parseInt(productId),
+        productId,
         parseInt(quantity)
       );
       res.status(201).json({ success: true, data: result });
@@ -57,7 +59,7 @@ class CartController {
     try {
       const result = await cartService.updateItemQuantity(
         getUserId(req),
-        parseInt(req.params.productId),
+        req.params.productId,
         parseInt(req.body.quantity)
       );
       res.status(200).json({ success: true, data: result });
@@ -71,7 +73,7 @@ class CartController {
     try {
       const result = await cartService.removeItem(
         getUserId(req),
-        parseInt(req.params.productId)
+        req.params.productId
       );
       res.status(200).json({ success: true, data: result });
     } catch (error) {

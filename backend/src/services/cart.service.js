@@ -19,7 +19,7 @@ const toResponseDto = (data) => new PedidoResponseDto({
   total: data.total ?? 0,
 });
 
-// Dirección estática de la sucursal central obtenida de los requerimientos de diseño (Pág. 3)
+// Dirección estática de la sucursal 
 const CABS_SUCURSAL_ADDRESS = {
   street: "Beatriz Prada",
   extNum: "450",
@@ -41,7 +41,7 @@ class CartService {
   async getCart(userId, userName) {
     let cart = await prisma.cart.findUnique({
       where: {
-        userId: parseInt(userId), // Soporta ambos formatos: { id: 1 } o { nameid: "1" }
+        userId: parseInt(userId), 
       },
       include: { items: true },
     });
@@ -55,7 +55,7 @@ class CartService {
     }
 
     const updated = await this.recalculateCartTotals(cart.id);
-    return toResponseDto({ ...updated, name: userName || `Usuario ${userId.id}` });
+    return toResponseDto({ ...updated, name: userName || `Usuario ${userId}` });
 
   }
 
@@ -79,14 +79,14 @@ class CartService {
     if (quantity <= 0) throw new Error("La cantidad debe ser mayor a 0.");
 
     let cart = await prisma.cart.findUnique({
-      where: { userId },
+      where: { userId: parseInt(userId) },
       include: { items: true },
     });
 
     // Crear carrito si todavía no existe
     if (!cart) {
       cart = await prisma.cart.create({
-        data: { userId, paymentType: "Transferencia", subtotal: 0, total: 0 },
+        data: { userId: parseInt(userId), paymentType: "Transferencia", subtotal: 0, total: 0 },
         include: { items: true },
       });
     }
@@ -98,29 +98,27 @@ class CartService {
       );
     }
 
-    // Validar existencias reales en el catálogo externo
-    const externalData = await ExelService.fetchExternalProducts({ id: productId });
-    const externalProduct = externalData?.find((p) => parseInt(p.id) === parseInt(productId));
+    // Validar existencias reales en el catálogo externo pero de redis
+    const product = await ExelService.getProductByReference(productId);
 
-    if (!externalProduct)
-      throw new Error("El producto seleccionado ya no existe en el catálogo.");
+    if (!product)
+      throw new Error("El producto seleccionado no esta en el catalogo por el momento")
 
-    const availableStock = parseInt(externalProduct.stock || 0);
+    const availableStock = parseInt(product.stock || 0);
     if (quantity > availableStock) {
       throw new Error(
         `Stock insuficiente. Solo quedan ${availableStock} unidades disponibles.`
       );
     }
-
     await prisma.cartItem.create({
       data: {
         cartId: cart.id,
         productId,
-        sku: externalProduct.sku,
-        name: externalProduct.nombre,
-        price: parseFloat(externalProduct.precio),
+        sku: product.sku,
+        name: product.nombre,
+        price: parseFloat(product.precio),
         quantity,
-        totalPrice: parseFloat(externalProduct.precio) * quantity,
+        totalPrice: parseFloat(product.precio) * quantity,
       },
     });
 
@@ -131,7 +129,7 @@ class CartService {
   // ─── UPDATE - Modificar la cantidad de un ítem ya existente ───
   async updateItemQuantity(userId, productId, quantity) {
     const cart = await prisma.cart.findUnique({
-      where: { userId },
+      where: { userId: parseInt(userId) },
       include: { items: true },
     });
 
@@ -142,9 +140,8 @@ class CartService {
       return await this.removeItem(userId, productId);
     }
 
-    // Validar existencias reales en el catálogo externo
-    const externalData = await ExelService.fetchExternalProducts({ id: productId });
-    const externalProduct = externalData?.find((p) => parseInt(p.id) === parseInt(productId));
+    // Validar existencias reales en el catálogo externo DE REDIS
+    const externalProduct = await ExelService.getProductByReference(productId);
 
     if (!externalProduct)
       throw new Error("El producto seleccionado ya no existe en el catálogo.");
@@ -178,7 +175,7 @@ class CartService {
   // ─── DELETE - Eliminar un producto específico del carrito ───
   async removeItem(userId, productId) {
     const cart = await prisma.cart.findUnique({
-      where: { userId },
+      where: { userId: parseInt(userId) },
       include: { items: true },
     });
 
@@ -194,7 +191,7 @@ class CartService {
 
   // ─── UPDATE - Cambiar el tipo de pago del carrito ───
   async setPaymentType(userId, paymentType) {
-    const cart = await prisma.cart.findUnique({ where: { userId } });
+    const cart = await prisma.cart.findUnique({ where: { userId: parseInt(userId) } });
     if (!cart) throw new Error("El carrito del usuario no existe.");
 
     const updated = await prisma.cart.update({
@@ -208,7 +205,7 @@ class CartService {
   // ─── UPDATE - Seleccionar método de entrega y calcular flete ───
   async setDeliveryMethod(userId, method, addressId = null) {
     const cart = await prisma.cart.findUnique({
-      where: { userId },
+      where: { userId: parseInt(userId) },
       include: { items: true },
     });
 
@@ -228,14 +225,14 @@ class CartService {
         );
 
       const address = await prisma.userAddress.findFirst({
-        where: { id: parseInt(addressId), userId },
+        where: { id: parseInt(addressId), userId: parseInt(userId) },
       });
       if (!address)
         throw new Error("La dirección de entrega seleccionada no existe.");
 
       shippingAddress = address;
-      // Regla del PDF: envío menor a $2,000 genera cargo de $90.00
-      shippingCost = cart.subtotal < 2000 ? 90.0 : 0.0;
+      const subtotalActual = cart.items.reduce((acc, item) => acc + item.totalPrice, 0);
+      shippingCost = subtotalActual < 2000 ? 90.0 : 0.0;
 
     } else {
       throw new Error("Método de entrega inválido.");
@@ -257,7 +254,7 @@ class CartService {
   // ─── CREATE - Checkout: convierte el carrito en una Orden persistente (transaccional) ───
   async processCheckout(userId) {
     const cart = await prisma.cart.findUnique({
-      where: { userId },
+      where: { userId: parseInt(userId) },
       include: { items: true },
     });
 

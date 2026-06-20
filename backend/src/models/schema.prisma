@@ -491,7 +491,7 @@ model Cart {
 model CartItem {
   id         Int    @id @default(autoincrement())
   cartId     Int
-  productId  Int
+  productId  String @db.VarChar(50)   // ← antes era Int
   sku        String @db.VarChar(100)
   name       String @db.NVarChar(200)
   price      Float
@@ -517,7 +517,7 @@ model Order {
 model OrderItem {
   id         Int    @id @default(autoincrement())
   orderId    Int
-  productId  Int
+  productId  String @db.VarChar(50)   // ← antes era Int
   sku        String @db.VarChar(100)
   name       String @db.NVarChar(200)
   price      Float
@@ -527,14 +527,16 @@ model OrderItem {
 }
 
 model UserAddress {
-  id           Int     @id @default(autoincrement())
-  userId       Int
-  street       String  @db.NVarChar(200)
-  extNum       String  @db.VarChar(20)
-  intNum       String? @db.VarChar(20)
-  neighborhood String  @db.NVarChar(100)
-  city         String  @db.NVarChar(100)
-  state        String  @db.NVarChar(100)
-  cp           String  @db.VarChar(10)
-  country      String  @db.NVarChar(100)
+  id            Int     @id @default(autoincrement())
+  userId        Int
+
+  calle         String  @db.NVarChar(50)
+  nExterior     String  @db.VarChar(10)
+  nInterior     String? @db.VarChar(10)
+
+  colonia       String  @db.NVarChar(50)
+  ciudad        String  @db.NVarChar(30)
+  estado        String  @db.NVarChar(30)
+  codigoPostal  String  @db.VarChar(10)
+  pais          String  @db.NVarChar(30)
 }

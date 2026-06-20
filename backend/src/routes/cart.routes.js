@@ -1,5 +1,6 @@
 import { Router } from "express";
 import cartController from "../controllers/cart.controller.js";
+import addressRouter from "./address.routes.js";
 import { validateToken } from "../middlewares/JWTValidator.js";  // ← nuevo
 
 const cartRouter = Router();
@@ -263,5 +264,12 @@ cartRouter.patch("/delivery", cartController.setDeliveryMethod.bind(cartControll
  *         description: Error interno del servidor
  */
 cartRouter.post("/checkout", cartController.processCheckout.bind(cartController));
+
+// ═══════════════════════════════════════════════════════════
+//  SUB-RUTAS - Direcciones anidadas en /api/cart/addresses
+//  (addressRouter no aplica su propio validateToken porque
+//   ya corre el de cartRouter.use(validateToken) arriba)
+// ═══════════════════════════════════════════════════════════
+cartRouter.use("/addresses", addressRouter);
 
 export default cartRouter;
