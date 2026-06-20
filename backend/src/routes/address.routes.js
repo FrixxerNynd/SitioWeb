@@ -71,7 +71,7 @@ addressRouter.get("/:addressId", addressController.getAddressById.bind(addressCo
  *         application/json:
  *           schema:
  *             type: object
- *             required: [pais, estado, ciudad, codigoPostal,colonia,calle,nExterior,nInterior]
+ *             required: [pais, estado, ciudad, codigoPostal, colonia, calle, nExterior]
  *             properties:
  *               pais:
  *                 type: string
@@ -127,7 +127,7 @@ addressRouter.post("/", addressController.createAddress.bind(addressController))
  *         application/json:
  *           schema:
  *             type: object
- *            properties:
+ *             properties:
  *               pais:
  *                 type: string
  *                 example: México

@@ -62,9 +62,13 @@ const options = {
     },
   },
   // Swagger escanea los JSDoc que están dentro de cart.routes.js
-  apis: ['./src/routes/cart.routes.js',
+  apis: [
+    './src/routes/cart.routes.js',
+    './src/routes/address.routes.js',
+    './src/routes/order.routes.js',
     './src/routes/exel.routes.js',
-    './app.js'],
+    './app.js',
+  ],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
