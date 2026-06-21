@@ -220,12 +220,12 @@
 
           <div class="flex gap-2 mt-4">
             <button
-              class="flex-1 bg-gradient-to-b from-[#31408f] to-[#021669] text-white py-2 rounded-lg hover:shadow-lg transition-all"
+              class="flex-1 gradient-bg text-white py-2 hover:shadow-lg transition-all" style="border-radius: 8px;"
               (click)="aplicarFiltros()">
               Aplicar filtro
             </button>
             <button
-              class="flex-1 bg-white border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-50 transition-all"
+              class="flex-1 bg-white border border-gray-300 text-zinc-600 py-2 rounded-lg hover:bg-gray-50 transition-all" style="border-radius: 8px;"
               (click)="limpiarFiltros()" [disabled]="!hasTempFilters()">
               Limpiar filtro
             </button>
@@ -510,7 +510,7 @@
           }
 
           @if (filteredProducts().length === 0 && !isLoading()) {
-          <div class="text-center flex flex-col justify-center items-center mt-4 mb-6">
+          <div class="text-center flex flex-col justify-center items-center mt-4 mb-6" style="height: 800px;">
             <div class="flex items-center  justify-center p-2 bg-orange-200 text-orange-800 rounded-full">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="size-6">

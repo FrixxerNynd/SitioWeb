@@ -938,3 +938,7 @@
     color: #6c757d;
     font-size: 0.85rem;
 }
+
+.gradient-bg {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0a1f44 100%);
+}

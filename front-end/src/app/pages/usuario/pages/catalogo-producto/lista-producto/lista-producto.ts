@@ -10,11 +10,13 @@ import {
   ICategory,
 } from '../../../../../interfaces/interface-excel-norte/excel-norte-interface';
 import { UIProductoCard } from '../../../../../components/shared/producto-card/producto-card';
+import { UiBoton } from '../../../../../components/shared/boton/boton';
+
 
 @Component({
   selector: 'app-lista-producto',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, UIProductoCard],
+  imports: [CommonModule, RouterModule, FormsModule, UIProductoCard,UiBoton],
   templateUrl: './lista-producto.html',
   styleUrl: './lista-producto.css',
 })

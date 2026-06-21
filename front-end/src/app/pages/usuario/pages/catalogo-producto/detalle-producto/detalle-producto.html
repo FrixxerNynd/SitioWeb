@@ -136,14 +136,14 @@
 
                 <!-- Contenedor de botones -->
                 <div class="flex flex-col gap-3 w-full">
-                    <div class="grid grid-cols-3 w-full gap-10">
-                        <ui-boton tipo="contador" text="Ordenar ahora" size="lg" [disabled]="false"></ui-boton>
+                    <div class="grid grid-cols-4 w-full gap-10">
+                        <ui-boton tipo="contador" size="md"  [disabled]="false" ></ui-boton>
                     </div>
                     <div class="w-full">
                         <div class="grid grid-cols-2 gap-3 w-full">
-                            <ui-boton text="Agregar al carrito" size="lg" widthType="full" [disabled]="false"
+                            <ui-boton text="Agregar al carrito" size="md" widthType="full" [disabled]="false"
                                 (btnClick)="addToCart()"></ui-boton>
-                            <ui-boton tipo="secundario" text="Ordenar ahora" size="lg" widthType="full"
+                            <ui-boton tipo="secundario" text="Ordenar ahora" size="md" widthType="full"
                                 [disabled]="false" (btnClick)="buyNow()"></ui-boton>
                         </div>
                     </div>
