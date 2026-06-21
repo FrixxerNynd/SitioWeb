@@ -5,7 +5,7 @@ using back_cabs.CRM.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using back_cabs.CRM.DTOs;
-using back_cabs.CRM.DTOs.Response;
+using back_cabs.CRM.DTOs.ServiceResponse;
 
 namespace back_cabs.CRM.repositories.Auth
 {

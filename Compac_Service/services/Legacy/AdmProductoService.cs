@@ -19,7 +19,6 @@ using back_cabs.CRM.Interfaces.Legacy;
 using back_cabs.CRM.models.legacy;
 using back_cabs.CRM.services;
 using CRM.DTOs.Response;
-
 namespace back_cabs.CRM.services.Legacy
 {
     /// <summary>

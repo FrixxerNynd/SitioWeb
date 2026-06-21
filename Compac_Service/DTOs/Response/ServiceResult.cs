@@ -1,5 +1,5 @@
 
-namespace back_cabs.CRM.DTOs.Response
+namespace back_cabs.CRM.DTOs.ServiceResponse
 {
     public class ServiceResult
     {

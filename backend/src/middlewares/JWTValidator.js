@@ -84,7 +84,7 @@ function setAuthCookies(res, accessToken, refreshToken) {
  */
 export const validateToken = async (req, res, next) => {
     const token = req.cookies?.AuthToken;
-    
+
     console.log("TOKEN RECIBIDO:", token ? token.substring(0, 20) + "..." : "NINGUNO");
     console.log("JWT_SECRET:", JWT_SECRET ? JWT_SECRET.substring(0, 5) + "..." : "UNDEFINED");
 
@@ -152,8 +152,8 @@ export const validateToken = async (req, res, next) => {
     }
 
     //Helper para los claims
-    function normalizeClaims(decoded){
-        const resultado = {...decoded};
+    function normalizeClaims(decoded) {
+        const resultado = { ...decoded };
         for (const [uri, alias] of Object.entries(CLAIMS_MAP)) {
             if (decoded[uri]) {
                 resultado[alias] = decoded[uri];
@@ -164,9 +164,9 @@ export const validateToken = async (req, res, next) => {
     }
 
     const CLAIM_MAP = {
-  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": "id",
-  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress": "email",
-  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": "name",
-  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role": "role",
-};
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": "id",
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress": "email",
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": "name",
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role": "role",
+    };
 };

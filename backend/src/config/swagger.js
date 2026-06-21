@@ -4,7 +4,7 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'CABS - API de Carrito y Catálogo de Productos',
+      title: 'CABS - API de SitioWeb',
       version: '1.0.0',
       description:
         'Servicio backend en Node.js/Express para gestión del carrito de compras CABS y consumo del catálogo Exel del Norte.',
@@ -25,6 +25,15 @@ const options = {
         },
       },
       schemas: {
+        Percentage: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer', example: 1 },
+            id_categoria: { type: 'string', example: '15' },
+            nombre_categoria: { type: 'string', example: 'Cemento y derivados' },
+            porcentaje: { type: 'number', example: 15.5 },
+          },
+        },
         PedidoResponse: {
           type: 'object',
           properties: {
@@ -64,11 +73,18 @@ const options = {
   // Swagger escanea los JSDoc que están dentro de cart.routes.js
   apis: [
     './src/routes/cart.routes.js',
+<<<<<<< Updated upstream
     './src/routes/address.routes.js',
     './src/routes/order.routes.js',
     './src/routes/exel.routes.js',
     './app.js',
   ],
+=======
+    './src/routes/exel.routes.js',
+    './src/routes/percentage.routes.js',
+    './src/routes/order.routes.js',
+    './app.js'],
+>>>>>>> Stashed changes
 };
 
 const swaggerSpec = swaggerJSDoc(options);

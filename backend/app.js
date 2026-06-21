@@ -10,6 +10,7 @@ import logger from './src/utils/Helpers/logger.js';
 import cartRouter from './src/routes/cart.routes.js';
 import exelRouter from './src/routes/exel.routes.js';
 import orderRouter from './src/routes/order.routes.js';
+import percentageRouter from './src/routes/percentage.routes.js';
 import redisClient from './src/config/redis.js';
 dotenv.config();
 
@@ -61,6 +62,7 @@ app.get('/health', (req, res) => {
 app.use('/api/cart', cartRouter);
 app.use('/api/productos', exelRouter);
 app.use('/api/orders', orderRouter);
+app.use('/api/porcentajes', percentageRouter);
 
 // ─────────────────────────────────────────────
 // 5. Documentación Swagger
@@ -73,11 +75,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use((err, req, res, next) => {
     logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
     res.status(err.status || 500).json({
-        error: {
-            message: process.env.NODE_ENV === 'production'
-                ? 'Internal Server Error'
-                : err.message,
-        }
+        success: false,
+        message: process.env.NODE_ENV === 'production'
+            ? 'Internal Server Error'
+            : err.message,
     });
 });
 

@@ -527,6 +527,7 @@ model OrderItem {
 }
 
 model UserAddress {
+<<<<<<< Updated upstream
   id            Int     @id @default(autoincrement())
   userId        Int
 
@@ -539,4 +540,23 @@ model UserAddress {
   estado        String  @db.NVarChar(30)
   codigoPostal  String  @db.VarChar(10)
   pais          String  @db.NVarChar(30)
+=======
+  id           Int     @id @default(autoincrement())
+  userId       Int
+  street       String  @db.NVarChar(200)
+  extNum       String  @db.VarChar(20)
+  intNum       String? @db.VarChar(20)
+  neighborhood String  @db.NVarChar(100)
+  city         String  @db.NVarChar(100)
+  state        String  @db.NVarChar(100)
+  cp           String  @db.VarChar(10)
+  country      String  @db.NVarChar(100)
+}
+
+model Percentages {
+  id              Int    @id @default(autoincrement())
+  id_categoria    String @unique @db.VarChar(50)
+  nombre_categoria String @db.VarChar(100)
+  porcentaje      Float  @default(0)
+>>>>>>> Stashed changes
 }

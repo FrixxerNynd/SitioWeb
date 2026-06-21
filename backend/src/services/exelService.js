@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import { responseDto } from "../utils/DTO's/Response/DTO-Index.js"
 import { stringify } from 'node:querystring';
 import redis from '../config/redis.js';
+import prisma from '../config/db.js';
 
 dotenv.config();
 
@@ -42,12 +43,31 @@ class ExelService {
       const precio_existencia = items.map(item => new responseDto.precio_stock({
         referencia: item.referencia,
         existencia: item.stock,
-        precio: parseFloat(item.precio ?? 0),
-        precioOferta: parseFloat(item.precio_oferta ?? 0),
-        precioSinOferta: parseFloat(item.precio_sin_oferta ?? 0),
+        precio: parseFloat(item.precio ?? 0).toFixed(2),
+        precioOferta: parseFloat(item.precio_oferta ?? 0).toFixed(2),
+        precioSinOferta: parseFloat(item.precio_sin_oferta ?? 0).toFixed(2),
         oferta: item.oferta ?? false
       }))
 
+      // ── Ajustar precios segun porcentajes configurados por categoria ──
+      try {
+        const percentages = await prisma.percentages.findMany();
+        if (percentages.length > 0) {
+          const pctMap = new Map(percentages.map(p => [p.id_categoria, p.porcentaje]));
+          for (let i = 0; i < items.length; i++) {
+            const catId = String(items[i].categoria_id ?? '');
+            if (catId && pctMap.has(catId)) {
+              const factor = 1 + (pctMap.get(catId) / 100);
+              const pe = precio_existencia[i];
+              pe.precio = (parseFloat(pe.precio) * factor).toFixed(2);
+              pe.precioSinOferta = (parseFloat(pe.precioSinOferta) * factor).toFixed(2);
+              pe.precioOferta = (parseFloat(pe.precioOferta) * factor).toFixed(2);
+            }
+          }
+        }
+      } catch (err) {
+        logger.warn(`Error al aplicar porcentajes de precio: ${err.message}`);
+      }
 
       await this.saveProductsRedis(productos);
       await this.savePreciosExistenciaProductosRedis(precio_existencia);
@@ -127,7 +147,7 @@ class ExelService {
    *                         lo que devuelve solo las referencias que cumplen TODOS los filtros.
    *   null si Redis no está disponible (el llamador debe hacer fallback a la API externa).
    */
-  async getProductsRedis({ categoria, subcategoria, marca, stock, pageSize = 100, page = 1 } = {}) {
+  async getProductsRedis({ categoria, subcategoria, marca, stock, searchTerm, precioMin, precioMax, pageSize = 100, page = 1 } = {}) {
     const client = redisClient.getClient();
 
     if (!client) {
@@ -135,53 +155,123 @@ class ExelService {
       return null;
     }
 
+    const tempKeys = [];
+
     try {
-      // ── 1. Determinar el conjunto de referencias ──────────────────────────
+      const buildKeys = async (groupName, values) => {
+        if (!values || values.length === 0) return null;
+        const keys = values.map(v => `indice:${groupName}:${v}`);
+        if (keys.length === 1) return keys[0];
+        const tmpKey = `_tmp:${groupName}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
+        await client.sUnionStore(tmpKey, keys);
+        tempKeys.push(tmpKey);
+        return tmpKey;
+      };
+
+      // ── 1. Determinar el conjunto de referencias por índices ──────────────
       let referencias = [];
 
-      const indicesActivos = [
-        categoria ? `indice:categoria:${categoria}` : null,
-        subcategoria ? `indice:subcategoria:${subcategoria}` : null,
-        marca ? `indice:marca:${marca}` : null,
+      const filterKeys = [
+        await buildKeys('categoria', categoria),
+        await buildKeys('subcategoria', subcategoria),
+        await buildKeys('marca', marca),
         stock !== undefined ? `indice:stock:${stock}` : null,
       ].filter(Boolean);
 
-      if (indicesActivos.length === 0) {
+      if (filterKeys.length === 0) {
         referencias = await client.sMembers('catalogo:referencias');
         logger.info(`Cache HIT catálogo completo: ${referencias.length} referencias`);
-      } else if (indicesActivos.length === 1) {
-        referencias = await client.sMembers(indicesActivos[0]);
-        logger.info(`Cache HIT índice [${indicesActivos[0]}]: ${referencias.length} referencias`);
+      } else if (filterKeys.length === 1) {
+        referencias = await client.sMembers(filterKeys[0]);
+        logger.info(`Cache HIT índice [${filterKeys[0]}]: ${referencias.length} referencias`);
       } else {
-        referencias = await client.sInter(indicesActivos);
-        logger.info(`Cache HIT SINTER [${indicesActivos.join(' ∩ ')}]: ${referencias.length} referencias`);
+        referencias = await client.sInter(filterKeys);
+        logger.info(`Cache HIT SINTER [${filterKeys.join(' ∩ ')}]: ${referencias.length} referencias`);
       }
 
-      // ── 2. Validar resultados ─────────────────────────────────────────────
+      // ── 2. Limpiar claves temporales ───────────────────────────────────────
+      if (tempKeys.length > 0) {
+        await client.del(tempKeys).catch(() => { });
+      }
+
       if (referencias.length === 0) {
         return { productos: [], total: 0, page, pageSize, totalPages: 0 };
       }
 
+      // ── 3. Cargar datos completos si hay filtros extra ──────────────────
+      const needsPostFilter = searchTerm || precioMin !== undefined || precioMax !== undefined;
+
+      if (needsPostFilter) {
+        const todosLosProductos = await Promise.all(
+          referencias.map(async (ref) => {
+            const prod = await client.hGetAll(`producto:${ref}`);
+            if (!prod || Object.keys(prod).length === 0) return null;
+            try {
+              const precioHash = await client.hGetAll(`precio_existencia:${ref}`);
+              if (precioHash && Object.keys(precioHash).length > 0) {
+                prod.precio = parseFloat(precioHash.precio ?? 0);
+                prod.precio_oferta = precioHash.precio_oferta ? parseFloat(precioHash.precio_oferta) : null;
+                prod.precio_sin_oferta = parseFloat(precioHash.precio_sin_oferta ?? precioHash.precio ?? 0);
+                prod.oferta = precioHash.oferta === 'true';
+                prod.stock = parseInt(precioHash.existencia ?? 0);
+              }
+            } catch (_) { }
+            return prod;
+          })
+        );
+
+        let filtrados = todosLosProductos.filter(Boolean);
+
+        if (searchTerm) {
+          const term = searchTerm.toLowerCase();
+          filtrados = filtrados.filter(p =>
+            (p.nombre && p.nombre.toLowerCase().includes(term)) ||
+            (p.sku && p.sku.toLowerCase().includes(term))
+          );
+        }
+
+        if (precioMin !== undefined) {
+          const min = parseFloat(precioMin);
+          if (!isNaN(min)) filtrados = filtrados.filter(p => (parseFloat(p.precio ?? 0)) >= min);
+        }
+
+        if (precioMax !== undefined) {
+          const max = parseFloat(precioMax);
+          if (!isNaN(max)) filtrados = filtrados.filter(p => (parseFloat(p.precio ?? 0)) <= max);
+        }
+
+        const total = filtrados.length;
+        const totalPages = Math.ceil(total / pageSize);
+
+        if (page < 1 || page > totalPages) {
+          return { productos: [], total, page, pageSize, totalPages };
+        }
+
+        const offset = (page - 1) * pageSize;
+        const pagina = filtrados.slice(offset, offset + pageSize);
+
+        logger.info(`Devolviendo página ${page}/${totalPages} — ${pagina.length}/${total} productos desde Redis (filtrados)`);
+
+        return { productos: pagina, total, page, pageSize, totalPages };
+      }
+
+      // ── 4. Sin filtros extra: flujo original optimizado ──────────────────
       const total = referencias.length;
       const totalPages = Math.ceil(total / pageSize);
 
-      // Clamp: si piden una página fuera de rango, devolver vacío
       if (page < 1 || page > totalPages) {
         return { productos: [], total, page, pageSize, totalPages };
       }
 
-      // ── 3. Paginación ─────────────────────────────────────────────────────
       const offset = (page - 1) * pageSize;
       const pagina = referencias.slice(offset, offset + pageSize);
 
-      // ── 4. Obtener hashes en paralelo ─────────────────────────────────────
       const resultados = await Promise.all(
         pagina.map(ref => client.hGetAll(`producto:${ref}`))
       );
 
       const productosBrutos = resultados.filter(p => p && Object.keys(p).length > 0);
 
-      // ── 5. Enriquecer con precio/stock ────────────────────────────────────
       const productos = await Promise.all(
         productosBrutos.map(async (prod) => {
           const ref = prod.referencia;
@@ -208,6 +298,7 @@ class ExelService {
       return { productos, total, page, pageSize, totalPages };
 
     } catch (error) {
+      try { if (tempKeys.length > 0) await client.del(tempKeys); } catch (_) { }
       logger.error(`Error al consultar productos en Redis: ${error.message}`);
       return null;
     }
@@ -222,18 +313,18 @@ class ExelService {
     try {
       const producto = await client.hGetAll(`producto:${reference}`);
       if (!producto || Object.keys(producto).length === 0) return null;
-      
+
       try {
         const precioHash = await client.hGetAll(`precio_existencia:${reference}`);
         if (precioHash && Object.keys(precioHash).length > 0) {
-          producto.precio = parseFloat(precioHash.precio ?? 0);
-          producto.precio_oferta = precioHash.precio_oferta ? parseFloat(precioHash.precio_oferta) : null;
-          producto.precio_sin_oferta = parseFloat(precioHash.precio_sin_oferta ?? precioHash.precio ?? 0);
+          producto.precio = parseFloat(precioHash.precio ?? 0).toFixed(2);
+          producto.precio_oferta = precioHash.precio_oferta ? parseFloat(precioHash.precio_oferta).toFixed(2) : null;
+          producto.precio_sin_oferta = parseFloat(precioHash.precio_sin_oferta ?? precioHash.precio ?? 0).toFixed(2);
           producto.oferta = precioHash.oferta === 'true';
           producto.stock = parseInt(precioHash.existencia ?? 0);
         }
       } catch (_) { /* si falla obtener precio, devolver producto base */ }
-      
+
       return producto;
     } catch (error) {
       logger.error(`Error al consultar producto por referencia en Redis: ${error.message}`);
@@ -289,15 +380,15 @@ class ExelService {
       const saved = await this.saveBrandsRedis(marcas);
 
       return saved;
-    } catch(error) {
+    } catch (error) {
       logger.error(`Error al obtener las marcas de Exel del Norte: ${error.message}`);
       throw new Error("No se pudo obtener el catálogo de marcas externo");
     }
   }
 
-   /**
-   * Obtiene las marcas desde Redis.
-   */
+  /**
+  * Obtiene las marcas desde Redis.
+  */
   async getBrandsRedis() {
     const client = redisClient.getClient();
     const helper = new RedisHelper(client);
@@ -324,7 +415,7 @@ class ExelService {
     return categorias
   }
 
- 
+
 
   async getExternalImagenes(query) {
     try {
@@ -396,13 +487,14 @@ class ExelService {
     if (!client) return { total: 0, page, limit, totalPages: 0, datos: [] };
 
     let idsPagina;
+    let total;
 
     if (refs && refs.length > 0) {
-      // Referencias específicas — sin paginar
       idsPagina = refs;
+      total = refs.length;
     } else {
-      // Sin filtro — paginar el catálogo completo
       const allIds = await client.sMembers(idsSetKey);
+      total = allIds.length;
       const start = (page - 1) * limit;
       idsPagina = allIds.slice(start, start + limit);
     }
@@ -417,7 +509,7 @@ class ExelService {
       })
     );
 
-    return { datos };
+    return { total, page, limit, totalPages: Math.ceil(total / limit), datos };
   }
 
 
@@ -496,53 +588,54 @@ class ExelService {
     const client = await redisClient.getClient();
 
     if (!client) {
-        logger.warn("Redis no disponible, productos no guardados en redis");
-        return;
+      logger.warn("Redis no disponible, productos no guardados en redis");
+      return;
     }
 
     try {
-        const multi = client.multi();
+      const multi = client.multi();
 
-        for (const p of productos) {
-            if (!p.referencia) continue;
+      for (const p of productos) {
+        if (!p.referencia) continue;
 
-            multi.hSet(`producto:${p.referencia}`, {
-                referencia:   p.referencia ?? '',
-                sku:          String(p.sku ?? ''),
-                nombre:       p.nombre ?? '',
-                marca:        p.marca ?? '',
-                categoria:    p.categoria ?? '',
-                subcategoria: p.subcategoria ?? '',
-                codigoBarras: p.codigoBarras ?? '',
-                codigoSAT:    p.codigoSAT ?? '',
-            });
+        multi.hSet(`producto:${p.referencia}`, {
+          referencia: p.referencia ?? '',
+          sku: String(p.sku ?? ''),
+          nombre: p.nombre ?? '',
+          descripcion: p.descripcion ?? '',
+          marca: p.marca ?? '',
+          categoria: p.categoria ?? '',
+          subcategoria: p.subcategoria ?? '',
+          codigoBarras: p.codigoBarras ?? '',
+          codigoSAT: p.codigoSAT ?? '',
+        });
 
-            multi.sAdd('catalogo:referencias', p.referencia);
+        multi.sAdd('catalogo:referencias', p.referencia);
 
-            if (p.categoria) {
-                multi.sAdd(`indice:categoria:${p.categoria}`, p.referencia);
-            }
-            if (p.subcategoria) {
-                multi.sAdd(`indice:subcategoria:${p.subcategoria}`, p.referencia);
-            }
-            if (p.marca) {
-                multi.sAdd(`indice:marca:${p.marca}`, p.referencia);
-            }
-
-            // ← índice de stock
-            if (p.stock > 0) {
-                multi.sAdd('indice:stock:true', p.referencia);
-                multi.sRem('indice:stock:false', p.referencia); // limpia el contrario
-            } else {
-                multi.sAdd('indice:stock:false', p.referencia);
-                multi.sRem('indice:stock:true', p.referencia); // limpia el contrario
-            }
+        if (p.categoria) {
+          multi.sAdd(`indice:categoria:${p.categoria}`, p.referencia);
+        }
+        if (p.subcategoria) {
+          multi.sAdd(`indice:subcategoria:${p.subcategoria}`, p.referencia);
+        }
+        if (p.marca) {
+          multi.sAdd(`indice:marca:${p.marca}`, p.referencia);
         }
 
-        await multi.exec();
-        logger.info(`Se guardaron ${productos.length} productos en Redis`);
+        // ← índice de stock
+        if (p.stock > 0) {
+          multi.sAdd('indice:stock:true', p.referencia);
+          multi.sRem('indice:stock:false', p.referencia); // limpia el contrario
+        } else {
+          multi.sAdd('indice:stock:false', p.referencia);
+          multi.sRem('indice:stock:true', p.referencia); // limpia el contrario
+        }
+      }
+
+      await multi.exec();
+      logger.info(`Se guardaron ${productos.length} productos en Redis`);
     } catch (error) {
-        logger.error("Error al guardar productos en redis: " + error.message);
+      logger.error("Error al guardar productos en redis: " + error.message);
     }
   }
 
@@ -655,7 +748,7 @@ class ExelService {
         allKeysSet: 'catalogo:marcas',
         toHash: (m) => ({
           id_marca: String(m.id_marca ?? ''),
-          nombre_marca: String(m.nombre?? ''),
+          nombre_marca: String(m.nombre ?? ''),
         }),
         indices: [],
       })
@@ -737,7 +830,7 @@ class ExelService {
     });
   }
 
-  
+
   /**
    * Lee medidas paginadas desde Redis.
    */
@@ -813,7 +906,7 @@ class ExelService {
       keyPrefix: 'ficha_tecnica',
       id: referencia,
       fromJson: (parsed, id) => ({ referencia: id, fichaTecnica: parsed }),
-   })
+    })
     if (!data) {
       return null;
     }

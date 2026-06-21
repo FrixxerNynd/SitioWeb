@@ -16,14 +16,23 @@ class ExelController {
      */
     async getProductos(req, res, next) {
         try {
-            const {
-                categoria,
-                subcategoria,
-                marca,
-                stock,
-                pageSize = 50,
-                page
-            } = req.query;
+            const isPost = req.method === 'POST';
+
+            const categoria = isPost
+                ? (req.body.categoria ?? []).filter(v => v !== '')
+                : (req.query.categoria ? [req.query.categoria] : undefined);
+            const subcategoria = isPost
+                ? (req.body.subcategoria ?? []).filter(v => v !== '')
+                : (req.query.subcategoria ? [req.query.subcategoria] : undefined);
+            const marca = isPost
+                ? (req.body.marca ?? []).filter(v => v !== '')
+                : (req.query.marca ? [req.query.marca] : undefined);
+
+            const { stock, pageSize = 50, page } = req.query;
+
+            const searchTerm = isPost ? req.body.searchTerm : req.query.searchTerm;
+            const precioMin = isPost ? req.body.precioMin : req.query.precioMin;
+            const precioMax = isPost ? req.body.precioMax : req.query.precioMax;
 
             // ── Intento desde Redis ───────────────────────────────
             const redisResult = await exelService.getProductsRedis({
@@ -31,6 +40,9 @@ class ExelController {
                 subcategoria,
                 marca,
                 stock,
+                searchTerm,
+                precioMin,
+                precioMax,
                 pageSize: parseInt(pageSize),
                 page: parseInt(page),
             });
@@ -38,15 +50,13 @@ class ExelController {
             if (redisResult) {
                 return res.status(200).json({
                     success: true,
-                    source: 'redis',
-                    total: redisResult.total,
                     data: redisResult.productos,
-                    pageSize: parseInt(redisResult.pageSize),
-                    Pagina: parseInt(redisResult.page),
-                    Paginas: redisResult.totalPages,
+                    page: parseInt(redisResult.page),
+                    total_pages: redisResult.totalPages,
                 });
             }
 
+            return res.status(503).json({ success: false, message: 'Redis no está disponible' });
 
         } catch (error) {
             next(error);
@@ -91,14 +101,16 @@ class ExelController {
     async getImagenes(req, res, next) {
         try {
             const { page = 1, limit = 50, referencias, referencia } = req.query;
-            // Acepta tanto ?referencias=A,B,C como ?referencia=A
             const refsRaw = referencias || referencia;
             const refs = refsRaw ? refsRaw.split(',') : null;
 
-            console.log('refs parseadas:', refs);
-
-            const data = await exelService.getImagenesBatch({ page, limit, refs });
-            res.status(200).json({ success: true, data });
+            const result = await exelService.getImagenesBatch({ page, limit, refs });
+            res.status(200).json({
+                success: true,
+                data: result.datos,
+                page: result.page,
+                total_pages: result.totalPages,
+            });
         } catch (error) {
             next(error);
         }
@@ -216,7 +228,7 @@ class ExelController {
 
             return res.status(200).json({
                 success: true,
-                redis: {
+                data: {
                     conectado: true,
                     totalProductos,
                     indices: {
@@ -270,8 +282,13 @@ class ExelController {
     async getMedidas(req, res, next) {
         try {
             const { page = 1, limit = 50 } = req.query;
-            const data = await exelService.getMedidasRedis(parseInt(page), parseInt(limit));
-            res.status(200).json({ success: true, data });
+            const result = await exelService.getMedidasRedis(parseInt(page), parseInt(limit));
+            res.status(200).json({
+                success: true,
+                data: result.datos,
+                page: result.page,
+                total_pages: result.totalPages,
+            });
         } catch (error) {
             next(error);
         }
@@ -299,8 +316,13 @@ class ExelController {
     async getFichasTecnicas(req, res, next) {
         try {
             const { page = 1, limit = 50 } = req.query;
-            const data = await exelService.getFichasTecnicasRedis(parseInt(page), parseInt(limit));
-            res.status(200).json({ success: true, data });
+            const result = await exelService.getFichasTecnicasRedis(parseInt(page), parseInt(limit));
+            res.status(200).json({
+                success: true,
+                data: result.datos,
+                page: result.page,
+                total_pages: result.totalPages,
+            });
         } catch (error) {
             next(error);
         }
@@ -328,8 +350,13 @@ class ExelController {
     async getProductosEnOferta(req, res, next) {
         try {
             const { page = 1, limit = 50 } = req.query;
-            const data = await exelService.getProductosEnOferta(parseInt(page), parseInt(limit));
-            res.status(200).json({ success: true, data });
+            const result = await exelService.getProductosEnOferta(parseInt(page), parseInt(limit));
+            res.status(200).json({
+                success: true,
+                data: result.datos,
+                page: result.page,
+                total_pages: result.totalPages,
+            });
         } catch (error) {
             next(error);
         }
@@ -344,8 +371,13 @@ class ExelController {
     async getPrecios(req, res, next) {
         try {
             const { page = 1, limit = 50 } = req.query;
-            const data = await exelService.getPreciosStockRedis(parseInt(page), parseInt(limit));
-            res.status(200).json({ success: true, data });
+            const result = await exelService.getPreciosStockRedis(parseInt(page), parseInt(limit));
+            res.status(200).json({
+                success: true,
+                data: result.datos,
+                page: result.page,
+                total_pages: result.totalPages,
+            });
         } catch (error) {
             next(error);
         }
@@ -363,7 +395,7 @@ class ExelController {
             res.status(200).json({
                 success: true,
                 message: `Medidas sincronizadas: ${result?.saved ?? 0} guardadas, ${result?.skipped ?? 0} omitidas`,
-                ...result,
+                total: result?.total ?? 0,
             });
         } catch (error) {
             next(error);
@@ -380,7 +412,7 @@ class ExelController {
             res.status(200).json({
                 success: true,
                 message: `Fichas técnicas sincronizadas: ${result.total} obtenidas, ${result.saved} guardadas, ${result.skipped} omitidas`,
-                ...result,
+                total: result.total,
             });
         } catch (error) {
             next(error);

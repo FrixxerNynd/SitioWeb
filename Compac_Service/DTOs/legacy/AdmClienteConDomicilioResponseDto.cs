@@ -37,4 +37,12 @@ namespace back_cabs.CRM.DTOs.Legacy
         public string Telefono2 { get; set; } = string.Empty;
         public string TelefonoCompleto { get; set; } = string.Empty;
     }
+
+    public class CreditClientDto
+    {
+        public double LimiteCredito { get; set; } = 0;
+        public int LimiteDocs { get; set; }
+        public int DiasCredito { get; set; }
+        public int ExcederCredito {get; set; }
+    }
 }

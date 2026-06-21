@@ -66,10 +66,13 @@ export class PageDetalleProducto implements OnInit {
         this.product = {
           ...this.product,
           name: p.nombre,
+          description: p.descripcion,
           category: p.categoria_nombre || p.categoria_id || 'Sin categoría',
           price: Number(p.precio) || 0,
           originalPrice: Number(p.precio_sin_oferta) || Number(p.precio) || 0,
           stock: Number(p.stock) || 0,
+          satCode: p.codigoSat,
+          barCode: p.codigoBarras,
           sku: p.sku,
           reference: p.referencia,
           brand: p.marca_nombre || p.marca_id || '',
@@ -96,6 +99,7 @@ export class PageDetalleProducto implements OnInit {
           };
         }
         this.selectedImage = this.product.images[0];
+        console.log(this.product);
       } else {
         console.warn('No se encontró el producto o la respuesta fue vacía.');
         this.product.name = 'Producto no encontrado';

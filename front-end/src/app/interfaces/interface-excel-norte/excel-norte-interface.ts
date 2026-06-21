@@ -11,6 +11,9 @@ export interface IProduct {
     referencia: string;
     sku: string;
     nombre: string;
+    descripcion: string;
+    codigoSat: string;
+    codigoBarras: string;
     stock: string;
     precio: string;
     precio_oferta: string | null;
@@ -25,14 +28,6 @@ export interface IProduct {
     categoria_nombre: string;
     imagenes?: string[];       
     imagen_principal?: string | null;    
-}
-
-export interface IImagenProducto {
-    id: string;
-    producto_id: string;
-    url: string;
-    principal: boolean;
-    orden: number;
 }
 
 export interface IBrand {
@@ -54,27 +49,3 @@ export interface ISubcategory {
     nombre_categoria?: string;
 }
 
-export interface IApiResponse<T> {
-    data: any;
-    resultado: boolean;
-    mensaje: string;
-    datos: T;
-}
-
-export interface IApiBrandsResponse {
-    resultado: boolean;
-    mensaje: string;
-    datos: IBrand[];
-}
-
-export interface IApiCategoriesResponse {
-    resultado: boolean;
-    mensaje: string;
-    datos: ICategory[];
-}
-
-export interface IApiSubcategoriesResponse {
-    resultado: boolean;
-    mensaje: string;
-    datos: ISubcategory[];
-}

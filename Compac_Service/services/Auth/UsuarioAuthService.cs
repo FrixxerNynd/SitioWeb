@@ -22,7 +22,7 @@ using back_cabs.CRM.contexts;
 using back_cabs.CRM.Interfaces.Auth;
 using CRM.DTOs.Request;
 using CRM.DTOs.Response;
-using back_cabs.CRM.DTOs.Response;
+using back_cabs.CRM.DTOs.ServiceResponse;
 using back_cabs.CRM.models.Auth;
 using back_cabs.CRM.validators.Auth;
 using back_cabs.CRM.Middleware;
@@ -128,6 +128,7 @@ namespace back_cabs.CRM.services.Auth
                     Email = request.Email.ToLower().Trim(),
                     Password = contrasenaHash, // Guardar el hash en password_hash
                     Activo = request.Activo ?? false, // Si no se envía, por defecto false
+                    Rol = "USUARIO",
                     CreadoEn = DateTime.UtcNow,
                     ActualizadoEn = DateTime.UtcNow,
                     IdAgenteLegacy = cliente.Id, // Asociar con el cliente registrado
@@ -286,7 +287,7 @@ namespace back_cabs.CRM.services.Auth
                         Nombre = clienteLegacy.CRazonSocial,
                         Apellido = "", // No hay campo de apellido en cliente legacy, se puede ajustar según necesidad
                         Email = clienteLegacy.CEmail1,
-                        Rol = "CLIENTE_LEGACY",
+                        Rol = "CLIENTE",
                         IdAgenteLegacy = clienteLegacy.CIdClienteProveedor,
                     };
                     _logger.LogInformation($"Credenciales válidas para cliente legacy: {email}");

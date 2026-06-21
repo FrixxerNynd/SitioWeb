@@ -86,6 +86,88 @@ const exelRouter = Router();
 exelRouter.get('/', exelController.getProductos.bind(exelController));
 /**
  * @swagger
+ * /api/productos:
+ *   post:
+ *     summary: Listar productos del catálogo con filtros múltiples
+ *     description: |
+ *       Versión POST que acepta arrays de categoría, subcategoría y marca en el body.
+ *       Útil para evitar URLs demasiado largas con muchos filtros.
+ *       La paginación y el filtro de stock van como query params.
+ *     tags: [Productos]
+ *     parameters:
+ *       - in: query
+ *         name: stock
+ *         schema:
+ *           type: string
+ *         description: true si tiene stock, false si no tiene
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *         description: Número de resultados por página
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Número de página
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               categoria:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: IDs de categoría para filtrar (OR entre sí)
+ *               subcategoria:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: IDs de subcategoría para filtrar (OR entre sí)
+ *               marca:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: IDs de marca para filtrar (OR entre sí)
+ *               searchTerm:
+ *                 type: string
+ *                 description: Término de búsqueda por nombre o SKU
+ *               precioMin:
+ *                 type: number
+ *                 description: Precio mínimo (filtro inclusivo)
+ *               precioMax:
+ *                 type: number
+ *                 description: Precio máximo (filtro inclusivo)
+ *     responses:
+ *       200:
+ *         description: Productos obtenidos exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 source:
+ *                   type: string
+ *                   enum: [redis, api]
+ *                 total:
+ *                   type: integer
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       500:
+ *         description: Error interno del servidor
+ */
+exelRouter.post('/', exelController.getProductos.bind(exelController));
+/**
+ * @swagger
  * /api/productos/categorias:
  *   get:
  *     summary: Listar categorías del catálogo

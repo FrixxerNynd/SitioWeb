@@ -1,4 +1,4 @@
-using back_cabs.CRM.DTOs.Response;
+using back_cabs.CRM.DTOs.ServiceResponse;
 using back_cabs.CRM.models.Auth;
 using System.Threading.Tasks;
 

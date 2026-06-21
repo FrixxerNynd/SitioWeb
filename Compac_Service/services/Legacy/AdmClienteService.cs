@@ -382,6 +382,37 @@ namespace back_cabs.CRM.services.Legacy
                 throw;
             }
         }
+        
+        /// <summary>
+        /// Obtener credito y estado de credito del cliente
+        /// </summary>
+        public async Task<CreditClientDto?> GetCreditByIdAsync(int idCliente)
+        {
+            try
+            {
+                _logger.LogInformation("🔍 Obteniendo cliente {IdCliente}", idCliente);
+
+                var cliente = await _repository.GetByIdWithDomicilioAsync(idCliente);
+                if (cliente == null)
+                {
+                    _logger.LogWarning("⚠️ Cliente {IdCliente} no encontrado", idCliente);
+                    return null;
+                }
+                
+                return new CreditClientDto
+                {
+                    LimiteCredito = cliente.CLimiteCreditoCliente,
+                    LimiteDocs = cliente.CLimDoctos,
+                    DiasCredito = cliente.CDiasCreditoCliente,
+                    ExcederCredito = cliente.CBanExcederCredito
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error al obtener cliente {IdCliente}", idCliente);
+                throw;
+            }
+        }
 
         public async Task<AdmCliente?> ValidateCredentialsAsync(string email, string contrasena)
         {

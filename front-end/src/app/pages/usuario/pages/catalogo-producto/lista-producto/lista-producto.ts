@@ -26,9 +26,8 @@ export class PageListaProducto implements OnInit {
   private catalogoService = inject(ExcelNorteCatalogoService);
 
   // ========== SEÑALES ==========
-  allProducts = signal<IProduct[]>([]);
-  displayedProducts = signal<IProduct[]>([]);
-  totalProductosBackend = signal(0);
+  currentProducts = signal<IProduct[]>([]);
+  totalResults = signal(0);
   mostrarModalFiltros = signal(false);
 
   brands = signal<IBrand[]>([]);
@@ -84,44 +83,10 @@ export class PageListaProducto implements OnInit {
 
   // ========== SEÑALES COMPUTADAS ==========
 
-  filteredProducts = computed(() => {
-    let result = this.allProducts();
-
-    const term = this.activeSearchTerm().toLowerCase();
-    if (term) {
-      result = result.filter(
-        (p) => p.nombre.toLowerCase().includes(term) || p.sku.toLowerCase().includes(term),
-      );
-    }
-
-    const selectedBrandsSet = this.activeSelectedBrands();
-    if (selectedBrandsSet.size > 0) {
-      result = result.filter((p) => selectedBrandsSet.has(p.marca_id));
-    }
-
-    const selectedCategoriesSet = this.activeSelectedCategories();
-    if (selectedCategoriesSet.size > 0) {
-      result = result.filter((p) => selectedCategoriesSet.has(p.categoria_id));
-    }
-
-    const min = this.activePrecioMinimo();
-    const max = this.activePrecioMaximo();
-    result = result.filter((p) => {
-      const precio = parseFloat(p.precio);
-      return precio >= min && precio <= max;
-    });
-
-    return result;
-  });
-
-  paginatedProducts = computed(() => {
-    const start = (this.currentPage() - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    return this.filteredProducts().slice(start, end);
-  });
-
-  totalResultados = computed(() => this.filteredProducts().length);
-  totalPagesCalculated = computed(() => Math.ceil(this.totalProductosBackend() / this.pageSize));
+  filteredProducts = computed(() => this.currentProducts());
+  paginatedProducts = computed(() => this.currentProducts());
+  totalResultados = computed(() => this.totalResults());
+  totalPagesCalculated = computed(() => Math.ceil(this.totalResults() / this.pageSize));
 
   hasActiveFilters = computed(() => {
     return (
@@ -233,12 +198,12 @@ export class PageListaProducto implements OnInit {
 
   // ========== OTROS MÉTODOS ==========
 
-  getProductCountByCategory(categoryId: string): number {
-    return this.allProducts().filter((p) => p.categoria_id === categoryId).length;
+  getProductCountByCategory(_categoryId: string): number {
+    return 0;
   }
 
-  getProductCountByBrand(brandId: string): number {
-    return this.allProducts().filter((p) => p.marca_id === brandId).length;
+  getProductCountByBrand(_brandId: string): number {
+    return 0;
   }
 
   isCategorySelected(categoryId: string): boolean {
@@ -255,16 +220,9 @@ export class PageListaProducto implements OnInit {
     this.cargandoDatos();
   }
 
-  calcularRangoPrecios(products: IProduct[]) {
-    if (products.length === 0) return;
-
-    const precios = products.map((p) => parseFloat(p.precio)).filter((p) => !isNaN(p));
-    if (precios.length > 0) {
-      this.rangoMinimoAbsoluto = Math.min(...precios);
-      this.rangoMaximoAbsoluto = Math.max(...precios);
-      this.tempPrecioMinimo.set(this.rangoMinimoAbsoluto);
-      this.tempPrecioMaximo.set(this.rangoMaximoAbsoluto);
-    }
+  calcularRangoPrecios() {
+    this.tempPrecioMinimo.set(this.rangoMinimoAbsoluto);
+    this.tempPrecioMaximo.set(this.rangoMaximoAbsoluto);
   }
 
   toggleBrand(brandId: string) {
@@ -294,7 +252,8 @@ export class PageListaProducto implements OnInit {
   }
 
   onStockChange() {
-    this.cargandoDatos();
+    const filters = this.buildActiveFilters();
+    this.cargandoDatos(filters);
   }
 
   actualizarRangoMinimo() {
@@ -343,6 +302,28 @@ export class PageListaProducto implements OnInit {
     return this.catalogoService.formatPrice(price);
   }
 
+  private buildActiveFilters(): { categoria?: string[]; subcategoria?: string[]; marca?: string[]; searchTerm?: string; precioMin?: number; precioMax?: number } | undefined {
+    const cats = Array.from(this.activeSelectedCategories());
+    const brands = Array.from(this.activeSelectedBrands());
+    const search = this.activeSearchTerm();
+    const min = this.activePrecioMinimo();
+    const max = this.activePrecioMaximo();
+    const minAbs = this.rangoMinimoAbsoluto;
+    const maxAbs = this.rangoMaximoAbsoluto;
+
+    if (cats.length === 0 && brands.length === 0 && !search && min <= minAbs && max >= maxAbs) {
+      return undefined;
+    }
+
+    const filters: any = {};
+    if (cats.length > 0) filters.categoria = cats;
+    if (brands.length > 0) filters.marca = brands;
+    if (search) filters.searchTerm = search;
+    if (min > minAbs) filters.precioMin = min;
+    if (max < maxAbs) filters.precioMax = max;
+    return filters;
+  }
+
   aplicarFiltros() {
     this.activeSelectedBrands.set(new Set(this.tempSelectedBrands()));
     this.activeSelectedCategories.set(new Set(this.tempSelectedCategories()));
@@ -351,7 +332,14 @@ export class PageListaProducto implements OnInit {
     this.activePrecioMaximo.set(this.tempPrecioMaximo());
     this.currentPage.set(1);
 
-    console.log('🔍 Filtros aplicados');
+    const filters = this.buildActiveFilters();
+    console.log('🔍 Filtros aplicados', filters);
+    this.cargandoDatos(filters);
+  }
+
+  aplicarFiltrosDesdeModal() {
+    this.aplicarFiltros();
+    this.cerrarModalFiltros();
   }
 
   // Método para eliminar un filtro específico
@@ -409,28 +397,29 @@ export class PageListaProducto implements OnInit {
     this.currentPage.set(1);
     this.actualizarFondoRango();
     console.log('🧹 Filtros limpiados');
+    this.cargandoDatos();
   }
 
-  nextPage() {
+  async nextPage() {
     if (this.currentPage() < this.totalPagesCalculated()) {
       this.currentPage.update((p) => p + 1);
-      this.cargarImagenesPaginaActual();
+      await this.fetchCurrentPage();
       document.querySelector('.productos-grid')?.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
-  prevPage() {
+  async prevPage() {
     if (this.currentPage() > 1) {
       this.currentPage.update((p) => p - 1);
-      this.cargarImagenesPaginaActual();
+      await this.fetchCurrentPage();
       document.querySelector('.productos-grid')?.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
-  goToPage(page: number) {
+  async goToPage(page: number) {
     if (page >= 1 && page <= this.totalPagesCalculated()) {
       this.currentPage.set(page);
-      this.cargarImagenesPaginaActual();
+      await this.fetchCurrentPage();
       document.querySelector('.productos-grid')?.scrollIntoView({ behavior: 'smooth' });
     }
   }
@@ -515,8 +504,35 @@ export class PageListaProducto implements OnInit {
     return product.precio_oferta || product.precio;
   }
 
-  // METODO PARA CARGAR DATOS (CATEGORIAS, MARCAS Y PRODUCTOS)
-  async cargandoDatos() {
+  // ── Cargar página actual desde el backend ──────────────────────────
+  private async fetchPage(p: number) {
+    const filters = this.buildActiveFilters();
+    const hasFilters = filters && (
+      !!filters.categoria?.length || !!filters.subcategoria?.length || !!filters.marca?.length ||
+      !!filters.searchTerm || filters.precioMin !== undefined || filters.precioMax !== undefined
+    );
+
+    return hasFilters
+      ? this.catalogoService.getFilteredProducts(filters!, p, this.pageSize, this.stock, false)
+      : this.catalogoService.getAllProducts(false, p, this.pageSize, this.stock);
+  }
+
+  private async fetchCurrentPage() {
+    this.isLoading.set(true);
+    try {
+      const response = await this.fetchPage(this.currentPage());
+      this.currentProducts.set(response.productos);
+      this.totalResults.set(response.total);
+      this.cargarImagenesPaginaActual();
+    } catch (error) {
+      console.error('Error al obtener página:', error);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  // CARGA INICIAL (categorías, marcas y primera página)
+  async cargandoDatos(filters?: { categoria?: string[]; subcategoria?: string[]; marca?: string[]; searchTerm?: string; precioMin?: number; precioMax?: number }) {
     this.isLoading.set(true);
     try {
       const [categorias, marcas] = await Promise.all([
@@ -527,46 +543,18 @@ export class PageListaProducto implements OnInit {
       this.categories.set(categorias);
       this.brands.set(marcas);
 
-      // ── Cargar primera página para saber el total ──────────────────
-
-      const PAGE_SIZE = 500;
-      const primeraRespuesta = await this.catalogoService.getAllProducts(
-        false,
-        1,
-        PAGE_SIZE,
-        this.stock,
-      );
-      this.totalProductosBackend.set(primeraRespuesta.total);
-      let todosLosProductos: IProduct[] = [...primeraRespuesta.productos];
-      const totalPaginas = primeraRespuesta.totalPages;
-
-      console.log(`📦 Página 1/${totalPaginas} cargada — ${todosLosProductos.length} productos`);
-
-      // ── Cargar el resto en lotes de 5 páginas ──────────────────────
-      if (totalPaginas > 1) {
-        const BATCH_SIZE = 5;
-        const paginas = Array.from({ length: totalPaginas - 1 }, (_, i) => i + 2);
-
-        for (let i = 0; i < paginas.length; i += BATCH_SIZE) {
-          const lote = paginas.slice(i, i + BATCH_SIZE);
-          const respuestas = await Promise.all(
-            lote.map((p) => this.catalogoService.getAllProducts(false, p, PAGE_SIZE, this.stock)),
-          );
-          respuestas.forEach((r) => todosLosProductos.push(...r.productos));
-          console.log(
-            `📦 Lote cargado — ${todosLosProductos.length}/${primeraRespuesta.total} productos`,
-          );
-        }
+      // Sincronizar filtros activos desde temp si no hay filtros externos
+      if (!filters) {
+        this.activeSelectedBrands.set(new Set(this.tempSelectedBrands()));
+        this.activeSelectedCategories.set(new Set(this.tempSelectedCategories()));
+        this.activeSearchTerm.set(this.tempSearchTerm());
+        this.activePrecioMinimo.set(this.tempPrecioMinimo());
+        this.activePrecioMaximo.set(this.tempPrecioMaximo());
       }
 
-      console.log(`✅ Total productos cargados: ${todosLosProductos.length}`);
-      this.allProducts.set(todosLosProductos);
-
-      this.calcularRangoPrecios(todosLosProductos);
-      this.tempPrecioMinimo.set(this.rangoMinimoAbsoluto);
-      this.tempPrecioMaximo.set(this.rangoMaximoAbsoluto);
-      this.aplicarFiltros();
-      this.cargarImagenesPaginaActual();
+      this.calcularRangoPrecios();
+      this.currentPage.set(1);
+      await this.fetchCurrentPage();
     } catch (error) {
       console.error('Error al cargar los datos:', error);
     } finally {
@@ -584,10 +572,6 @@ export class PageListaProducto implements OnInit {
     document.body.style.overflow = '';
   }
 
-  aplicarFiltrosDesdeModal() {
-    this.aplicarFiltros();
-    this.cerrarModalFiltros();
-  }
   async cargarImagenesPaginaActual() {
     const productosVisibles = this.paginatedProducts();
     const referencias = productosVisibles
@@ -603,23 +587,7 @@ export class PageListaProducto implements OnInit {
       this.catalogoService.getImagenesMultiplesProductos(referencias),
     ]);
 
-    this.allProducts.update((productos) =>
-      productos.map((p) => {
-        const clave = p.referencia || p.sku;
-        if (clave && referencias.includes(clave)) {
-          return {
-            ...p,
-            imagen_principal: imagenesPrincipales.get(clave) || null,
-            imagenes: todasImagenes.get(clave) || [],
-          };
-        }
-        return p;
-      }),
-    );
-
-    // IMPORTANTE: También debemos actualizar displayedProducts porque es una señal independiente (no es computed)
-    // Si no la actualizamos, la vista de la página no se refresca con las imágenes cargadas.
-    this.displayedProducts.update((productos) =>
+    this.currentProducts.update((productos) =>
       productos.map((p) => {
         const clave = p.referencia || p.sku;
         if (clave && referencias.includes(clave)) {

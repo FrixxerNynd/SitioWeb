@@ -29,7 +29,13 @@ namespace back_cabs.CRM.Interfaces.Legacy
         /// Obtener cliente por ID con domicilio
         /// </summary>
         Task<AdmClienteConDomicilioResponseDto?> GetByIdAsync(int idCliente, bool incluirDetalleUbicacion = true);
-
+        
+        /// <summary>
+        /// Obtener el credito de un cliente por id
+        /// </summary>
+        /// <param name="idCliente"></param>
+        /// <returns></returns>
+        Task<CreditClientDto?> GetCreditByIdAsync(int idCliente);
         ///<summary>
         /// Registrar un cliente nuevo
         /// </summary>
