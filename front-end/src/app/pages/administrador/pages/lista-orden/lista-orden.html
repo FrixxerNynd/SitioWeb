@@ -46,6 +46,13 @@
                 [(ngModel)]="filtroFechaFin" />
             </div>
 
+            <div class="col-12 col-md-2">
+              <label class="form-label text-sm font-semibold text-gray-600 mb-1">Usuario ID</label>
+              <input type="text"
+                class="form-control h-10 rounded-md border-gray-300 text-sm focus:ring-2 focus:ring-[#1e3a5f]"
+                placeholder="Filtrar por userId" [(ngModel)]="filtroUserId" />
+            </div>
+
             <!-- Botones -->
             <div class="col-12 col-md-2">
               <div class="d-flex gap-2">
@@ -201,10 +208,18 @@
                   </span>
                 </td>
                 <td class="p-4 text-end">
-                  <button class="text-gray-600 hover:text-[#1e3a5f] transition-colors p-1"
-                    (click)="verDetalleOrden(orden)">
-                    <app-ui-icono name="eye" size="h-5 w-5"></app-ui-icono>
-                  </button>
+                  <div class="flex items-center justify-end gap-1">
+                    <button class="text-gray-600 hover:text-[#1e3a5f] transition-colors p-1"
+                      (click)="verDetalleOrden(orden)">
+                      <app-ui-icono name="eye" size="h-5 w-5"></app-ui-icono>
+                    </button>
+                    @if (orden.estado === 'Procesando') {
+                    <button class="text-red-500 hover:text-red-700 transition-colors p-1 disabled:opacity-40"
+                      [disabled]="cancelandoId === orden.apiId" (click)="cancelarOrden(orden)">
+                      <app-ui-icono name="x-mark" size="h-5 w-5"></app-ui-icono>
+                    </button>
+                    }
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -262,6 +277,7 @@
 <modal-detalles-orden
   [orden]="ordenSeleccionada" 
   [(visible)]="modalVisible" 
-  (cerrar)="cerrarModal()">
+  (cerrar)="cerrarModal()"
+  (cancelar)="cancelarOrden($event)">
 </modal-detalles-orden>
 }

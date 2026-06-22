@@ -27,14 +27,14 @@ app.use(helmet());
 const corsOptions = {
     origin: function (origin, callback) {
         // Permitir solicitudes sin origen (como Postman) o desde localhost:4200
-        if (!origin || origin === 'http://localhost:4200' || origin === 'https://localhost:4200') {
+        if (!origin || origin === 'http://localhost:4200' || origin === 'https://localhost:4200' || origin === 'http://localhost:4205' || origin === 'https://localhost:4205' || origin === '*') {
             callback(null, true);
         } else {
             callback(new Error('No permitido por CORS'));
         }
     },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'X-Content-Type-Options', 'X-Frame-Options', 'x-xsrf-token', 'X-DNS-Prefetch-Control', 'X-Download-Options', 'X-Permitted-Cross-Domain-Policies', 'X-XSS-Protection', 'Referrer-Policy', 'Authorization', 'Cookie', 'X-Requested-With', 'Referrer-Policy', 'Sec-Fetch-Site', 'Sec-Fetch-Mode', 'Sec-Fetch-Dest'],
     credentials: true, // ← Necesario para cookies HttpOnly
     optionsSuccessStatus: 200
 };

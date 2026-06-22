@@ -17,6 +17,7 @@ const MAPPED_STATUS: Record<string, string> = {
 
 const mapOrder = (o: Order) => ({
   id: `ORD-${String(o.id).padStart(3, '0')}`,
+  apiId: o.id,
   fecha: o.fechaPedido.slice(0, 10),
   estado: MAPPED_STATUS[o.estado] ?? o.estado,
   tipoPago: o.metodoPago,
@@ -48,6 +49,7 @@ export class PageListaOrdenAdministrador implements OnInit {
   filtroEstatus: string = '';
   filtroFechaInicio: string = '';
   filtroFechaFin: string = '';
+  filtroUserId: string = '';
 
   // Estadísticas
   totalGastado: number = 0;
@@ -62,6 +64,7 @@ export class PageListaOrdenAdministrador implements OnInit {
 
   // Estado skeleton
   loadingData: boolean = true;
+  cancelandoId: number | null = null;
 
   // Datos
   ordenesFiltradas: any[] = [];
@@ -119,7 +122,7 @@ export class PageListaOrdenAdministrador implements OnInit {
 
   buscarOrdenes() {
     this.paginaActual = 1;
-    
+
     this.ordenesFiltradas = this.ordenesOriginales.filter((orden) => {
       const coincideId = this.filtroId
         ? orden.id.toLowerCase().includes(this.filtroId.toLowerCase())
@@ -137,7 +140,11 @@ export class PageListaOrdenAdministrador implements OnInit {
         ? orden.fecha <= this.filtroFechaFin
         : true;
 
-      return coincideId && coincideEstatus && coincideFechaInicio && coincideFechaFin;
+      const coincideUserId = this.filtroUserId
+        ? String(orden.apiId).includes(this.filtroUserId)
+        : true;
+
+      return coincideId && coincideEstatus && coincideFechaInicio && coincideFechaFin && coincideUserId;
     });
 
     this.calcularEstadisticas();
@@ -154,20 +161,20 @@ export class PageListaOrdenAdministrador implements OnInit {
   // ==================== ESTADÍSTICAS ====================
 
   calcularEstadisticas() {
-    this.totalGastado = this.ordenesFiltradas.reduce(
-      (sum, orden) => sum + orden.total,
-      0
+    const activas = this.ordenesFiltradas.filter(
+      (o) => o.estado !== 'Cancelada',
     );
 
+    this.totalGastado = activas.reduce((sum, orden) => sum + orden.total, 0);
     this.totalOrdenes = this.ordenesFiltradas.length;
 
-    this.ordenesProcesando = this.ordenesFiltradas.filter(
-      (orden) => orden.estado === 'Procesando'
+    this.ordenesProcesando = activas.filter(
+      (orden) => orden.estado === 'Procesando',
     ).length;
 
     const limiteCredito = 50000;
     this.creditoDisponible = limiteCredito - this.totalGastado;
-    
+
     if (this.creditoDisponible < 0) this.creditoDisponible = 0;
   }
 
@@ -189,6 +196,22 @@ export class PageListaOrdenAdministrador implements OnInit {
     const select = event.target as HTMLSelectElement;
     this.filasPorPagina = Number(select.value);
     this.paginaActual = 1;
+  }
+
+  // ==================== CANCELAR ORDEN ====================
+
+  async cancelarOrden(orden: any) {
+    if (!orden.apiId) return;
+    this.cancelandoId = orden.apiId;
+    try {
+      const result = await this.ordenService.updateStatus(orden.apiId, 'CANCELADO');
+      if (result) {
+        orden.estado = 'Cancelada';
+        this.calcularEstadisticas();
+      }
+    } finally {
+      this.cancelandoId = null;
+    }
   }
 
   // ==================== MODAL DETALLES ====================

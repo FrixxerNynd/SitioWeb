@@ -41,6 +41,7 @@ class OrderResponseDto {
    */
   constructor(data = {}) {
     this.id              = data.id              ?? 0;
+    this.userId          = data.userId          ?? 0;
     this.estado          = data.estado          ?? '';
     this.fechaPedido     = data.fechaPedido ? new Date(data.fechaPedido) : new Date();
     this.metodoPago      = data.metodoPago      ?? '';

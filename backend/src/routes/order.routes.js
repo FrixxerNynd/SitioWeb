@@ -4,9 +4,6 @@ import { validateToken } from "../middlewares/JWTValidator.js";
 
 const orderRouter = Router();
 
-// Todas las rutas de órdenes requieren autenticación
-orderRouter.use(validateToken);
-
 // ═══════════════════════════════════════════════════════════
 //  RUTAS - Endpoints de Órdenes de Venta con JSDoc Swagger
 // ═══════════════════════════════════════════════════════════
@@ -111,7 +108,37 @@ orderRouter.use(validateToken);
  *       500:
  *         description: Error interno del servidor
  */
-orderRouter.get("/", orderController.getOrders.bind(orderController));
+orderRouter.get("/", validateToken, orderController.getOrders.bind(orderController));
+
+/**
+ * @swagger
+ * /api/orders/all:
+ *   get:
+ *     summary: Listar TODAS las órdenes registradas (sin filtro por usuario)
+ *     tags: [Órdenes]
+ *     security:
+ *       - cokieAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista completa de órdenes obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/OrderResponse'
+ *       401:
+ *         description: Token inválido o no proporcionado
+ *       500:
+ *         description: Error interno del servidor
+ */
+orderRouter.get("/all", orderController.getAllOrders.bind(orderController));
 
 /**
  * @swagger
@@ -141,7 +168,7 @@ orderRouter.get("/", orderController.getOrders.bind(orderController));
  *       500:
  *         description: Error interno del servidor
  */
-orderRouter.post("/checkout", orderController.checkout.bind(orderController));
+orderRouter.post("/checkout", validateToken, orderController.checkout.bind(orderController));
 
 /**
  * @swagger
@@ -170,6 +197,7 @@ orderRouter.post("/checkout", orderController.checkout.bind(orderController));
  */
 orderRouter.get(
   "/summary/total",
+  validateToken,
   orderController.getExistingOrders.bind(orderController),
 );
 
@@ -208,7 +236,7 @@ orderRouter.get(
  *       500:
  *         description: Error interno del servidor
  */
-orderRouter.get("/:id", orderController.getOrderById.bind(orderController));
+orderRouter.get("/:id", validateToken, orderController.getOrderById.bind(orderController));
 
 /**
  * @swagger
@@ -289,6 +317,6 @@ orderRouter.patch(
  *       500:
  *         description: Error interno del servidor
  */
-orderRouter.delete("/:id", orderController.deleteOrder.bind(orderController));
+orderRouter.delete("/:id", validateToken, orderController.deleteOrder.bind(orderController));
 
 export default orderRouter;

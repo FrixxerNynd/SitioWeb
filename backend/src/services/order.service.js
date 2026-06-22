@@ -17,6 +17,7 @@ const toResponseDto = (order) => {
 
   return new OrderResponseDto({
     id: order.id,
+    userId: order.userId,
     estado: order.status ?? "",
     fechaPedido: order.createdAt ?? new Date(),
     metodoPago: order.paymentType ?? "",
@@ -45,6 +46,16 @@ class OrderService {
   async getOrders(userId) {
     const orders = await prisma.order.findMany({
       where: { userId: parseInt(userId) },
+      include: { items: true },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return orders.map(toResponseDto);
+  }
+
+  // ─── READ - Listar TODOS los pedidos (sin importar el usuario) ───
+  async getAllOrders() {
+    const orders = await prisma.order.findMany({
       include: { items: true },
       orderBy: { createdAt: "desc" },
     });
@@ -120,6 +131,7 @@ class OrderService {
       "EN_CAMINO",
       "ENTREGADO",
       "CANCELADO",
+      "RECHAZADO",
     ];
 
     if (!ESTADOS_VALIDOS.includes(status)) {
@@ -135,7 +147,7 @@ class OrderService {
 
     if (!order) throw new Error("El pedido no existe.");
 
-    if (order.userId !== parseInt(userId))
+    if (userId && order.userId !== parseInt(userId))
       throw new Error("No tienes permiso para modificar este pedido.");
 
     const updated = await prisma.order.update({

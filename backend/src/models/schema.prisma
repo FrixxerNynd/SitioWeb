@@ -540,3 +540,10 @@ model UserAddress {
 
   @@map("UserAddress")
 }
+
+model Percentages {
+  id              Int    @id @default(autoincrement())
+  id_categoria    String @unique @db.VarChar(50)
+  nombre_categoria String @db.VarChar(100)
+  porcentaje      Float  @default(0)
+}

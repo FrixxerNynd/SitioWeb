@@ -15,6 +15,7 @@ export class ModalDetallesOrdenComponent implements OnChanges {
   @Input() visible: boolean = false;
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() cerrar = new EventEmitter<void>();
+  @Output() cancelar = new EventEmitter<any>();
 
   // Signals internas
   ordenData = signal<any>(null);
@@ -76,5 +77,10 @@ export class ModalDetallesOrdenComponent implements OnChanges {
   cerrarPanel() {
     this.visibleChange.emit(false);
     this.cerrar.emit();
+  }
+
+  cancelarOrden() {
+    this.cancelar.emit(this.ordenData());
+    this.cerrarPanel();
   }
 }

@@ -36,13 +36,14 @@ class OrderController {
     }
   }
 
-  // PATCH /api/orders/:id/status
+  // PATCH /api/orders/:id/status (público, sin auth)
   async updateOrderStatus(req, res, next) {
     try {
+      const { userId, status } = req.body;
       const result = await orderService.updateOrderStatus(
-        getUserId(req),
+        userId ? parseInt(userId) : null,
         parseInt(req.params.id),
-        req.body.status,
+        status,
       );
       res.status(200).json({ success: true, data: result });
     } catch (error) {
@@ -76,6 +77,16 @@ class OrderController {
   async getExistingOrders(req, res, next) {
     try {
       const result = await orderService.getExistingOrders(getUserId(req));
+      res.status(200).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // GET /api/orders/all — Todas las órdenes (sin filtro por usuario)
+  async getAllOrders(req, res, next) {
+    try {
+      const result = await orderService.getAllOrders();
       res.status(200).json({ success: true, data: result });
     } catch (error) {
       next(error);
