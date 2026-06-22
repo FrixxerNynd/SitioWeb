@@ -18,7 +18,7 @@ import { PagueListaUsuario } from './pages/administrador/pages/lista-usuario/lis
 import { PagueConfiguracionMargenes } from './pages/administrador/pages/configuracion-margenes/configuracion-margenes';
 import { PageListaOrdenAdministrador } from './pages/administrador/pages/lista-orden/lista-orden';
 import { PageOrdenCompra } from './pages/shared/orden-compra/orden-compra';
-//import { AuthGuard } from './guards/auth.guard'; 
+import { AuthGuard } from './guards/auth.guard'; 
 
 export const routes: Routes = [
     {
@@ -51,7 +51,7 @@ export const routes: Routes = [
     {
         path: '',
         component: MainLayout,
-        // canActivate: [AuthGuard],
+        canActivate: [AuthGuard],
         children: [
             {
                 path: 'catalogo-producto',
@@ -88,5 +88,6 @@ export const routes: Routes = [
             }
         ]
     },
-    ///  { path: '**', redirectTo: '/inicio-sesion' }
+    
+    { path: '**', redirectTo: '/inicio-sesion' }
 ];
