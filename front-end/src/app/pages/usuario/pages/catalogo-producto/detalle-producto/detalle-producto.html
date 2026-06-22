@@ -10,7 +10,9 @@
                 </div>
                 <div class="flex flex-wrap gap-3 w-full">
                     @for (item of [1,2,3,4]; track item) {
-                    <div class="w-[calc(25%-0.75rem)] sm:w-[calc(20%-0.75rem)] md:w-[calc(16.666%-0.75rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.75rem)] aspect-square rounded-2xl skeleton"></div>
+                    <div
+                        class="w-[calc(25%-0.75rem)] sm:w-[calc(20%-0.75rem)] md:w-[calc(16.666%-0.75rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.75rem)] aspect-square rounded-2xl skeleton">
+                    </div>
                     }
                 </div>
             </div>
@@ -81,7 +83,7 @@
             </div>
         </div>
         } @else {
-        <!-- CONTENIDO REAL -->
+        <!-- Datos -->
         <div class="flex flex-col lg:flex-row">
             <!-- Contenedor izquierdo - Imágenes -->
             <div class="lg:w-1/2 p-4 md:p-6">
@@ -120,6 +122,12 @@
                 </div>
 
                 <div class="flex flex-col gap-2">
+                    <!-- Mensaje informativo -->
+                    <div class=" bg-blue-50 text-blue-800 font-medium p-3 rounded-md flex gap-2 items-start"
+                        style="border: 1px solid #193cb8 ">
+                        <app-ui-icono name="information-circle" size="h-6 w-6" color="text-blue-800"></app-ui-icono>
+                        <span>Los precios y existencia están sujetos a cambios sin previo aviso.</span>
+                    </div>
                     <p class="text-gray-600 text-sm font-medium">{{ product.description }}</p>
                     <span class="text-sm text-gray-500 font-semibold"> + IVA incluido</span>
                 </div>
@@ -136,13 +144,10 @@
 
                 <!-- Contenedor de botones -->
                 <div class="flex flex-col gap-3 w-full">
-<<<<<<< Updated upstream
                     <div class="grid grid-cols-4 w-full gap-10">
-                        <ui-boton tipo="contador" size="md"  [disabled]="false" ></ui-boton>
-=======
-                    <div class="grid grid-cols-3 w-full gap-10">
-                        <ui-boton tipo="contador" text="Ordenar ahora" size="md" [disabled]="false"></ui-boton>
->>>>>>> Stashed changes
+                        <ui-boton tipo="contador" size="md" [disabled]="false" [contador]="quantity"
+                            (contadorChange)="actualizarCantidad($event)">
+                        </ui-boton>
                     </div>
                     <div class="w-full">
                         <div class="grid grid-cols-2 gap-3 w-full">
@@ -175,32 +180,39 @@
 
                     @if (activeTab == 'caracteristicas') {
                     <div>
-                        <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                        <div
+                            class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
                             <div class="p-2"><span>ATRIBUTO</span></div>
                             <div class="p-2"><span>VALOR</span></div>
                         </div>
                         <div>
-                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
+                            <div
+                                class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
                                 <div class="p-2"><span>SKU</span></div>
                                 <div class="p-2"><span>{{ product.sku || 'N/A' }}</span></div>
                             </div>
-                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                            <div
+                                class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
                                 <div class="p-2"><span>Código SAT</span></div>
                                 <div class="p-2"><span>{{ product.satCode || 'N/A' }}</span></div>
                             </div>
-                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
+                            <div
+                                class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
                                 <div class="p-2"><span>Código de barras</span></div>
                                 <div class="p-2"><span>{{ product.barCode || 'N/A' }}</span></div>
                             </div>
-                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                            <div
+                                class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
                                 <div class="p-2"><span>Referencia</span></div>
                                 <div class="p-2"><span>{{ product.reference || 'N/A' }}</span></div>
                             </div>
-                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
+                            <div
+                                class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
                                 <div class="p-2"><span>Marca</span></div>
                                 <div class="p-2"><span>{{ product.brand || 'N/A' }}</span></div>
                             </div>
-                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                            <div
+                                class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
                                 <div class="p-2"><span>Subcategoría</span></div>
                                 <div class="p-2"><span>{{ product.subcategory || 'N/A' }}</span></div>
                             </div>
@@ -210,36 +222,44 @@
 
                     @if (activeTab == 'medidasDimensiones') {
                     <div>
-                        <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                        <div
+                            class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
                             <div class="p-2"><span>ATRIBUTO</span></div>
                             <div class="p-2"><span>VALOR</span></div>
                         </div>
                         <div>
-                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
+                            <div
+                                class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
                                 <div class="p-2"><span>Altura</span></div>
                                 <div class="p-2"><span>{{ product.height || 'N/A' }}</span></div>
                             </div>
-                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                            <div
+                                class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
                                 <div class="p-2"><span>Ancho</span></div>
                                 <div class="p-2"><span>{{ product.width || 'N/A' }}</span></div>
                             </div>
-                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
+                            <div
+                                class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
                                 <div class="p-2"><span>Largo / Profundidad</span></div>
                                 <div class="p-2"><span>{{ product.depth || 'N/A' }}</span></div>
                             </div>
-                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                            <div
+                                class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
                                 <div class="p-2"><span>Peso</span></div>
                                 <div class="p-2"><span>{{ product.weight || 'N/A' }}</span></div>
                             </div>
-                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
+                            <div
+                                class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
                                 <div class="p-2"><span>Unidad de peso</span></div>
                                 <div class="p-2"><span>{{ product.weightUnit || 'N/A' }}</span></div>
                             </div>
-                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
+                            <div
+                                class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-zinc-100 border-b border-zinc-400">
                                 <div class="p-2"><span>Volumen</span></div>
                                 <div class="p-2"><span>{{ product.volume || 'N/A' }}</span></div>
                             </div>
-                            <div class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
+                            <div
+                                class="grid grid-cols-2 text-xs font-semibold text-zinc-600 bg-white border-b border-zinc-400">
                                 <div class="p-2"><span>Unidad de volumen</span></div>
                                 <div class="p-2"><span>{{ product.volumeUnit || 'N/A' }}</span></div>
                             </div>

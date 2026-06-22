@@ -73,18 +73,11 @@ const options = {
   // Swagger escanea los JSDoc que están dentro de cart.routes.js
   apis: [
     './src/routes/cart.routes.js',
-<<<<<<< Updated upstream
     './src/routes/address.routes.js',
     './src/routes/order.routes.js',
     './src/routes/exel.routes.js',
     './app.js',
   ],
-=======
-    './src/routes/exel.routes.js',
-    './src/routes/percentage.routes.js',
-    './src/routes/order.routes.js',
-    './app.js'],
->>>>>>> Stashed changes
 };
 
 const swaggerSpec = swaggerJSDoc(options);

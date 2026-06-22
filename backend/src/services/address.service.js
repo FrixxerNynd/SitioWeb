@@ -1,10 +1,12 @@
+// backend/src/services/address.service.js
+
 import prisma from "../config/db.js";
 
 // ═══════════════════════════════════════════════════════════
 //  SERVICIO - Lógica de negocio de las direcciones del usuario
 // ═══════════════════════════════════════════════════════════
 
-const CAMPOS_OBLIGATORIOS = ["pais", "estado", "ciudad", "codigoPostal", "colonia", "calle", "nExterior"];
+const CAMPOS_OBLIGATORIOS = ["country", "state", "city", "cp", "neighborhood", "street", "extNum"];
 
 // Recorta espacios y revienta si algún campo obligatorio viene vacío/undefined/null
 const limpiarYValidarObligatorios = (data, campos = CAMPOS_OBLIGATORIOS) => {
@@ -19,7 +21,7 @@ const limpiarYValidarObligatorios = (data, campos = CAMPOS_OBLIGATORIOS) => {
   return limpio;
 };
 
-const limpiarNInterior = (valor) =>
+const limpiarIntNum = (valor) =>
   valor !== undefined && valor !== null && String(valor).trim() !== ""
     ? String(valor).trim()
     : "";
@@ -46,20 +48,20 @@ class AddressService {
   // ─── CREATE - Agregar una nueva dirección ───
   async createAddress(userId, data) {
     const limpio = limpiarYValidarObligatorios(data);
-    const nInterior = limpiarNInterior(data.nInterior);
+    const intNum = limpiarIntNum(data.intNum);
 
     // Evitar registrar dos veces exactamente la misma dirección para el mismo usuario
     const duplicada = await prisma.userAddress.findFirst({
       where: {
         userId,
-        calle: limpio.calle,
-        nExterior: limpio.nExterior,
-        nInterior,
-        colonia: limpio.colonia,
-        ciudad: limpio.ciudad,
-        estado: limpio.estado,
-        codigoPostal: limpio.codigoPostal,
-        pais: limpio.pais,
+        street: limpio.street,
+        extNum: limpio.extNum,
+        intNum,
+        neighborhood: limpio.neighborhood,
+        city: limpio.city,
+        state: limpio.state,
+        cp: limpio.cp,
+        country: limpio.country,
       },
     });
 
@@ -70,8 +72,14 @@ class AddressService {
     return await prisma.userAddress.create({
       data: {
         userId,
-        ...limpio,
-        nInterior,
+        street: limpio.street,
+        extNum: limpio.extNum,
+        intNum,
+        neighborhood: limpio.neighborhood,
+        city: limpio.city,
+        state: limpio.state,
+        cp: limpio.cp,
+        country: limpio.country,
       },
     });
   }
@@ -97,8 +105,8 @@ class AddressService {
       }
     }
 
-    if (data.nInterior !== undefined) {
-      actualizacion.nInterior = limpiarNInterior(data.nInterior);
+    if (data.intNum !== undefined) {
+      actualizacion.intNum = limpiarIntNum(data.intNum);
     }
 
     // Cómo quedaría la dirección después de aplicar los cambios
@@ -109,14 +117,14 @@ class AddressService {
       where: {
         id: { not: addressId },
         userId,
-        calle: resultante.calle,
-        nExterior: resultante.nExterior,
-        nInterior: resultante.nInterior,
-        colonia: resultante.colonia,
-        ciudad: resultante.ciudad,
-        estado: resultante.estado,
-        codigoPostal: resultante.codigoPostal,
-        pais: resultante.pais,
+        street: resultante.street,
+        extNum: resultante.extNum,
+        intNum: resultante.intNum,
+        neighborhood: resultante.neighborhood,
+        city: resultante.city,
+        state: resultante.state,
+        cp: resultante.cp,
+        country: resultante.country,
       },
     });
 

@@ -520,4 +520,92 @@ export class ExcelNorteCatalogoService {
     this.imagenesCache.clear();
     console.log('🗑️ Caché de imágenes limpiada');
   }
+
+// front-end/src/app/services/exel-api-base.service.ts
+
+// Agregar este método después de getMedidaProducto
+
+/**
+ * Obtiene información de productos por nombre para el carrito
+ * Busca productos que coincidan con los nombres proporcionados
+ */
+async getProductosInfoParaCarrito(nombres: string[]): Promise<Map<string, { 
+  referencia: string; 
+  precio: string; 
+  imagen_principal: string | null;
+  sku: string;
+}>> {
+  const resultado = new Map();
+  
+  if (!nombres || nombres.length === 0) {
+    return resultado;
+  }
+
+  try {
+    console.log('🔍 Buscando información para productos:', nombres);
+    
+    // Buscar productos por nombre usando el endpoint de productos
+    // Usamos el método getFilteredProducts con searchTerm para buscar por nombre
+    const productosResponse = await this.getFilteredProducts(
+      { searchTerm: nombres.join(' ') }, // Buscar por todos los nombres
+      1, // página 1
+      100, // hasta 100 productos
+      true, // incluir sin stock
+      true // incluir imágenes
+    );
+
+    if (productosResponse && productosResponse.productos) {
+      // Crear un mapa de nombres en minúscula para búsqueda flexible
+      const productosMap = new Map();
+      for (const producto of productosResponse.productos) {
+        const nombreLower = producto.nombre.toLowerCase().trim();
+        productosMap.set(nombreLower, producto);
+      }
+
+      // Buscar cada producto por nombre
+      for (const nombre of nombres) {
+        const nombreLower = nombre.toLowerCase().trim();
+        
+        // Buscar coincidencia exacta o parcial
+        let productoEncontrado = null;
+        
+        // Primero buscar coincidencia exacta
+        if (productosMap.has(nombreLower)) {
+          productoEncontrado = productosMap.get(nombreLower);
+        } else {
+          // Buscar coincidencia parcial (el nombre del carrito puede ser parte del nombre completo)
+          for (const [key, value] of productosMap) {
+            if (key.includes(nombreLower) || nombreLower.includes(key)) {
+              productoEncontrado = value;
+              break;
+            }
+          }
+        }
+
+        if (productoEncontrado) {
+          resultado.set(nombre, {
+            referencia: productoEncontrado.referencia || productoEncontrado.sku || '',
+            precio: productoEncontrado.precio || '0',
+            imagen_principal: productoEncontrado.imagen_principal || null,
+            sku: productoEncontrado.sku || ''
+          });
+        } else {
+          // Si no se encuentra, guardar con valores por defecto
+          resultado.set(nombre, {
+            referencia: nombre,
+            precio: '0',
+            imagen_principal: null,
+            sku: ''
+          });
+        }
+      }
+    }
+
+    console.log('✅ Información de productos obtenida:', resultado.size);
+    return resultado;
+  } catch (error) {
+    console.error('❌ Error al obtener información de productos:', error);
+    return resultado;
+  }
+}  
 }

@@ -1,3 +1,4 @@
+// backend/app.js
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -21,12 +22,31 @@ const PORT = process.env.PORT || 3000;
 // 1. Middlewares globales
 // ─────────────────────────────────────────────
 app.use(helmet());
-app.use(cors({
-    origin: process.env.CORS_ORIGIN || '*',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-}));
+
+// ✅ CORS CORREGIDO - Permitir solicitudes desde el frontend
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Permitir solicitudes sin origen (como Postman) o desde localhost:4200
+        if (!origin || origin === 'http://localhost:4200' || origin === 'https://localhost:4200') {
+            callback(null, true);
+        } else {
+            callback(new Error('No permitido por CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With'],
+    credentials: true, // ← Necesario para cookies HttpOnly
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+
+// Para depuración - log de todas las peticiones
+app.use((req, res, next) => {
+    console.log(`📥 ${req.method} ${req.url} - Origin: ${req.headers.origin}`);
+    next();
+});
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -38,16 +58,6 @@ app.use(morgan('combined', { stream: morganStream }));
 // 3. Rutas utilitarias
 // ─────────────────────────────────────────────
 
-/**
- * @swagger
- * /health:
- *   get:
- *     summary: Estado del servidor
- *     tags: [Sistema]
- *     responses:
- *       200:
- *         description: Servicio en línea
- */
 app.get('/health', (req, res) => {
     res.status(200).json({
         status: 'UP',
@@ -70,7 +80,7 @@ app.use('/api/porcentajes', percentageRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // ─────────────────────────────────────────────
-// 6. Manejador de errores global (siempre al final)
+// 6. Manejador de errores global
 // ─────────────────────────────────────────────
 app.use((err, req, res, next) => {
     logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
@@ -86,7 +96,6 @@ app.use((err, req, res, next) => {
 // 7. Arranque del servidor
 // ─────────────────────────────────────────────
 async function startServer() {
-    // Conectar a Redis antes de aceptar peticiones
     await redisClient.connect();
 
     app.listen(PORT, () => {
@@ -98,7 +107,6 @@ async function startServer() {
 
 startServer();
 
-// Cierre graceful
 const shutdown = async () => {
     logger.info('Cerrando servidor...');
     await redisClient.disconnect();

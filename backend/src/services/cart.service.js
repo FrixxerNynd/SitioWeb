@@ -5,21 +5,22 @@ import PedidoCreateDto from "../utils/DTO's/Request/Pedidos/PedidoCreateDto.js";
 import PedidoResponseDto from "../utils/DTO's/Response/Pedidos/PedidoResponseDto.js";
 
 // ── Adaptador: traduce el objeto de Prisma al formato que espera PedidoResponseDto
-const toResponseDto = (data) => new PedidoResponseDto({
-  id: data.id,
-  estado: data.status ?? data.estado ?? '',
-  fechaPedido: data.createdAt ?? data.fechaPedido ?? new Date(),
-  clienteNombre: data.name ?? '',
-  transportista: data.deliveryMethod ?? '',
-  numeroFactura: data.id?.toString() ?? '',
-  productos: (data.items ?? []).map(i => `${i.name} x${i.quantity}`),
-  subtotal: data.subtotal ?? 0,
-  flete: data.shippingCost ?? 0,
-  iva: 0,
-  total: data.total ?? 0,
-});
+const toResponseDto = (data) =>
+  new PedidoResponseDto({
+    id: data.id,
+    estado: data.status ?? data.estado ?? "",
+    fechaPedido: data.createdAt ?? data.fechaPedido ?? new Date(),
+    clienteNombre: data.name ?? "",
+    transportista: data.deliveryMethod ?? "",
+    numeroFactura: data.id?.toString() ?? "",
+    productos: (data.items ?? []).map((i) => `${i.name} x${i.quantity}`),
+    subtotal: data.subtotal ?? 0,
+    flete: data.shippingCost ?? 0,
+    iva: 0,
+    total: data.total ?? 0,
+  });
 
-// Dirección estática de la sucursal 
+// Dirección estática de la sucursal
 const CABS_SUCURSAL_ADDRESS = {
   street: "Beatriz Prada",
   extNum: "450",
@@ -36,12 +37,14 @@ const CABS_SUCURSAL_ADDRESS = {
 // ═══════════════════════════════════════════════════════════
 
 class CartService {
+  // ─── READ - Obtener el carrito completo del usuario ───
+  // backend/src/services/cart.service.js
 
   // ─── READ - Obtener el carrito completo del usuario ───
   async getCart(userId, userName) {
     let cart = await prisma.cart.findUnique({
       where: {
-        userId: parseInt(userId), 
+        userId: parseInt(userId),
       },
       include: { items: true },
     });
@@ -49,14 +52,51 @@ class CartService {
     // Inicializar carrito en DB si el usuario entra por primera vez
     if (!cart) {
       cart = await prisma.cart.create({
-        data: { userId: parseInt(userId), paymentType: "Transferencia", subtotal: 0, total: 0 },
+        data: {
+          userId: parseInt(userId),
+          paymentType: "Transferencia",
+          subtotal: 0,
+          total: 0,
+        },
         include: { items: true },
       });
     }
 
     const updated = await this.recalculateCartTotals(cart.id);
-    return toResponseDto({ ...updated, name: userName || `Usuario ${userId}` });
 
+    // 🔥 MODIFICAR: Construir respuesta con productId incluido
+    const items = updated.items || [];
+
+    // Crear array de strings con formato "Nombre xCantidad" (para compatibilidad)
+    const productosStrings = items.map((i) => `${i.name} x${i.quantity}`);
+
+    // 🔥 CREAR NUEVO ARRAY CON PRODUCTOS DETALLADOS (incluye productId)
+    const productosDetallados = items.map((i) => ({
+      productId: i.productId,
+      sku: i.sku,
+      name: i.name,
+      price: i.price,
+      quantity: i.quantity,
+      totalPrice: i.totalPrice,
+    }));
+
+    // Devolver respuesta con ambos formatos
+    return {
+      id: updated.id,
+      estado: updated.status ?? updated.estado ?? "",
+      fechaPedido: updated.createdAt ?? updated.fechaPedido ?? new Date(),
+      clienteNombre: userName || `Usuario ${userId}`,
+      transportista: updated.deliveryMethod ?? "",
+      numeroFactura: updated.id?.toString() ?? "",
+      // 🔥 FORMATO ORIGINAL (strings) - para compatibilidad
+      productos: productosStrings,
+      // 🔥 NUEVO FORMATO (objetos con productId)
+      items: productosDetallados,
+      subtotal: updated.subtotal ?? 0,
+      flete: updated.shippingCost ?? 0,
+      iva: 0,
+      total: updated.total ?? 0,
+    };
   }
 
   // ─── READ - Obtener un ítem específico del carrito por productId ───
@@ -75,7 +115,7 @@ class CartService {
   }
 
   // ─── CREATE - Agregar un producto nuevo al carrito ───
-  // ─── CREATE - Agregar un producto nuevo al carrito ───
+
   async addItem(userId, productId, quantity) {
     if (!productId || String(productId).trim() === "") {
       throw new Error("El productId es obligatorio.");
@@ -91,40 +131,62 @@ class CartService {
 
     if (!cart) {
       cart = await prisma.cart.create({
-        data: { userId: parseInt(userId), paymentType: "Transferencia", subtotal: 0, total: 0 },
+        data: {
+          userId: parseInt(userId),
+          paymentType: "Transferencia",
+          subtotal: 0,
+          total: 0,
+        },
         include: { items: true },
       });
     }
 
-    // Protección anti-duplicados: si el producto ya está en el carrito, no se vuelve a insertar
+    // Verificar si el producto ya está en el carrito
     const alreadyInCart = cart.items.find((i) => i.productId === productId);
     if (alreadyInCart) {
       throw new Error(
-        "El producto ya está en el carrito. Use updateItemQuantity para modificar la cantidad."
+        "El producto ya está en el carrito. Use updateItemQuantity para modificar la cantidad.",
       );
     }
 
+    // Obtener producto completo (incluyendo precio y stock)
     const product = await ExelService.getProductByReference(productId);
+    if (!product) {
+      throw new Error("El producto seleccionado no existe en el catálogo.");
+    }
 
-    if (!product)
-      throw new Error("El producto seleccionado no esta en el catalogo por el momento");
+    // Verificar que tenemos precio y stock
+    if (product.stock === undefined || product.precio === undefined) {
+      console.error(`Producto ${productId} no tiene precio/stock en Redis`);
+      throw new Error("El producto no tiene precio o stock disponible.");
+    }
 
-    const availableStock = parseInt(product.stock || 0);
+    const availableStock = parseInt(product.stock) || 0;
     if (quantity > availableStock) {
       throw new Error(
-        `Stock insuficiente. Solo quedan ${availableStock} unidades disponibles.`
+        `Stock insuficiente. Solo quedan ${availableStock} unidades disponibles.`,
       );
     }
 
+    const price = parseFloat(product.precio) || 0;
+    if (price <= 0) {
+      throw new Error("El producto no tiene un precio válido.");
+    }
+
+    console.log(
+      `🛒 Agregando producto: ${product.nombre}, Precio: ${price}, Stock: ${availableStock}`,
+    );
+
+    // Crear el item en el carrito
     await prisma.cartItem.create({
       data: {
         cartId: cart.id,
-        productId,
-        sku: product.sku,
-        name: product.nombre,
-        price: parseFloat(product.precio),
-        quantity,
-        totalPrice: parseFloat(product.precio) * quantity,
+        productId: productId,
+        sku: product.sku || productId,
+        name: product.nombre || "Producto",
+        price: price,
+        quantity: quantity,
+        totalPrice: price * quantity,
       },
     });
 
@@ -160,11 +222,13 @@ class CartService {
     const availableStock = parseInt(externalProduct.stock || 0);
     if (quantity > availableStock) {
       throw new Error(
-        `Stock insuficiente. Solo quedan ${availableStock} unidades disponibles.`
+        `Stock insuficiente. Solo quedan ${availableStock} unidades disponibles.`,
       );
     }
 
-    const existingItem = cart.items.find((item) => item.productId === productId);
+    const existingItem = cart.items.find(
+      (item) => item.productId === productId,
+    );
 
     if (existingItem) {
       await prisma.cartItem.update({
@@ -186,10 +250,14 @@ class CartService {
   async setPaymentType(userId, paymentType) {
     const TIPOS_VALIDOS = ["Efectivo", "Transferencia", "Crédito"];
     if (!paymentType || !TIPOS_VALIDOS.includes(paymentType)) {
-      throw new Error("Tipo de pago inválido. Use: " + TIPOS_VALIDOS.join(", "));
+      throw new Error(
+        "Tipo de pago inválido. Use: " + TIPOS_VALIDOS.join(", "),
+      );
     }
 
-    const cart = await prisma.cart.findUnique({ where: { userId: parseInt(userId) } });
+    const cart = await prisma.cart.findUnique({
+      where: { userId: parseInt(userId) },
+    });
     if (!cart) throw new Error("El carrito del usuario no existe.");
 
     const updated = await prisma.cart.update({
@@ -218,7 +286,9 @@ class CartService {
 
   // ─── UPDATE - Cambiar el tipo de pago del carrito ───
   async setPaymentType(userId, paymentType) {
-    const cart = await prisma.cart.findUnique({ where: { userId: parseInt(userId) } });
+    const cart = await prisma.cart.findUnique({
+      where: { userId: parseInt(userId) },
+    });
     if (!cart) throw new Error("El carrito del usuario no existe.");
 
     const updated = await prisma.cart.update({
@@ -244,11 +314,10 @@ class CartService {
     if (method === "Sucursal") {
       shippingAddress = CABS_SUCURSAL_ADDRESS;
       shippingCost = 0.0; // Recoger en sucursal es gratis
-
     } else if (method === "Domicilio") {
       if (!addressId)
         throw new Error(
-          "Debe seleccionar una dirección registrada para la entrega a domicilio."
+          "Debe seleccionar una dirección registrada para la entrega a domicilio.",
         );
 
       const address = await prisma.userAddress.findFirst({
@@ -258,9 +327,11 @@ class CartService {
         throw new Error("La dirección de entrega seleccionada no existe.");
 
       shippingAddress = address;
-      const subtotalActual = cart.items.reduce((acc, item) => acc + item.totalPrice, 0);
+      const subtotalActual = cart.items.reduce(
+        (acc, item) => acc + item.totalPrice,
+        0,
+      );
       shippingCost = subtotalActual < 2000 ? 90.0 : 0.0;
-
     } else {
       throw new Error("Método de entrega inválido.");
     }
@@ -340,7 +411,9 @@ class CartService {
         },
       });
 
-      logger.info(`Pedido #${order.id} generado exitosamente para el usuario ${userId}`);
+      logger.info(
+        `Pedido #${order.id} generado exitosamente para el usuario ${userId}`,
+      );
       return toResponseDto(order);
     });
   }

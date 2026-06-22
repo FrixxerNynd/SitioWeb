@@ -169,7 +169,6 @@ namespace back_cabs.CRM.services.Legacy
                 CIdCuenta = 0,
                 CUsoCfdi = "",
                 CRegimFisc = "",
-                CCodigoAlterno = "",
 
                 //Datos de Contacto
                 CEmail1 = clientData.Email,

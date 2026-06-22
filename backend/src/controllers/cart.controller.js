@@ -40,19 +40,29 @@ class CartController {
   }
 
   // POST /api/cart/item
-  async addItem(req, res, next) {
+// backend/src/controllers/cart.controller.js
+
+async addItem(req, res, next) {
     try {
-      const { productId, quantity } = req.body;
-      const result = await cartService.addItem(
-        getUserId(req),
-        productId,
-        parseInt(quantity)
-      );
-      res.status(201).json({ success: true, data: result });
+        const { productId, quantity } = req.body;
+        
+        console.log('📥 Recibiendo solicitud addItem:');
+        console.log('  productId:', productId);
+        console.log('  quantity:', quantity);
+        
+        const result = await cartService.addItem(
+            getUserId(req),
+            productId,
+            parseInt(quantity)
+        );
+        
+        console.log('✅ Producto agregado correctamente');
+        res.status(201).json({ success: true, data: result });
     } catch (error) {
-      next(error);
+        console.error('❌ Error en addItem:', error.message);
+        next(error);
     }
-  }
+}
 
   // PUT /api/cart/item/:productId
   async updateItemQuantity(req, res, next) {

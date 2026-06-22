@@ -304,33 +304,42 @@ class ExelService {
     }
   }
 
-  async getProductByReference(reference) {
+// backend/src/services/exelService.js
+
+async getProductByReference(reference) {
     const client = redisClient.getClient();
     if (!client) {
-      logger.warn('Redis no disponible, se omite caché para la consulta');
-      return null;
+        logger.warn('Redis no disponible, se omite caché para la consulta');
+        return null;
     }
     try {
-      const producto = await client.hGetAll(`producto:${reference}`);
-      if (!producto || Object.keys(producto).length === 0) return null;
+        // 1. Obtener datos del producto desde producto:*
+        const producto = await client.hGetAll(`producto:${reference}`);
+        if (!producto || Object.keys(producto).length === 0) return null;
 
-      try {
-        const precioHash = await client.hGetAll(`precio_existencia:${reference}`);
-        if (precioHash && Object.keys(precioHash).length > 0) {
-          producto.precio = parseFloat(precioHash.precio ?? 0).toFixed(2);
-          producto.precio_oferta = precioHash.precio_oferta ? parseFloat(precioHash.precio_oferta).toFixed(2) : null;
-          producto.precio_sin_oferta = parseFloat(precioHash.precio_sin_oferta ?? precioHash.precio ?? 0).toFixed(2);
-          producto.oferta = precioHash.oferta === 'true';
-          producto.stock = parseInt(precioHash.existencia ?? 0);
+        // 2. Obtener precio y stock desde precio_existencia:*
+        try {
+            const precioHash = await client.hGetAll(`precio_existencia:${reference}`);
+            if (precioHash && Object.keys(precioHash).length > 0) {
+                producto.precio = parseFloat(precioHash.precio ?? 0);
+                producto.precio_oferta = precioHash.precio_oferta ? parseFloat(precioHash.precio_oferta) : null;
+                producto.precio_sin_oferta = parseFloat(precioHash.precio_sin_oferta ?? precioHash.precio ?? 0);
+                producto.oferta = precioHash.oferta === 'true';
+                producto.stock = parseInt(precioHash.existencia ?? 0);
+                producto.fecha_actualizacion = precioHash.fecha_actualizacion || null;
+            } else {
+                console.warn(`⚠️ Producto ${reference} no tiene precio/stock en Redis`);
+            }
+        } catch (error) {
+            console.error(`Error al obtener precio/stock para ${reference}:`, error.message);
         }
-      } catch (_) { /* si falla obtener precio, devolver producto base */ }
 
-      return producto;
+        return producto;
     } catch (error) {
-      logger.error(`Error al consultar producto por referencia en Redis: ${error.message}`);
-      return null;
+        logger.error(`Error al consultar producto por referencia en Redis: ${error.message}`);
+        return null;
     }
-  }
+}
   /**
    * Obtiene las categorias desde la API externa y las guarda en Redis.
    */

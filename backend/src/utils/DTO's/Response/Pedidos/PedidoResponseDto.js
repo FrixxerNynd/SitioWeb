@@ -1,3 +1,5 @@
+// backend/src/utils/DTO's/Response/Pedidos/PedidoResponseDto.js
+
 class PedidoResponseDto {
   /**
    * @param {Object} data
@@ -7,7 +9,8 @@ class PedidoResponseDto {
    * @param {string} [data.clienteNombre]
    * @param {string} [data.transportista]
    * @param {string} [data.numeroFactura]
-   * @param {string[]} [data.productos]
+   * @param {string[]} [data.productos] 
+   * @param {Array<{productId: string, sku: string, name: string, price: number, quantity: number, totalPrice: number}>} [data.items] 
    * @param {number} data.subtotal
    * @param {number} data.flete
    * @param {number} data.iva
@@ -21,6 +24,7 @@ class PedidoResponseDto {
     this.transportista = data.transportista ?? '';
     this.numeroFactura = data.numeroFactura ?? '';
     this.productos = data.productos ?? [];
+    this.items = data.items ?? []; 
     this.subtotal = data.subtotal ?? 0;
     this.flete = data.flete ?? 0;
     this.iva = data.iva ?? 0;

@@ -1,3 +1,5 @@
+<!-- front-end/src/app/pages/shared/orden-compra/orden-compra.html -->
+
 <div class="bg-gray-50 min-h-screen">
     <div class="container-fluid">
         <div class="container flex flex-col gap-4 py-4">
@@ -22,20 +24,25 @@
                         </span>
                     </div>
 
-                    <div class="flex flex-col w-full h-full truncate gap-2 max-h-[500px] overflow-y-auto pr-2">
-                        @for(producto of productos; track producto.id) {
+                    <div class="flex flex-col w-full h-full gap-2 max-h-[500px] overflow-y-auto pr-2">
+                        @for(producto of productosCarrito; track producto.id) {
                         <div
                             class="flex items-center gap-4 p-3 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors duration-200">
+                            <!-- Ícono genérico -->
                             <div
                                 class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <span class="text-xs text-gray-500 font-medium">{{ producto.imagen }}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-gray-400">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                </svg>
                             </div>
 
                             <div class="flex-1 min-w-0">
-                                <p class="font-semibold text-gray-800 text-sm truncate">{{ producto.nombre }}</p>
+                                <p class="font-semibold text-gray-800 text-sm break-words whitespace-normal">{{
+                                    producto.nombre }}</p>
                                 <div class="flex flex-wrap items-center gap-2 mt-0.5">
-                                    <span class="text-xs text-gray-800 bg-gray-100"
-                                        style="padding: 4px 6px; border-radius: 6px;">{{ producto.categoria }}</span>
+                                    <span class="text-xs text-gray-500">SKU: {{ producto.sku || 'N/A' }}</span>
                                     <span class="text-xs font-medium text-indigo-800">${{ producto.precio.toFixed(2)
                                         }}</span>
                                 </div>
@@ -48,8 +55,8 @@
                                 <span class="text-sm font-semibold text-gray-800 min-w-[70px] text-right">
                                     ${{ producto.subtotal.toFixed(2) }}
                                 </span>
-                                <button (click)="eliminarProducto(producto.id)"
-                                    class="p-1.5 text-gray-400 hover:text-red-500 transition-colors duration-200 hover:bg-red-50 truncate"
+                                <button (click)="eliminarProducto(producto.productId)"
+                                    class="p-1.5 text-gray-400 hover:text-red-500 transition-colors duration-200 hover:bg-red-50"
                                     style="border-radius: 6px">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -59,8 +66,7 @@
                             </div>
                         </div>
                         } @empty {
-                        <div class="flex flex-col truncate justify-center items-center text-center"
-                            style="padding-top: 100px;">
+                        <div class="flex flex-col justify-center items-center text-center" style="padding: 100px 0;">
                             <div class="flex justify-center items-center rounded-full p-3 bg-blue-50">
                                 <svg class="w-10 h-10 mx-auto text-blue-800" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
@@ -85,24 +91,14 @@
                         <div class="flex flex-col gap-2 pt-3">
                             <p class="text-sm font-semibold text-gray-700">Tipo de pago</p>
                             <div class="flex justify-between items-center" style="padding: 10px;">
+                                @for(tipo of tiposPago; track tipo) {
                                 <div class="flex items-center gap-1.5 cursor-pointer">
-                                    <input type="radio" name="tipoPago" value="efectivo"
-                                        [checked]="orden.tipoPago === 'efectivo'" (change)="cambiarTipoPago('efectivo')"
+                                    <input type="radio" name="tipoPago" [value]="tipo"
+                                        [checked]="tipoPagoSeleccionado === tipo" (change)="cambiarTipoPago(tipo)"
                                         class="w-4 h-4 text-indigo-600 border-gray-300 transition-all duration-200">
-                                    <span class="text-sm font-medium text-gray-700">Efectivo</span>
+                                    <span class="text-sm font-medium text-gray-700">{{ tipo }}</span>
                                 </div>
-                                <div class="flex items-center gap-1.5 cursor-pointer">
-                                    <input type="radio" name="tipoPago" value="tarjeta"
-                                        [checked]="orden.tipoPago === 'tarjeta'" (change)="cambiarTipoPago('tarjeta')"
-                                        class="w-4 h-4 text-indigo-600 border-gray-300 transition-all duration-200">
-                                    <span class="text-sm font-medium text-gray-700">Tarjeta</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 cursor-pointer">
-                                    <input type="radio" name="tipoPago" value="credito"
-                                        [checked]="orden.tipoPago === 'credito'" (change)="cambiarTipoPago('credito')"
-                                        class="w-4 h-4 text-indigo-600 border-gray-300 transition-all duration-200">
-                                    <span class="text-sm font-medium text-gray-700">Crédito</span>
-                                </div>
+                                }
                             </div>
                         </div>
 
@@ -113,16 +109,12 @@
                                 style="padding: 10px;">
                                 <div class="flex justify-between font-medium">
                                     <span class="text-gray-500">Subtotal</span>
-                                    <span class="text-gray-800">${{ orden.subtotal.toFixed(2) }}</span>
-                                </div>
-                                <div class="flex justify-between font-medium">
-                                    <span class="text-gray-500">Flete</span>
-                                    <span class="text-gray-800">${{ orden.totalFlete.toFixed(2) }}</span>
+                                    <span class="text-gray-800">${{ subtotal.toFixed(2) }}</span>
                                 </div>
                                 <div
                                     class="flex justify-between items-center font-medium pt-1 border-t border-gray-200">
                                     <span class="text-gray-500">Total</span>
-                                    <span class="text-indigo-800 text-2xl">${{ orden.total.toFixed(2) }}</span>
+                                    <span class="text-indigo-800 text-2xl">${{ total.toFixed(2) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -130,7 +122,7 @@
                         <!-- Botón siguiente -->
                         <div class="size-full">
                             <ui-boton widthType="full" text="Siguiente" (btnClick)="irAlSiguientePaso()"
-                                [disabled]="productos.length === 0"></ui-boton>
+                                [disabled]="productosCarrito.length === 0"></ui-boton>
                         </div>
                     </div>
                 </div>
@@ -156,10 +148,8 @@
                                 <input type="radio" name="tipoEntrega" value="domicilio"
                                     [checked]="tipoEntrega === 'domicilio'" (change)="cambiarTipoEntrega('domicilio')"
                                     class="hidden peer">
-                                <div class="p-4 border-2 rounded-xl transition-all duration-200
-                                peer-checked:border-indigo-600 peer-checked:bg-indigo-50
-                                hover:border-indigo-300 hover:shadow-sm
-                                border-gray-200">
+                                <div
+                                    class="p-4 border-2 rounded-xl transition-all duration-200 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 hover:border-indigo-300 hover:shadow-sm border-gray-200">
                                     <div class="flex items-start gap-3">
                                         <svg class="w-6 h-6 text-gray-500 peer-checked:text-indigo-600 mt-1 flex-shrink-0"
                                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,10 +171,8 @@
                                 <input type="radio" name="tipoEntrega" value="sucursal"
                                     [checked]="tipoEntrega === 'sucursal'" (change)="cambiarTipoEntrega('sucursal')"
                                     class="hidden peer">
-                                <div class="p-4 border-2 rounded-xl transition-all duration-200
-                                peer-checked:border-indigo-600 peer-checked:bg-indigo-50
-                                hover:border-indigo-300 hover:shadow-sm
-                                border-gray-200">
+                                <div
+                                    class="p-4 border-2 rounded-xl transition-all duration-200 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 hover:border-indigo-300 hover:shadow-sm border-gray-200">
                                     <div class="flex items-start gap-3">
                                         <svg class="w-6 h-6 text-gray-500 peer-checked:text-indigo-600 mt-1 flex-shrink-0"
                                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,10 +196,11 @@
                         <div class="border-b border-gray-200 pb-3 mb-4">
                             <div class="flex justify-between items-center">
                                 <span class="text-lg font-semibold text-zinc-700 tracking-tighter">
-                                    {{ tipoEntrega === 'domicilio' ? 'Dirección de envío' : 'Dirección de la sucursal' }}
+                                    {{ tipoEntrega === 'domicilio' ? 'Dirección de envío' : 'Dirección de la sucursal'
+                                    }}
                                 </span>
                                 @if(tipoEntrega === 'domicilio') {
-                                <button (click)="agregarDireccion()"
+                                <button (click)="abrirFormularioDireccion()"
                                     class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
                                     + Agregar nueva
                                 </button>
@@ -220,81 +209,262 @@
                         </div>
 
                         @if(tipoEntrega === 'domicilio') {
-                        <!-- Lista de direcciones -->
+                        <!--Empty state para domicilio -->
+                        @if(direcciones.length === 0 && !mostrarFormularioDireccion && !mostrarFormularioEdicion) {
+                        <div class="flex flex-col items-center justify-center text-center gap-6"
+                            style="padding: 28px 32px;">
+                            <!-- Icono -->
+                            <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center">
+                                <app-ui-icono name="home" size="h-8 w-8" color="text-blue-800"></app-ui-icono>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <!-- Título -->
+                                <span class="text-lg font-semibold text-gray-800 ">Por el momento no tienes una
+                                    dirección registrada</span>
+                                <!-- Descripción -->
+                                <p class="text-sm text-gray-500 ">Agrega una dirección de entrega para poder recibir tus
+                                    pedidos a domicilio.</p>
+                            </div>
+
+                            <!-- Botón -->
+                            <ui-boton text="Registrar dirección" (btnClick)="abrirFormularioDireccion()"
+                                widthType="auto" size="xs"></ui-boton>
+                        </div>
+                        }
+
+                        <!-- ========== FORMULARIO PARA AGREGAR DIRECCIÓN ========== -->
+                        @if(mostrarFormularioDireccion) {
+                        <div class="border border-indigo-200 bg-indigo-50 rounded-xl p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="text-base font-semibold text-gray-800">Nueva dirección</h4>
+                                <button (click)="cerrarFormularioDireccion()"
+                                    class="text-gray-400 hover:text-gray-600 transition-colors"
+                                    [disabled]="guardandoDireccion">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="col-span-2">
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">País</label>
+                                    <input type="text" [(ngModel)]="nuevaDireccion.pais" disabled
+                                        class="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-600 cursor-not-allowed">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Estado <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" [(ngModel)]="nuevaDireccion.estado" placeholder="Ej. Durango"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Ciudad <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" [(ngModel)]="nuevaDireccion.ciudad"
+                                        placeholder="Ej. Victoria de Durango"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Código Postal <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" [(ngModel)]="nuevaDireccion.codigoPostal" placeholder="Ej. 34167"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Colonia <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" [(ngModel)]="nuevaDireccion.colonia" placeholder="Ej. Barcelona"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                                </div>
+
+                                <div class="col-span-2">
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Calle <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" [(ngModel)]="nuevaDireccion.calle"
+                                        placeholder="Ej. Eduardo de la Peña Lares"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">N° Exterior <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" [(ngModel)]="nuevaDireccion.nExterior" placeholder="Ej. 154"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">N° Interior</label>
+                                    <input type="text" [(ngModel)]="nuevaDireccion.nInterior"
+                                        placeholder="Ej. 652 (opcional)"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end gap-3 mt-4">
+                                <ui-boton text="Cancelar" tipo="cerrar" (btnClick)="cerrarFormularioDireccion()"
+                                    [disabled]="guardandoDireccion"></ui-boton>
+                                <ui-boton text="Guardar dirección" (btnClick)="guardarNuevaDireccion()"
+                                    [disabled]="guardandoDireccion"></ui-boton>
+                            </div>
+                        </div>
+                        }
+
+                        <!-- ========== FORMULARIO PARA EDITAR DIRECCIÓN ========== -->
+                        @if(mostrarFormularioEdicion) {
+                        <div class="border border-yellow-200 bg-yellow-50 rounded-xl p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="text-base font-semibold text-gray-800">Editar dirección</h4>
+                                <button (click)="cerrarFormularioEdicion()"
+                                    class="text-gray-400 hover:text-gray-600 transition-colors"
+                                    [disabled]="guardandoEdicion">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="col-span-2">
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">País</label>
+                                    <input type="text" [(ngModel)]="direccionEditada.pais" disabled
+                                        class="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-600 cursor-not-allowed">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Estado <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" [(ngModel)]="direccionEditada.estado" placeholder="Ej. Durango"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Ciudad <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" [(ngModel)]="direccionEditada.ciudad"
+                                        placeholder="Ej. Victoria de Durango"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Código Postal <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" [(ngModel)]="direccionEditada.codigoPostal" placeholder="Ej. 34167"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Colonia <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" [(ngModel)]="direccionEditada.colonia" placeholder="Ej. Barcelona"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition">
+                                </div>
+
+                                <div class="col-span-2">
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Calle <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" [(ngModel)]="direccionEditada.calle"
+                                        placeholder="Ej. Eduardo de la Peña Lares"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">N° Exterior <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" [(ngModel)]="direccionEditada.nExterior" placeholder="Ej. 154"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">N° Interior</label>
+                                    <input type="text" [(ngModel)]="direccionEditada.nInterior"
+                                        placeholder="Ej. 652 (opcional)"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition">
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end gap-3 mt-4">
+                                <ui-boton text="Cancelar" tipo="cerrar" (btnClick)="cerrarFormularioEdicion()"
+                                    [disabled]="guardandoEdicion"></ui-boton>
+                                <ui-boton text="Actualizar dirección" (btnClick)="guardarEdicionDireccion()"
+                                    [disabled]="guardandoEdicion"></ui-boton>
+                            </div>
+                        </div>
+                        }
+
+                        <!-- ========== LISTA DE DIRECCIONES EXISTENTES ========== -->
+                        @if(direcciones.length > 0 && !mostrarFormularioDireccion && !mostrarFormularioEdicion) {
                         <div class="flex flex-col gap-3">
                             @for(direccion of direcciones; track direccion.id) {
-                            <div class="flex items-start justify-between p-4 border rounded-xl hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+                            <div class="flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition-all duration-200"
                                 [class.border-indigo-600]="direccionSeleccionada?.id === direccion.id"
                                 [class.bg-indigo-50]="direccionSeleccionada?.id === direccion.id"
+                                [class.border-gray-200]="direccionSeleccionada?.id !== direccion.id"
+                                [class.hover:bg-gray-50]="direccionSeleccionada?.id !== direccion.id"
                                 (click)="seleccionarDireccion(direccion)">
+                                <input type="radio" name="direccionSeleccionada"
+                                    [checked]="direccionSeleccionada?.id === direccion.id"
+                                    class="w-4 h-4 text-indigo-600 border-gray-300 mt-1 flex-shrink-0">
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <p class="text-base font-semibold text-gray-800">{{ direccion.nombre }}</p>
+                                        <div class="flex gap-1 flex-shrink-0">
+                                            <button (click)="editarDireccion(direccion); $event.stopPropagation()"
+                                                class="px-2 py-1 text-xs font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 transition-colors duration-200 rounded-lg">
+                                                Editar
+                                            </button>
+                                            <button (click)="eliminarDireccion(direccion); $event.stopPropagation()"
+                                                class="px-2 py-1 text-xs font-medium text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors duration-200 rounded-lg">
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    </div>
 
-                                <div class="flex items-start gap-3 flex-1">
-                                    <!-- Radio button -->
-                                    <input type="radio" name="direccionSeleccionada"
-                                        [checked]="direccionSeleccionada?.id === direccion.id"
-                                        class="w-4 h-4 text-indigo-600 border-gray-300 mt-1 flex-shrink-0">
-
-                                    <!-- Información de la dirección -->
-                                    <div class="flex-1">
-                                        <div class="flex justify-between items-center">
-                                            <!-- Nombre de la dirección -->
-                                            <p class="text-base font-semibold text-gray-800">{{ direccion.nombre }}</p>
-
-                                            <!-- Botones de acción con texto -->
-                                            <div class="flex gap-2 flex-shrink-0 ml-2">
-                                                <button (click)="editarDireccion(direccion); $event.stopPropagation()"
-                                                    class="px-3 py-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 transition-colors duration-200 rounded-lg">
-                                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                    </svg>
-                                                    Editar
-                                                </button>
-                                                <button (click)="eliminarDireccion(direccion); $event.stopPropagation()"
-                                                    class="px-3 py-1.5 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors duration-200 rounded-lg">
-                                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                    Eliminar
-                                                </button>
+                                    <div class="flex flex-col gap-2 p-3 bg-zinc-50 border rounded-xl w-full">
+                                        <div class="grid grid-cols-2 font-semibold" style="font-size: 16px;">
+                                            <div class="flex gap-2">
+                                                <p class="text-zinc-600">Calle:</p>
+                                                <p class="text-zinc-800">{{ direccion.street }}</p>
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <p class="text-zinc-600">Colonia:</p>
+                                                <p class="text-zinc-800">{{ direccion.neighborhood }}</p>
                                             </div>
                                         </div>
-
-                                        <!-- Dirección en formato de filas -->
-                                        <div class="mt-1.5 space-y-1">
-                                            <!-- Fila 1: Calle, N° exterior, N° Interior -->
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-sm text-zinc-600 min-w-[70px]">Calle</span>
-                                                <span class="text-sm text-zinc-800">{{ direccion.calle }}</span>
-                                                <span class="text-sm text-zinc-600 ml-4 min-w-[80px]">N° exterior</span>
-                                                <span class="text-sm text-zinc-800">#{{ direccion.numeroExterior
-                                                    }}</span>
-                                                <span class="text-sm text-zinc-600 ml-4 min-w-[70px]">N° Interior</span>
-                                                <span class="text-sm text-zinc-800">{{ direccion.numeroInterior || 'N/A'
-                                                    }}</span>
+                                        <div class="grid grid-cols-2 font-semibold" style="font-size: 16px;">
+                                            <div class="flex gap-2">
+                                                <p class="text-zinc-600">Ciudad:</p>
+                                                <p class="text-zinc-800">{{ direccion.city }}</p>
                                             </div>
-
-                                            <!-- Fila 2: Colonia, Ciudad -->
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-sm text-zinc-600 min-w-[70px]">Colonia</span>
-                                                <span class="text-sm text-zinc-800">{{ direccion.colonia }}</span>
-                                                <span class="text-sm text-zinc-600 ml-4 min-w-[70px]">Ciudad</span>
-                                                <span class="text-sm text-zinc-800">{{ direccion.ciudad }}</span>
+                                            <div class="flex gap-2">
+                                                <p class="text-zinc-600">Estado:</p>
+                                                <p class="text-zinc-800">{{ direccion.state }}</p>
                                             </div>
-
-                                            <!-- Fila 3: Estado, Código postal, País -->
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-sm text-zinc-600 min-w-[70px]">Estado</span>
-                                                <span class="text-sm text-zinc-800">{{ direccion.estado }}</span>
-                                                <span class="text-sm text-zinc-600 ml-4 min-w-[70px]">C.P.</span>
-                                                <span class="text-sm text-zinc-800">{{ direccion.codigoPostal }}</span>
-                                                <span class="text-sm text-zinc-600 ml-4 min-w-[70px]">País</span>
-                                                <span class="text-sm text-zinc-800">{{ direccion.pais }}</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 font-semibold" style="font-size: 16px;">
+                                            <div class="flex gap-2">
+                                                <p class="text-zinc-600">N° exterior:</p>
+                                                <p class="text-zinc-800">{{ direccion.extNum }}</p>
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <p class="text-zinc-600">N° interior:</p>
+                                                <p class="text-zinc-800">{{ direccion.intNum || 'N/A' }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="grid grid-cols-2 font-semibold" style="font-size: 16px;">
+                                            <div class="flex gap-2">
+                                                <p class="text-zinc-600">C.P.:</p>
+                                                <p class="text-zinc-800">{{ direccion.cp }}</p>
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <p class="text-zinc-600">País:</p>
+                                                <p class="text-zinc-800">{{ direccion.country }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -302,35 +472,49 @@
                             </div>
                             }
                         </div>
+                        }
                         } @else {
                         <!-- Dirección de sucursal -->
-                        <div class="flex items-start gap-3">
-                            <div
-                                class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                </svg>
+                        <div class="flex flex-col items-start gap-3">
+                            <!-- Mensaje informativo -->
+                            <div class="bg-blue-50 text-blue-800 font-medium p-3 rounded-md flex gap-2 items-start"
+                                style="border: 1px solid #193cb8">
+                                <app-ui-icono name="information-circle" size="h-5 w-5"
+                                    color="text-blue-800"></app-ui-icono>
+                                <span class="text-sm">Puedes pasar por tu paquete durante nuestro horario de atención {{
+                                    sucursal.horario }}</span>
                             </div>
-                            <div>
+                            <div class="flex flex-col gap-2 p-3 bg-zinc-50 border rounded-xl w-full">
                                 <p class="font-medium text-gray-800">{{ sucursal.nombre }}</p>
-                                <p class="text-sm text-gray-600">{{ sucursal.calle }} #{{ sucursal.numero }}</p>
-                                <p class="text-sm text-gray-600">{{ sucursal.colonia }}</p>
-                                <p class="text-sm text-gray-600">{{ sucursal.ciudad }}, {{ sucursal.estado }}</p>
-                                <p class="text-sm text-gray-600">C.P. {{ sucursal.codigoPostal }}</p>
-                                <div
-                                    class="mt-2 flex items-start gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                    <svg class="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <p class="text-xs text-yellow-700">
-                                        <span class="font-medium">Puedes pasar por tu paquete durante nuestro horario de
-                                            atención</span>
-                                        <br>{{ sucursal.horario }}
-                                    </p>
+                                <div class="grid grid-cols-2 font-semibold" style="font-size: 16px;">
+                                    <div class="flex gap-2">
+                                        <p class="text-zinc-600">Calle:</p>
+                                        <p class="text-zinc-800">{{ sucursal.calle }}</p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <p class="text-zinc-600">Colonia:</p>
+                                        <p class="text-zinc-800">{{ sucursal.colonia }}</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 font-semibold" style="font-size: 16px;">
+                                    <div class="flex gap-2">
+                                        <p class="text-zinc-600">Ciudad:</p>
+                                        <p class="text-zinc-800">{{ sucursal.ciudad }}</p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <p class="text-zinc-600">Estado:</p>
+                                        <p class="text-zinc-800">{{ sucursal.estado }}</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 font-semibold" style="font-size: 16px;">
+                                    <div class="flex gap-2">
+                                        <p class="text-zinc-600">N° exterior:</p>
+                                        <p class="text-zinc-800">{{ sucursal.numero }}</p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <p class="text-zinc-600">Código postal:</p>
+                                        <p class="text-zinc-800">{{ sucursal.codigoPostal }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -358,19 +542,23 @@
                             </button>
                         </div>
                         <div class="flex flex-col gap-2 max-h-[250px] overflow-y-auto pr-1">
-                            @for(producto of productos; track producto.id) {
+                            @for(producto of productosCarrito; track producto.id) {
                             <div class="flex items-center justify-between py-3 border-b border-gray-100">
                                 <div class="flex items-center gap-2">
-                                    <!-- Imagen del producto más grande -->
                                     <div
                                         class="w-14 h-14 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <span class="text-xs text-gray-500 font-medium">{{ producto.imagen }}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-gray-400">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                        </svg>
                                     </div>
                                     <div class="flex flex-col">
-                                        <span class="text-sm font-medium text-gray-800 truncate max-w-[140px]">{{
+                                        <span
+                                            class="text-sm font-medium text-gray-800 break-words whitespace-normal max-w-[140px]">{{
                                             producto.nombre }}</span>
-                                        <span class="text-xs text-gray-500">{{ producto.cantidad }} x
-                                            {{producto.precio.toFixed(2)}}</span>
+                                        <span class="text-xs text-gray-500">{{ producto.cantidad }} x {{
+                                            producto.precio.toFixed(2) }}</span>
                                     </div>
                                 </div>
                                 <div class="flex flex-col items-end">
@@ -396,24 +584,14 @@
                         @if(estadoCambiarTipoPago){
                         <div class="flex flex-col gap-2">
                             <div class="flex justify-between items-center" style="padding: 10px;">
+                                @for(tipo of tiposPago; track tipo) {
                                 <div class="flex items-center gap-1.5 cursor-pointer">
-                                    <input type="radio" name="tipoPago" value="efectivo"
-                                        [checked]="orden.tipoPago === 'efectivo'" (change)="cambiarTipoPago('efectivo')"
+                                    <input type="radio" name="tipoPagoConfirmacion" [value]="tipo"
+                                        [checked]="tipoPagoTemp === tipo" (change)="tipoPagoTemp = tipo"
                                         class="w-4 h-4 text-indigo-600 border-gray-300 transition-all duration-200">
-                                    <span class="text-sm font-medium text-gray-700">Efectivo</span>
+                                    <span class="text-sm font-medium text-gray-700">{{ tipo }}</span>
                                 </div>
-                                <div class="flex items-center gap-1.5 cursor-pointer">
-                                    <input type="radio" name="tipoPago" value="tarjeta"
-                                        [checked]="orden.tipoPago === 'tarjeta'" (change)="cambiarTipoPago('tarjeta')"
-                                        class="w-4 h-4 text-indigo-600 border-gray-300 transition-all duration-200">
-                                    <span class="text-sm font-medium text-gray-700">Tarjeta</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 cursor-pointer">
-                                    <input type="radio" name="tipoPago" value="credito"
-                                        [checked]="orden.tipoPago === 'credito'" (change)="cambiarTipoPago('credito')"
-                                        class="w-4 h-4 text-indigo-600 border-gray-300 transition-all duration-200">
-                                    <span class="text-sm font-medium text-gray-700">Crédito</span>
-                                </div>
+                                }
                             </div>
                             <div class="flex justify-end gap-2">
                                 <ui-boton size="xs" tipo="cerrar" text="Cancelar"
@@ -424,7 +602,8 @@
                         } @else {
                         <div class="flex bg-zinc-50 border rounded-xl" style="padding: 10px;">
                             <div class="flex items-center gap-1.5">
-                                <span class="text-sm font-medium text-gray-700 capitalize">{{ orden.tipoPago }}</span>
+                                <span class="text-sm font-medium text-gray-700 capitalize">{{ tipoPagoSeleccionado
+                                    }}</span>
                             </div>
                         </div>
                         }
@@ -434,34 +613,32 @@
 
                     <!-- Resumen financiero -->
                     <div class="flex flex-col gap-2">
-                        <div class="flex flex-col  gap-2">
+                        <div class="flex flex-col gap-2">
                             <p class="text-start text-sm font-semibold text-gray-700">Resumen financieros</p>
                             @if(tipoEntrega === 'sucursal'){
                             <div class="flex gap-2 items-center bg-blue-50 font-semibold text-xs text-blue-800"
                                 style="padding: 10px 14px; border: 1px solid #193cb8; border-radius: 10px;">
                                 <app-ui-icono name="information-circle" size="h-5 w-5"
-                                    color="text-blu-800"></app-ui-icono>
-                                <span>Envio: pedidos menores a $2,000 generán cargo por flete </span>
+                                    color="text-blue-800"></app-ui-icono>
+                                <span>Envío: pedidos menores a $2,000 generan cargo por flete</span>
                             </div>
                             }
-
                         </div>
                         <div class="flex flex-col gap-2 border border-gray-200 bg-zinc-50 text-lg rounded-xl"
                             style="padding: 10px;">
                             <div class="flex justify-between font-medium">
                                 <span class="text-gray-500">Subtotal</span>
-                                <span class="text-gray-800">${{ orden.subtotal.toFixed(2) }}</span>
+                                <span class="text-gray-800">${{ subtotal.toFixed(2) }}</span>
                             </div>
                             @if(tipoEntrega === 'domicilio'){
                             <div class="flex justify-between font-medium">
-                                <span class="text-gray-500">Costo de envio</span>
-                                <span class="text-gray-800">$90.00</span>
+                                <span class="text-gray-500">Costo de envío</span>
+                                <span class="text-gray-800">${{ flete.toFixed(2) }}</span>
                             </div>
                             }
-
                             <div class="flex justify-between items-center font-medium pt-1 border-t border-gray-200">
                                 <span class="text-gray-500">Total</span>
-                                <span class="text-indigo-800 text-2xl">${{ orden.total.toFixed(2) }}</span>
+                                <span class="text-indigo-800 text-2xl">${{ total.toFixed(2) }}</span>
                             </div>
                         </div>
                     </div>
@@ -469,7 +646,7 @@
                     <!-- Botones -->
                     <div class="flex flex-col gap-2">
                         <ui-boton widthType="full" text="Confirmar pedido" (btnClick)="confirmarPedido()"
-                            [disabled]="productos.length === 0 || (tipoEntrega === 'domicilio' && !direccionSeleccionada)"></ui-boton>
+                            [disabled]="productosCarrito.length === 0 || (tipoEntrega === 'domicilio' && !direccionSeleccionada) || isLoading"></ui-boton>
                         <ui-boton widthType="full" text="← Retroceder" (btnClick)="irAlPasoAnterior()"
                             tipo="secundario"></ui-boton>
                     </div>

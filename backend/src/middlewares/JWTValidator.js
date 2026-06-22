@@ -1,6 +1,3 @@
-//Middleware para realizar validacion de Json Web Token enviado por el login_service (.NET) atraves de HttpOnly cookie
-//Si el token está expirado, intenta refrescarlo automáticamente llamando al login_service
-
 import jwt from "jsonwebtoken";
 import axios from "axios";
 import dotenv from "dotenv";
@@ -22,10 +19,9 @@ async function refreshAccessToken(refreshToken) {
             {
                 headers: {
                     "Content-Type": "application/json",
-                    // Enviar el refresh token también como cookie para compatibilidad con el login_service
                     Cookie: `RefreshToken=${refreshToken}`,
                 },
-                timeout: 5000, // 5 segundos máximo de espera
+                timeout: 5000,
             }
         );
 
@@ -38,7 +34,6 @@ async function refreshAccessToken(refreshToken) {
 
         return null;
     } catch (error) {
-        // Log discreto sin exponer información sensible
         console.error(
             "[JWTValidator] Error al refrescar token:",
             error.response?.status || error.message
@@ -48,48 +43,73 @@ async function refreshAccessToken(refreshToken) {
 }
 
 /**
- * Establece las cookies de autenticación en la respuesta, alineadas con la configuración
- * del CookieHelper del login_service (.NET).
+ * Establece las cookies de autenticación en la respuesta.
  */
 function setAuthCookies(res, accessToken, refreshToken) {
-    // Cookie del access token — alineada con CookieHelper.SetSecureJwtCookie
     res.cookie("AuthToken", accessToken, {
         httpOnly: true,
         secure: true,
         sameSite: "Strict",
         path: "/",
-        maxAge: 30 * 60 * 1000, // 30 minutos
+        maxAge: 30 * 60 * 1000,
     });
 
-    // Cookie del refresh token — alineada con CookieHelper.SetSecureRefreshCookie
     if (refreshToken) {
         res.cookie("RefreshToken", refreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: "Strict",
             path: "/",
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
+            maxAge: 7 * 24 * 60 * 60 * 1000,
         });
     }
 }
 
 /**
- * Middleware para validar JWT desde cookies HttpOnly.
- *
- * Flujo:
- * 1. Lee el token de la cookie "AuthToken"
- * 2. Verifica firma y expiración
- * 3. Si el token expiró y existe "RefreshToken", intenta refrescar automáticamente
- * 4. Si el refresh es exitoso, actualiza las cookies y continúa la request
+ * ✅ Función para extraer token de diferentes fuentes
+ * 1. Cookie HttpOnly (AuthToken)
+ * 2. Header Authorization: Bearer <token>
+ * 3. Query param (para debugging)
+ */
+function extractToken(req) {
+    // 1. Intentar desde cookie HttpOnly
+    let token = req.cookies?.AuthToken;
+    
+    // 2. Si no hay cookie, intentar del header Authorization
+    if (!token) {
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.substring(7);
+            console.log("📥 Token extraído del header Authorization");
+        }
+    }
+    
+    // 3. Intentar desde query param (solo para debugging)
+    if (!token && req.query?.token) {
+        token = req.query.token;
+        console.log("📥 Token extraído del query param");
+    }
+    
+    return token;
+}
+
+/**
+ * Middleware para validar JWT desde cookies HttpOnly o header Authorization.
  */
 export const validateToken = async (req, res, next) => {
-    const token = req.cookies?.AuthToken;
+    // ✅ Extraer token de cualquier fuente
+    const token = extractToken(req);
 
-    console.log("TOKEN RECIBIDO:", token ? token.substring(0, 20) + "..." : "NINGUNO");
-    console.log("JWT_SECRET:", JWT_SECRET ? JWT_SECRET.substring(0, 5) + "..." : "UNDEFINED");
+    console.log("🔑 TOKEN RECIBIDO:", token ? token.substring(0, 30) + "..." : "NINGUNO");
+    console.log("🍪 Cookies:", req.cookies);
+    console.log("📋 Header Authorization:", req.headers.authorization);
+    console.log("🔐 JWT_SECRET:", JWT_SECRET ? JWT_SECRET.substring(0, 5) + "..." : "UNDEFINED");
 
     if (!token) {
-        return res.status(401).json({ message: "No autorizado" });
+        return res.status(401).json({ 
+            message: "No autorizado - Token no proporcionado",
+            source: "no-token"
+        });
     }
 
     // Intentar verificar el token directamente
@@ -97,15 +117,27 @@ export const validateToken = async (req, res, next) => {
         const decoded = jwt.verify(token, JWT_SECRET, {
             algorithms: ["HS256"],
         });
-        req.user = decoded;
-        console.log("USUARIO DECODIFICADO: ", req.user)
+        
+        // ✅ Normalizar claims si vienen en formato URI
+        const normalizedUser = {
+            id: decoded.id || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"],
+            email: decoded.email || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
+            name: decoded.name || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"],
+            role: decoded.role || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"],
+            ...decoded
+        };
+        
+        req.user = normalizedUser;
+        console.log("✅ USUARIO AUTENTICADO:", req.user);
         return next();
     } catch (err) {
-        // Si el error NO es de expiración, el token es inválido (firma corrupta, malformado, etc.)
         console.error("[JWTValidator] Error:", err.name, err.message);
 
         if (err.name !== "TokenExpiredError") {
-            return res.status(403).json({ message: "Token inválido" });
+            return res.status(401).json({ 
+                message: "Token inválido",
+                error: err.message 
+            });
         }
     }
 
@@ -135,11 +167,20 @@ export const validateToken = async (req, res, next) => {
             algorithms: ["HS256"],
         });
 
+        // Normalizar claims
+        const normalizedUser = {
+            id: decoded.id || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"],
+            email: decoded.email || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
+            name: decoded.name || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"],
+            role: decoded.role || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"],
+            ...decoded
+        };
+
         // Establecer las nuevas cookies en la respuesta
         setAuthCookies(res, newTokens.accessToken, newTokens.refreshToken);
 
         // Continuar con la request usando el nuevo payload
-        req.user = decoded;
+        req.user = normalizedUser;
         return next();
     } catch (verifyErr) {
         console.error(
@@ -150,23 +191,4 @@ export const validateToken = async (req, res, next) => {
             .status(401)
             .json({ message: "Error al renovar sesión", expired: true });
     }
-
-    //Helper para los claims
-    function normalizeClaims(decoded) {
-        const resultado = { ...decoded };
-        for (const [uri, alias] of Object.entries(CLAIMS_MAP)) {
-            if (decoded[uri]) {
-                resultado[alias] = decoded[uri];
-                delete resultado[uri];
-            }
-        }
-        return resultado;
-    }
-
-    const CLAIM_MAP = {
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": "id",
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress": "email",
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": "name",
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role": "role",
-    };
 };

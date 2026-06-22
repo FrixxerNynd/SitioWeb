@@ -1,8 +1,9 @@
+<!-- front-end/src/app/components/layout/navbar/navbar.html -->
+
 <nav class="navbar">
     <div class="container-fluid">
         <!-- Logo y botón hamburguesa -->
         <div class="flex items-center gap-3">
-            <!-- Botón hamburguesa - visible en móvil -->
             <button 
                 (click)="toggleSidebar()" 
                 class="hamburger-btn p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none transition-colors duration-200" style="border-radius: 8px;"
@@ -19,7 +20,7 @@
             </div>
         </div>
         
-        <!-- Enlaces de navegación - visible solo en pantallas grandes (desktop) -->
+        <!-- Enlaces de navegación -->
         <div class="nav-links-desktop">
             <a class="nav-link" 
                routerLink="catalogo-producto/lista-producto"
@@ -60,7 +61,7 @@
         
         <!-- Contenedor derecho: Carrito + Menú usuario -->
         <div class="flex items-center gap-2">
-            <!-- Carrito - visible en todas las pantallas -->
+            <!-- Carrito -->
             <div class="relative inline-block cart-wrapper">
                 <button 
                     (click)="toggleCarrito()" 
@@ -70,7 +71,6 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-600">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                     </svg>
-                    <!-- Badge de cantidad - encima del icono en la parte derecha -->
                     @if(cantidadCarrito > 0) {
                         <span class="cart-badge">
                             {{ cantidadCarrito }}
@@ -80,7 +80,7 @@
 
                 <!-- Dropdown del carrito -->
                 @if(carritoAbierto) {
-                    <div class="absolute top-full bg-white right-0 mt-2 min-w-[280px] max-w-[320px]  rounded-xl shadow-md z-[9999] border border-gray-100"
+                    <div class="absolute top-full bg-white right-0 mt-2 min-w-[320px] max-w-[380px] rounded-xl shadow-md z-[9999] border border-gray-100"
                         (clickOutside)="cerrarCarrito()">
                         
                         <!-- Header del carrito -->
@@ -90,33 +90,45 @@
                                 <div class="flex items-center justify-center bg-blue-50" style="padding: 4px 6px; border-radius: 6px;">
                                     <p class="text-xs text-blue-800 font-semibold">{{ cantidadCarrito }} @if(cantidadCarrito == 1){<span>producto</span>}@else {<span>productos</span>}</p>
                                 </div>
-                            }@else {
-
                             }
                         </div>
 
                         <!-- Lista de productos del carrito -->
-                        <div class="max-h-48 overflow-y-auto">
+                        <div class="max-h-64 overflow-y-auto">
                             @if(productosCarrito.length === 0) {
                                 <div class="flex flex-col items-center justify-center text-center min-h-48">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-zinc-400">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                                     </svg>
-
                                     <p class="text-sm text-gray-500 mt-2">Tu carrito está vacío</p>
                                 </div>
                             } @else {
                                 @for(item of productosCarrito; track item.id) {
-                                    <div class="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 transition-colors duration-150 border-b border-gray-50">
-                                        <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                            <span class="text-xs font-semibold text-gray-600">{{ item.cantidad }}</span>
+                                    <div class="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 transition-colors duration-150 border-b cursor-pointer border-gray-50" (click)="irADetalleProducto(item.productId)">
+                                        <!-- Ícono del producto -->
+                                        <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-400">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                            </svg>
                                         </div>
+                                        
+                                        <!-- Información del producto -->
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-medium text-gray-800 truncate">{{ item.nombre }}</p>
-                                            <p class="text-xs text-gray-500">${{ item.precio }}</p>
+                                            <div class="flex flex-wrap items-center gap-2 mt-0.5">
+                                                <span class="text-xs text-gray-500">Cant: {{ item.cantidad }}</span>
+                                                @if(item.precio > 0) {
+                                                    <span class="text-xs text-gray-500">x</span>
+                                                    <span class="text-xs font-semibold text-indigo-700">${{ item.precio.toFixed(2) }}</span>
+                                                    <span class="text-xs text-gray-400">=</span>
+                                                    <span class="text-xs font-bold text-gray-800">${{ (item.precio * item.cantidad).toFixed(2) }}</span>
+                                                }
+                                            </div>
                                         </div>
-                                        <button (click)="eliminarDelCarrito(item.id)" 
-                                                class="text-gray-400 hover:text-red-500 transition-colors duration-200">
+                                        
+                                        <!-- Botón eliminar -->
+                                        <button (click)="eliminarDelCarrito(item.productId)" 
+                                                class="text-gray-400 hover:text-red-500 transition-colors duration-200 p-1">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                             </svg>
@@ -131,34 +143,31 @@
                             <div class="border-t border-gray-100 p-3">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-sm font-medium text-gray-700">Total:</span>
-                                    <span class="text-sm font-bold text-gray-900">${{ totalCarrito }}</span>
+                                    <span class="text-sm font-bold text-gray-900">${{ totalCarrito.toFixed(2) }}</span>
                                 </div>
-                                <ui-boton text="Ir al carrito" widthType="full" [disabled]="false" (btnClick)="comprarCarrito()" ></ui-boton>
+                                <ui-boton text="Ir al carrito" widthType="full" [disabled]="false" (btnClick)="comprarCarrito()"></ui-boton>
                             </div>
                         }
                     </div>
                 }
             </div>
 
-            <!-- Menú de usuario - visible en desktop y tablet, oculto en móvil -->
+            <!-- Menú de usuario -->
             <div class="relative inline-block user-menu-wrapper">
                 <div class="flex items-center gap-2 cursor-pointer rounded-xl transition-all duration-200 hover:bg-indigo-50 hover:-translate-y-px user-menu-trigger" style="padding: 12px;"
                     (click)="toggleDropdown()">
                     <div class="w-8 h-8 bg-zinc-800 rounded-full flex items-center justify-center flex-shrink-0 user-avatar">
                         <span class="text-white text-sm font-semibold uppercase tracking-wide">{{ getInitials() }}</span>
                     </div>
-                    <!-- Nombre y rol - visible en desktop y tablet -->
                     <div class="flex flex-col leading-tight user-info"> 
                         <p class="font-semibold tracking-wider text-zinc-800 text-sm">{{ getNombreCompleto() }}</p>
                     </div>
                 </div>
                 
-                <!-- Dropdown del menú de usuario -->
                 @if(dropOpciones) {
                     <div class="absolute top-full bg-white right-0 mt-2 min-w-[220px] rounded-xl shadow-md z-[9999] border border-gray-100"
                         (clickOutside)="cerrarDropdown()">
                         
-                        <!-- Información del usuario -->
                         <div class="border-b border-gray-100" style="padding: 12px 16px">
                             <p class="text-sm font-semibold text-gray-900">{{ getNombreCompleto() }}</p>
                             <p class="text-xs text-gray-500 mt-0.5">{{ usuarioActual?.email }}</p>
@@ -176,15 +185,12 @@
     </div>
 </nav>
 
-<!-- Sidebar - solo visible en móvil -->
+<!-- Sidebar -->
 @if(mostrarSidebar) {
     <div class="fixed inset-0 z-[99999] sidebar-container">
-        <!-- Overlay -->
         <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" (click)="cerrarSidebar()"></div>
         
-        <!-- Sidebar -->
         <div class="fixed left-0 top-0 bottom-0 w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-out overflow-y-auto">
-            <!-- Header del sidebar -->
             <div class="flex items-center justify-between p-4 border-b border-gray-200">
                 <span class="text-lg font-semibold text-gray-900">Menú</span>
                 <button (click)="cerrarSidebar()" 
@@ -195,7 +201,6 @@
                 </button>
             </div>
             
-            <!-- Enlaces del sidebar -->
             <div class="p-4 flex flex-col gap-2">
                 <a class="nav-link-sidebar" 
                    routerLink="catalogo-producto/lista-producto"
@@ -240,10 +245,8 @@
                 </a>
             </div>
             
-            <!-- Footer del sidebar con avatar y cerrar sesión -->
             <div class="absolute bottom-0 left-0 right-0 border-t border-gray-200 sidebar-footer">
                 <div class="flex items-center gap-3 px-4 py-3">
-                    <!-- Avatar - visible solo en móvil -->
                     <div class="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center flex-shrink-0 sidebar-avatar-mobile">
                         <span class="text-white text-sm font-semibold uppercase">{{ getInitials() }}</span>
                     </div>
@@ -251,7 +254,6 @@
                         <p class="text-sm font-semibold text-gray-900 truncate">{{ getNombreCompleto() }}</p>
                         <p class="text-xs text-gray-500 truncate">{{ usuarioActual?.email }}</p>
                     </div>
-                    <!-- Botón cerrar sesión en sidebar -->
                     <button (click)="abrirModalConfirmacion()" 
                             class="p-2 text-red-600 hover:bg-red-50 transition-colors duration-200 truncate" style="border-radius: 8px;">
                         <app-ui-icono name="arrow-right-start-on-rectangle" size="h-5 w-5" color="text-red-600"></app-ui-icono>

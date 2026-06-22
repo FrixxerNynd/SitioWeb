@@ -11,12 +11,14 @@ import {
 } from '../../../../../interfaces/interface-excel-norte/excel-norte-interface';
 import { UIProductoCard } from '../../../../../components/shared/producto-card/producto-card';
 import { UiBoton } from '../../../../../components/shared/boton/boton';
+import { CartService } from '../../../../../services/cart.service';
+
 
 
 @Component({
   selector: 'app-lista-producto',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, UIProductoCard,UiBoton],
+  imports: [CommonModule, RouterModule, FormsModule, UIProductoCard, UiBoton],
   templateUrl: './lista-producto.html',
   styleUrl: './lista-producto.css',
 })
@@ -24,6 +26,8 @@ export class PageListaProducto implements OnInit {
   private authService = inject(SecureAuthService);
   private router = inject(Router);
   private catalogoService = inject(ExcelNorteCatalogoService);
+  private cartService = inject(CartService);
+
 
   // ========== SEÑALES ==========
   currentProducts = signal<IProduct[]>([]);
@@ -450,10 +454,32 @@ export class PageListaProducto implements OnInit {
     return Math.round(((original - oferta) / original) * 100);
   }
 
-  agregarAlCarrito(product: IProduct): void {
-    console.log('Producto agregado al carrito:', product);
-    alert(`Producto "${product.nombre}" agregado al carrito`);
-  }
+// front-end/src/app/pages/usuario/pages/catalogo-producto/lista-producto/lista-producto.ts
+
+async agregarAlCarrito(product: IProduct): Promise<void> {
+    if (!product.referencia) {
+      alert('Error: Producto sin referencia');
+      return;
+    }
+
+    try {
+      const result = await this.cartService.addItemFull({
+        productId: product.referencia,
+        quantity: 1,
+        price: this.roundPrice(product.precio),
+        stock: parseInt(product.stock) || 0,
+        name: product.nombre,
+        sku: product.sku
+      });
+      
+      if (result.success) {
+        alert(`"${product.nombre}" agregado al carrito`);
+      }
+    } catch (error: any) {
+      console.error('Error al agregar al carrito:', error);
+      alert(`${error.error?.message || 'Error al agregar el producto'}`);
+    }
+}
 
   logout() {
     this.authService.logout();
