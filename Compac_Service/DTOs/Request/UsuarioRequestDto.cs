@@ -24,8 +24,8 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using back_cabs.CRM.DTOs.Legacy;
 using back_cabs.CRM.Core.Validation;
+using back_cabs.CRM.DTOs.Legacy;
 
 namespace CRM.DTOs.Request
 {
@@ -201,7 +201,7 @@ namespace CRM.DTOs.Request
 
     public class UserClientRequestDto
     {
-        
+
         public string Nombre { get; set; } = string.Empty;
         public string ApellidoPaterno { get; set; } = string.Empty;
         public string ApellidoMaterno { get; set; } = string.Empty;

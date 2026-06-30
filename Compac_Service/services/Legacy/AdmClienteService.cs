@@ -1,13 +1,13 @@
 using back_cabs.CRM.contexts;
 using back_cabs.CRM.DTOs.Legacy;
-using back_cabs.CRM.Interfaces.Legacy;
-using back_cabs.CRM.models.legacy;
-using back_cabs.CRM.Middleware;
-using CRM.DTOs.Request;
-using Microsoft.EntityFrameworkCore;
 using back_cabs.CRM.DTOs.ServiceResponse;
 using back_cabs.CRM.Interfaces.Auth;
+using back_cabs.CRM.Interfaces.Legacy;
+using back_cabs.CRM.Middleware;
 using back_cabs.CRM.models.Auth;
+using back_cabs.CRM.models.legacy;
+using CRM.DTOs.Request;
+using Microsoft.EntityFrameworkCore;
 
 namespace back_cabs.CRM.services.Legacy
 {
@@ -381,7 +381,7 @@ namespace back_cabs.CRM.services.Legacy
                 throw;
             }
         }
-        
+
         /// <summary>
         /// Obtener credito y estado de credito del cliente
         /// </summary>
@@ -397,7 +397,7 @@ namespace back_cabs.CRM.services.Legacy
                     _logger.LogWarning("⚠️ Cliente {IdCliente} no encontrado", idCliente);
                     return null;
                 }
-                
+
                 return new CreditClientDto
                 {
                     LimiteCredito = cliente.CLimiteCreditoCliente,

@@ -30,6 +30,7 @@ export class PageDatosFiscales {
     if (file) {
       this.loginForm.patchValue({ constancia: file });
       this.loginForm.get('constancia')?.updateValueAndValidity();
+      this.preRegistroService.guardarArchivoConstancia(file);
     }
   }
 

@@ -20,26 +20,26 @@
 //
 // =====================================================================================
 
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Security.Claims;
+using System.Text;
+using back_cabs.CRM.DTOs.Legacy;
+using back_cabs.CRM.Interfaces.Legacy;
+using back_cabs.CRM.Middleware;
+using back_cabs.CRM.models;
+using back_cabs.CRM.models.Auth;
+using back_cabs.CRM.services.Auth;
+using back_cabs.CRM.utils.Security;
 using CRM.DTOs.Request;
 using CRM.DTOs.Response;
-using back_cabs.CRM.DTOs.Legacy;
-using back_cabs.CRM.services.Auth;
-using back_cabs.CRM.Interfaces.Legacy;
-using back_cabs.CRM.models.Auth;
-using back_cabs.CRM.models;
-using back_cabs.CRM.Middleware;
-using back_cabs.CRM.utils.Security;
-using Microsoft.AspNetCore.Mvc;
+using login_service.services;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using System.Net;
-using login_service.services;
 
 namespace back_cabs.CRM.controllers.Auth
 {
@@ -50,7 +50,7 @@ namespace back_cabs.CRM.controllers.Auth
     [Route("api/[controller]")]
     [Produces("application/json")]
     public class AuthController : ControllerBase
-    
+
     {
         private readonly UsuarioAuthService _usuarioAuthService;
         private readonly IAdmClienteService _admClienteService;
@@ -101,7 +101,7 @@ namespace back_cabs.CRM.controllers.Auth
                 //     _logger.LogWarning("Registro bloqueado por reCAPTCHA v2 para email: {Email}", request.Email);
                 //     return BadRequest(new { message = "Por favor completa el reCAPTCHA." });
                 // }
-                
+
                 _logger.LogInformation("Iniciando registro de cliente para email: {Email}", request?.Email);
                 // Validación básica del request
                 if (request == null)
@@ -633,7 +633,7 @@ namespace back_cabs.CRM.controllers.Auth
                 }
 
                 // 5. Generar nuevos tokens
-                
+
                 var userModel = new User
                 {
                     Id = usuario.Id.ToString(),
@@ -1381,7 +1381,7 @@ namespace back_cabs.CRM.controllers.Auth
 
         #region TODO: Métodos de Base de Datos (reemplazar con implementación real)
 
-      
+
 
         private async Task<User?> GetUserByIdAsync(string id)
         {
@@ -1398,7 +1398,7 @@ namespace back_cabs.CRM.controllers.Auth
                     return null;
                 }
 
-              
+
 
                 return new User
                 {
