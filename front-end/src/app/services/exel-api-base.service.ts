@@ -139,7 +139,7 @@ export class ExcelNorteCatalogoService {
 
         for (const brand of respuesta.data) {
           marcas.push({
-            id: brand.id,
+            id: brand.id_marca,
             nombre: brand.nombre_marca,
           });
         }
@@ -295,8 +295,8 @@ export class ExcelNorteCatalogoService {
           precio_sin_oferta: String(product.precio_sin_oferta || product.precio),
           oferta: Boolean(product.oferta),
           moneda: product.moneda,
-          marca_id: String(product.marca_id),
-          marca_nombre: product.marca_nombre,
+          marca_id: String(product.marca ?? product.marca_id ?? ''),
+          marca_nombre: product.marca_nombre ?? '',
           subcategoria_id: String(product.subcategoria_id || ''),
           subcategoria_nombre: product.subcategoria_nombre || '',
           categoria_id: String(product.categoria_id || ''),
@@ -396,8 +396,8 @@ export class ExcelNorteCatalogoService {
           precio_sin_oferta: String(product.precio_sin_oferta || product.precio),
           oferta: Boolean(product.oferta),
           moneda: product.moneda,
-          marca_id: String(product.marca_id),
-          marca_nombre: product.marca_nombre,
+          marca_id: String(product.marca ?? product.marca_id ?? ''),
+          marca_nombre: product.marca_nombre ?? '',
           subcategoria_id: String(product.subcategoria_id || ''),
           subcategoria_nombre: product.subcategoria_nombre || '',
           categoria_id: String(product.categoria_id || ''),
@@ -512,6 +512,7 @@ export class ExcelNorteCatalogoService {
       style: 'currency',
       currency: 'MXN',
       minimumFractionDigits: 2,
+      useGrouping: true,
     }).format(num);
   }
 

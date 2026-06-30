@@ -157,6 +157,8 @@ class ExelService {
 
     const tempKeys = [];
 
+    logger.info(`Filtros aplicados — searchTerm: "${searchTerm || ''}", categoria: ${JSON.stringify(categoria)}, subcategoria: ${JSON.stringify(subcategoria)}, marca: ${JSON.stringify(marca)}, stock: ${stock}, precioMin: ${precioMin}, precioMax: ${precioMax}, page: ${page}, pageSize: ${pageSize}`);
+
     try {
       const buildKeys = async (groupName, values) => {
         if (!values || values.length === 0) return null;
@@ -195,6 +197,7 @@ class ExelService {
       }
 
       if (referencias.length === 0) {
+        logger.info(`Respuesta Redis — 0 productos encontrados con los filtros aplicados`);
         return { productos: [], total: 0, page, pageSize, totalPages: 0 };
       }
 
@@ -226,6 +229,7 @@ class ExelService {
           const term = searchTerm.toLowerCase();
           filtrados = filtrados.filter(p =>
             (p.nombre && p.nombre.toLowerCase().includes(term)) ||
+            (p.descripcion && p.descripcion.toLowerCase().includes(term)) ||
             (p.sku && p.sku.toLowerCase().includes(term))
           );
         }

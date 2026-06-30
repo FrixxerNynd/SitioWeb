@@ -27,7 +27,15 @@ app.use(helmet());
 const corsOptions = {
     origin: function (origin, callback) {
         // Permitir solicitudes sin origen (como Postman) o desde localhost:4200
-        if (!origin || origin === 'http://localhost:4200' || origin === 'https://localhost:4200' || origin === 'http://localhost:4205' || origin === 'https://localhost:4205' || origin === '*') {
+        if (
+            !origin ||
+            origin === 'http://localhost:4200' ||
+            origin === 'https://localhost:4200' ||
+            origin === 'http://localhost:4205' ||
+            origin === 'https://localhost:4205' ||
+            origin === 'http://localhost:3000' ||
+            origin === 'https://localhost:3000'
+        ) {
             callback(null, true);
         } else {
             callback(new Error('No permitido por CORS'));

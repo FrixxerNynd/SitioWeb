@@ -34,4 +34,11 @@ export class UIProductoCard {
   onAgregar() {
     this.agregar.emit();
   }
+
+  formatPrice(value: number): string {
+    return value.toLocaleString('es-MX', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
 }

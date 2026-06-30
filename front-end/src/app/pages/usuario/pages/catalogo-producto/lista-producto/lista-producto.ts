@@ -251,8 +251,9 @@ export class PageListaProducto implements OnInit {
     this.tempSelectedCategories.set(newSet);
   }
 
-  onSearchChange() {
-    this.tempSearchTerm.set(this.searchInputValue);
+  onSearchSubmit() {
+    this.tempSearchTerm.set(this.searchInputValue.trim());
+    this.aplicarFiltros();
   }
 
   onStockChange() {
@@ -547,7 +548,8 @@ async agregarAlCarrito(product: IProduct): Promise<void> {
     this.isLoading.set(true);
     try {
       const response = await this.fetchPage(this.currentPage());
-      this.currentProducts.set(response.productos);
+      const enriched = this.enrichProducts(response.productos);
+      this.currentProducts.set(enriched);
       this.totalResults.set(response.total);
       this.cargarImagenesPaginaActual();
     } catch (error) {
@@ -555,6 +557,15 @@ async agregarAlCarrito(product: IProduct): Promise<void> {
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  private enrichProducts(products: IProduct[]): IProduct[] {
+    return products.map(p => ({
+      ...p,
+      marca_nombre: p.marca_nombre || this.brands().find(b => b.id === p.marca_id)?.nombre || p.marca_id,
+      categoria_nombre: p.categoria_nombre || this.categories().find(c => c.id_categoria === p.categoria_id)?.nombre_categoria || p.categoria_id,
+      subcategoria_nombre: p.subcategoria_nombre || '',
+    }));
   }
 
   // CARGA INICIAL (categorías, marcas y primera página)

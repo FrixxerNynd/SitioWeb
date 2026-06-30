@@ -14,8 +14,8 @@
 
     <p class="producto-marca"> {{ marca }} • {{ categoria }} • Stock: {{ stock }} </p>
     <div class="precios">
-      <span class="precio-actual">${{ precio }}</span>
-      <span class="precio-original">${{ precioOriginal }}</span>
+      <span class="precio-actual">${{ formatPrice(precio) }}</span>
+      <span class="precio-original">${{ formatPrice(precioOriginal) }}</span>
     </div>
 
     <div class="acciones">

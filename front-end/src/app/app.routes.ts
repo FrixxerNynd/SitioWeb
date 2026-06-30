@@ -51,7 +51,7 @@ export const routes: Routes = [
     {
         path: '',
         component: MainLayout,
-        canActivate: [AuthGuard],
+        //canActivate: [AuthGuard],
         children: [
             {
                 path: 'catalogo-producto',
@@ -89,5 +89,5 @@ export const routes: Routes = [
         ]
     },
     
-    { path: '**', redirectTo: '/inicio-sesion' }
+    //{ path: '**', redirectTo: '/inicio-sesion' }
 ];
