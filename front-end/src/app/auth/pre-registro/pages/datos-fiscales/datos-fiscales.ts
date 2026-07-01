@@ -21,7 +21,7 @@ export class PageDatosFiscales {
 
     this.loginForm = this.fb.group({
       rfc: ['', [Validators.required, Validators.pattern(/^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$/)]],
-      constancia: [null]
+      constancia: [null, Validators.required]
     });
   }
 
@@ -31,6 +31,9 @@ export class PageDatosFiscales {
       this.loginForm.patchValue({ constancia: file });
       this.loginForm.get('constancia')?.updateValueAndValidity();
       this.preRegistroService.guardarArchivoConstancia(file);
+    } else {
+      this.loginForm.patchValue({ constancia: null });
+      this.loginForm.get('constancia')?.updateValueAndValidity();
     }
   }
 

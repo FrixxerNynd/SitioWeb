@@ -96,6 +96,8 @@ export class MexicoApiService {
 
   async getSettlementsByZipCode(zipCode: string): Promise<IMexicoSettlement[]> {
     try {
+      /*
+      // Versión anterior: Por si es la que les funciona
       console.log(`🌐 GET Colonias por CP: ${this.baseUrl}/colonia?per_page=500`);
       const response = await firstValueFrom(
         this.http.get<IApiMexicoResponse<IMexicoSettlement>>(`${this.baseUrl}/colonia?per_page=500`)
@@ -106,6 +108,20 @@ export class MexicoApiService {
         return filtered;
       }
       return [];
+      */
+
+      // Versión para pruebas en local con Mario (Que me funciona a mi)
+      console.log(`🌐 GET Colonias por CP: ${this.baseUrl}/codigo-postal/${zipCode}`);
+      const response = await firstValueFrom(
+        this.http.get<IApiMexicoResponse<IMexicoSettlement>>(`${this.baseUrl}/codigo-postal/${zipCode}`)
+      );
+      if (response?.data) {
+        console.log(`✅ Colonias encontradas para CP ${zipCode}:`, response.data.length);
+        return response.data;
+      }
+      return [];
+      //
+
     } catch (error) {
       console.error('Error fetching settlements:', error);
       return [];

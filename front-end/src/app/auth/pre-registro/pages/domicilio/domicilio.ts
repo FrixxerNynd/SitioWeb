@@ -124,12 +124,12 @@ export class PageDomicilio implements OnInit {
         this.settlements.set(data.settlements);
         
         if (data.state) {
-          this.domicilioForm.patchValue({ estado: data.state.d_estado });
+          this.domicilioForm.patchValue({ estado: data.state.d_estado }, { emitEvent: false });
           await this.loadCitiesByState(data.state.d_estado);
         }
         
         if (data.city) {
-          this.domicilioForm.patchValue({ ciudad: data.city.d_ciudad });
+          this.domicilioForm.patchValue({ ciudad: data.city.d_ciudad }, { emitEvent: false });
         }
       } else {
         this.settlements.set([]);

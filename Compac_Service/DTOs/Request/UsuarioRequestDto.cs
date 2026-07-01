@@ -26,6 +26,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using back_cabs.CRM.Core.Validation;
 using back_cabs.CRM.DTOs.Legacy;
+using Microsoft.AspNetCore.Http;
 
 namespace CRM.DTOs.Request
 {
@@ -213,13 +214,14 @@ namespace CRM.DTOs.Request
         public string Telefono { get; set; } = string.Empty;
         [Required(ErrorMessage = "El Email es obligatorio")]
         public string Email { get; set; } = string.Empty;
-        public string Email2 { get; set; } = string.Empty;
-        public string Email3 { get; set; } = string.Empty;
+        public string? Email2 { get; set; }
+        public string? Email3 { get; set; }
         [Required(ErrorMessage = "La contraseña es obligatoria")]
         public string Contraseña { get; set; } = string.Empty;
         public string Estado { get; set; } = string.Empty;
         public string RecaptchaToken { get; set; } = string.Empty;
         public UbicacionDetalleDto? Direccion { get; set; }
+        public IFormFile? ConstanciaFiscal { get; set; }
     }
 
 }

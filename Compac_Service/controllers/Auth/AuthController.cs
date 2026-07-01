@@ -90,7 +90,7 @@ namespace back_cabs.CRM.controllers.Auth
         [ProducesResponseType(typeof(IActionResult), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> RegistrarCliente([FromBody] UserClientRequestDto request)
+        public async Task<IActionResult> RegistrarCliente([FromForm] UserClientRequestDto request)
         {
             try
             {
