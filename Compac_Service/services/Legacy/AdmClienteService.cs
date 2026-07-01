@@ -1,13 +1,16 @@
 using back_cabs.CRM.contexts;
 using back_cabs.CRM.DTOs.Legacy;
-using back_cabs.CRM.Interfaces.Legacy;
-using back_cabs.CRM.models.legacy;
-using back_cabs.CRM.Middleware;
-using CRM.DTOs.Request;
-using Microsoft.EntityFrameworkCore;
 using back_cabs.CRM.DTOs.ServiceResponse;
 using back_cabs.CRM.Interfaces.Auth;
+using back_cabs.CRM.Interfaces.Legacy;
+using back_cabs.CRM.Middleware;
 using back_cabs.CRM.models.Auth;
+using back_cabs.CRM.models.legacy;
+using CRM.DTOs.Request;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace back_cabs.CRM.services.Legacy
 {
@@ -24,6 +27,7 @@ namespace back_cabs.CRM.services.Legacy
         private readonly IUsuarioAuthRepository _repositoryAuth;
         private readonly ILogger<AdmClienteService> _logger;
         private readonly ICacheService _cacheService;
+        private readonly IConfiguration _config;
 
         // Tiempos de caché
         private readonly TimeSpan _cacheDurationBusqueda = TimeSpan.FromMinutes(10);
@@ -35,7 +39,8 @@ namespace back_cabs.CRM.services.Legacy
             ReadOnlyContext authContext,
             WriteContext writeContext,
             ILogger<AdmClienteService> logger,
-            ICacheService cacheService)
+            ICacheService cacheService,
+            IConfiguration config)
         {
             _repository = repository;
             _context = context;
@@ -44,6 +49,49 @@ namespace back_cabs.CRM.services.Legacy
             _repositoryAuth = repositoryAuth;
             _logger = logger;
             _cacheService = cacheService;
+            _config = config;
+        }
+
+        private string? GetRutaConstancias()
+        {
+            var ruta = _config["RUTA_CONSTANCIAS"];
+            if (!string.IsNullOrEmpty(ruta)) return ruta;
+
+            ruta = Environment.GetEnvironmentVariable("RUTA_CONSTANCIAS");
+            if (!string.IsNullOrEmpty(ruta)) return ruta;
+
+            try
+            {
+                var dir = Directory.GetCurrentDirectory();
+                for (int i = 0; i < 4; i++)
+                {
+                    var envPath = Path.Combine(dir, ".env");
+                    if (File.Exists(envPath))
+                    {
+                        var lines = File.ReadAllLines(envPath);
+                        foreach (var line in lines)
+                        {
+                            if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("#"))
+                                continue;
+
+                            var parts = line.Split('=', 2);
+                            if (parts.Length == 2 && parts[0].Trim() == "RUTA_CONSTANCIAS")
+                            {
+                                return parts[1].Trim().Trim('"').Trim('\'');
+                            }
+                        }
+                    }
+                    var parent = Directory.GetParent(dir);
+                    if (parent == null) break;
+                    dir = parent.FullName;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error al intentar leer el archivo .env para buscar RUTA_CONSTANCIAS");
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -51,6 +99,51 @@ namespace back_cabs.CRM.services.Legacy
         /// </summary>
         public async Task<ServiceResult<AdmClienteConDomicilioResponseDto>> RegistrarAsync(UserClientRequestDto clientData)
         {
+            string rutaBaseGuardada = "";
+            string tituloArchivo = "";
+            string nombreArchivoOriginal = "";
+
+            if (clientData.ConstanciaFiscal != null && clientData.ConstanciaFiscal.Length > 0)
+            {
+                nombreArchivoOriginal = Path.GetFileName(clientData.ConstanciaFiscal.FileName);
+                tituloArchivo = $"CSF{clientData.RFC}";
+
+                var rutaBase = GetRutaConstancias();
+                if (string.IsNullOrEmpty(rutaBase))
+                {
+                    _logger.LogWarning("No se definió la variable de entorno RUTA_CONSTANCIAS. Usando ruta por defecto 'wwwroot/constancias'.");
+                    rutaBase = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "constancias");
+                }
+
+                rutaBaseGuardada = rutaBase;
+
+                if (!Directory.Exists(rutaBase))
+                {
+                    Directory.CreateDirectory(rutaBase);
+                }
+
+                var nombreArchivoDestino = nombreArchivoOriginal;
+                var rutaArchivoGuardado = Path.Combine(rutaBase, nombreArchivoDestino);
+
+                try
+                {
+                    using (var stream = new FileStream(rutaArchivoGuardado, FileMode.Create))
+                    {
+                        await clientData.ConstanciaFiscal.CopyToAsync(stream);
+                    }
+                    _logger.LogInformation("Archivo de constancia fiscal guardado exitosamente en: {Ruta}", rutaArchivoGuardado);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error al guardar el archivo de constancia fiscal");
+                    return new ServiceResult<AdmClienteConDomicilioResponseDto>
+                    {
+                        Success = false,
+                        Message = "Error al guardar el archivo de constancia fiscal en el servidor."
+                    };
+                }
+            }
+
             //Validar existencia de RFC o email para evitar duplicados
             var existeRfc = await _context.AdmClientes
                 .AsNoTracking()
@@ -66,6 +159,7 @@ namespace back_cabs.CRM.services.Legacy
             {
                 //Datos Personales
                 CCodigoCliente = clientData.RFC, // Usamos RFC como código cliente para garantizar unicidad
+                CCodigoAlterno = string.Empty,
                 CRazonSocial = $"{clientData.Nombre} {clientData.ApellidoPaterno} {clientData.ApellidoMaterno}".Trim(),
                 CRfc = clientData.RFC,
                 CCurp = clientData.CURP,
@@ -172,16 +266,16 @@ namespace back_cabs.CRM.services.Legacy
 
                 //Datos de Contacto
                 CEmail1 = clientData.Email,
-                CEmail2 = clientData.Email2,
-                CEmail3 = clientData.Email3,
+                CEmail2 = clientData.Email2 ?? string.Empty,
+                CEmail3 = clientData.Email3 ?? string.Empty,
                 CWhatsapp = clientData.Telefono,
 
                 //Campos Extra
                 CTextoExtra1 = clientData.Contraseña, // Contraseña cifrada con SHA-256
                 CTextoExtra2 = "Cliente registrado desde sitio web",
-                CTextoExtra3 = "",
-                CTextoExtra4 = "",
-                CTextoExtra5 = "",
+                CTextoExtra3 = rutaBaseGuardada.Length > 50 ? rutaBaseGuardada.Substring(0, 50) : rutaBaseGuardada,
+                CTextoExtra4 = tituloArchivo.Length > 50 ? tituloArchivo.Substring(0, 50) : tituloArchivo,
+                CTextoExtra5 = nombreArchivoOriginal.Length > 50 ? nombreArchivoOriginal.Substring(0, 50) : nombreArchivoOriginal,
                 CImporteExtra1 = 0,
                 CImporteExtra2 = 0,
                 CImporteExtra3 = 0,
@@ -381,7 +475,7 @@ namespace back_cabs.CRM.services.Legacy
                 throw;
             }
         }
-        
+
         /// <summary>
         /// Obtener credito y estado de credito del cliente
         /// </summary>
@@ -397,7 +491,7 @@ namespace back_cabs.CRM.services.Legacy
                     _logger.LogWarning("⚠️ Cliente {IdCliente} no encontrado", idCliente);
                     return null;
                 }
-                
+
                 return new CreditClientDto
                 {
                     LimiteCredito = cliente.CLimiteCreditoCliente,

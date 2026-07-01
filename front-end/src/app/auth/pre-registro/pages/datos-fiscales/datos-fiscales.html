@@ -67,12 +67,6 @@
                                 RFC requerido o formato inválido
                             </div>
                         }
-                        @if(loginForm.get('rfc')?.touched && loginForm.get('rfc')?.invalid){
-                            <div 
-                                class="invalid-feedback d-block">
-                                RFC requerido o formato inválido
-                            </div>
-                        }
                     </div>
 
                     <!-- Campo: Subir constancia fiscal -->
@@ -81,7 +75,7 @@
                             Subir tu constancia fiscal <span class="text-danger">*</span>
                         </label>
                         <input type="file" class="form-control form-control-lg" id="constanciaInput"
-                            formControlName="constancia" accept=".pdf,.jpg,.png" (change)="onFileSelected($event)">
+                            accept=".pdf,.jpg,.png" (change)="onFileSelected($event)">
                         @if(loginForm.get('constancia')?.touched && loginForm.get('constancia')?.invalid){
                             <div
                                 class="invalid-feedback d-block">

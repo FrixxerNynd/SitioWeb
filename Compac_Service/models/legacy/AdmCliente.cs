@@ -20,6 +20,10 @@ namespace back_cabs.CRM.models.legacy
         [StringLength(30)]
         public string CCodigoCliente { get; set; } = string.Empty;
 
+        [Column("CCODIGOALTERNO")]
+        [StringLength(60)]
+        public string CCodigoAlterno { get; set; } = string.Empty;
+
         [Column("CRAZONSOCIAL")]
         [StringLength(60)]
         public string CRazonSocial { get; set; } = string.Empty;

@@ -40,6 +40,17 @@ export class PreRegistroService {
   private http = inject(HttpClient);
   private readonly STORAGE_KEY = 'preRegistro';
   private readonly apiUrl = environment.apiCabsUrl;
+  private archivoConstancia: File | null = null;
+
+  /** Guarda el archivo binario de la constancia fiscal en memoria */
+  guardarArchivoConstancia(file: File): void {
+    this.archivoConstancia = file;
+  }
+
+  /** Obtiene el archivo binario de la constancia fiscal guardado en memoria */
+  obtenerArchivoConstancia(): File | null {
+    return this.archivoConstancia;
+  }
 
   /** Guarda datos parciales del paso actual, fusionando con lo ya almacenado */
   guardarPaso(datos: Partial<PreRegistroState>): void {
@@ -57,33 +68,57 @@ export class PreRegistroService {
   /** Limpia el estado tras un registro exitoso */
   limpiar(): void {
     localStorage.removeItem(this.STORAGE_KEY);
+    this.archivoConstancia = null;
   }
 
   /**
-   * Envía el formulario completo al endpoint POST /api/auth/registro-cliente.
+   * Envía el formulario completo como FormData al endpoint POST /api/auth/registro-cliente.
    * Requiere que los 4 pasos hayan guardado sus datos previamente.
    */
+
   registrar(): Observable<RegistroClienteResponse> {
     const estado = this.obtenerEstado();
+    
+    const formData = new FormData();
 
-    const payload = {
-      nombre: estado.nombre ?? '',
-      apellidoPaterno: estado.apellidoPaterno ?? '',
-      apellidoMaterno: estado.apellidoMaterno ?? '',
-      RFC: estado.RFC ?? '',
-      CURP: estado.CURP ?? '',
-      telefono: estado.telefono ?? '',
-      email: estado.email ?? '',
-      email2: '',
-      email3: '',
-      contraseña: estado.contrasena ?? '',
-      recaptchaToken: estado.recaptchaToken ?? '',
-      direccion: estado.direccion,
-    };
+    formData.append('nombre', estado.nombre ?? '');
+    formData.append('apellidoPaterno', estado.apellidoPaterno ?? '');
+    formData.append('apellidoMaterno', estado.apellidoMaterno ?? '');
+    formData.append('RFC', estado.RFC ?? '');
+    formData.append('CURP', estado.CURP ?? '');
+    formData.append('telefono', estado.telefono ?? '');
+    formData.append('email', estado.email ?? '');
+    formData.append('email2', '');
+    formData.append('email3', '');
+    formData.append('contraseña', estado.contrasena ?? '');
+    formData.append('recaptchaToken', estado.recaptchaToken ?? '');
+
+    if (estado.direccion) {
+      formData.append('direccion.calle', estado.direccion.calle ?? '');
+      formData.append('direccion.numeroExterior', estado.direccion.numeroExterior ?? '');
+      if (estado.direccion.numeroInterior) {
+        formData.append('direccion.numeroInterior', estado.direccion.numeroInterior);
+      }
+      formData.append('direccion.colonia', estado.direccion.colonia ?? '');
+      formData.append('direccion.codigoPostal', estado.direccion.codigoPostal ?? '');
+      formData.append('direccion.ciudad', estado.direccion.ciudad ?? '');
+      if (estado.direccion.municipio) {
+        formData.append('direccion.municipio', estado.direccion.municipio);
+      }
+      formData.append('direccion.estado', estado.direccion.estado ?? '');
+      formData.append('direccion.pais', estado.direccion.pais ?? '');
+      if (estado.direccion.telefono1) {
+        formData.append('direccion.telefono1', estado.direccion.telefono1);
+      }
+    }
+
+    if (this.archivoConstancia) {
+      formData.append('constanciaFiscal', this.archivoConstancia, this.archivoConstancia.name);
+    }
 
     return this.http.post<RegistroClienteResponse>(
       `${this.apiUrl}/api/Auth/registro-cliente`,
-      payload,
+      formData,
     );
   }
 }
